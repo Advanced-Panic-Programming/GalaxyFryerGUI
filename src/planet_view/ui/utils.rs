@@ -1,0 +1,2 @@
+pub const LEGEND_TOP_POSITION: f32 = 10.0;
+pub const LEGEND_RIGHT_POSITION: f32 = 10.0;
