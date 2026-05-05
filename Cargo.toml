@@ -6,5 +6,4 @@ edition = "2024"
 [dependencies]
 bevy = "0.17.2"
 rand = "0.9.2"
-
-galaxy_fryer = {git="https://github.com/Advanced-Panic-Programming/GalaxyFryer.git"}
+galaxy_fryer = {git="ssh://git@github.com/Advanced-Panic-Programming/GalaxyFryer.git"}
