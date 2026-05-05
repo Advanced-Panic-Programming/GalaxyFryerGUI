@@ -14,11 +14,15 @@ use crate::input_handler::plugin::InputHandlerPlugin;
 use crate::setup_simulation::plugin::SetupSimulationPlugin;
 use crate::planet_view::plugin::PlanetViewPlugin;
 
+use galaxy_fryer::orchestrator::*;
 
 fn main() {
 
     let handle = thread::spawn(|| {
-       // orchestrator_code()
+
+        galaxy_fryer::orchestrator::Orchestrator::new();
+
+        // orchestrator_code()
         /*
             Todo:
              - terminare thread orchestrator dall'app
