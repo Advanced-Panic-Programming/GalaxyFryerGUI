@@ -51,6 +51,4 @@ fn main() {
         // ===== Message Systems =====
         // .add_systems(Update, core_messages_system) // This system handles messages from core and updates shared resources
         .run();
-
-    println!("AFTER");
 }
