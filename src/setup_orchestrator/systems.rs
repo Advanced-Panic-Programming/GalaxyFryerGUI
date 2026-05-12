@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::thread;
 use bevy::prelude::*;
 use crate::setup_orchestrator::resources::*;
-use galaxy_fryer::orchestrator::{ExplorerInfo, PlanetInfo};
+use galaxy_fryer::orchestrator::{ExplorerInfo, GUIToOrchestrator, PlanetInfo};
 use common_game::utils::ID;
 
 
@@ -26,6 +26,8 @@ pub fn setup_orchestrator(mut commands: Commands) {
         );
         orchestrator.initialize_galaxy();
     });
+
+    let _ = gui_to_orch_s.send(GUIToOrchestrator::AutomaticMode);
 
     // Adding channels as Bevy resources in order to use them in the GUI
     commands.insert_resource(ToOrchestrator(gui_to_orch_s));

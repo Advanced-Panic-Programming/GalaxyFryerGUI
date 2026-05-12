@@ -24,7 +24,7 @@ impl Plugin for SetupSimulationPlugin {
                 })
             )
             // ===== Init State =====
-            .init_state::<AppState>() // Initialize AppStates : Default -> Setup
+            .init_state::<AppState>() // Initialize AppStates : Default
             // ===== Resources =====
             .insert_resource(PlanetsData { planets: Vec::new() })
             .insert_resource(Galaxy::default())
@@ -42,8 +42,11 @@ impl Plugin for SetupSimulationPlugin {
                     init_selected_planet_resource,
                 )
             )
-            // ===== When Setup finishes -> go to GalaxyView ===== 
-            .add_systems(Update, set_galaxy_view_state.run_if(in_state(SetupSimulation))
+            // ===== When SetupSimulation finishes -> go to SetupOrchestrator =====
+            .add_systems(Update, set_up_orchestrator.run_if(in_state(SetupSimulation))
+            )
+            // ===== When SetupOrchestrator finishes -> go to GalaxyView =====
+            .add_systems(Update, set_galaxy_view_state.run_if(in_state(SetupOrchestrator))
             )
             // ===== Normal Update systems =====
             .add_systems(Update, update_orbit_on_window_resized) // Runs even if the app is in a different state

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::WindowResized;
 use crate::app_states::AppState;
-use crate::app_states::AppState::{GalaxyView, PlanetView};
+use crate::app_states::AppState::{GalaxyView, PlanetView, SetupOrchestrator};
 use crate::setup_simulation::utils::*;
 use crate::setup_simulation::resources::*;
 
@@ -114,6 +114,14 @@ pub fn init_selected_planet_resource(
     mut selected_planet: ResMut<SelectedPlanet>,
 ) {
     selected_planet.clear();
+}
+
+pub fn set_up_orchestrator(
+    mut next_state: ResMut<NextState<AppState>>,
+    mut last_state: ResMut<LastState>,
+) {
+    next_state.set(SetupOrchestrator);
+    last_state.state = SetupOrchestrator;
 }
 
 pub fn set_galaxy_view_state(
