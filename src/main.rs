@@ -6,6 +6,7 @@ mod legend;
 mod planet_view;
 mod common_systems;
 mod input_handler;
+mod setup_orchestrator;
 
 use std::thread;
 use bevy::prelude::*;
@@ -13,16 +14,15 @@ use crate::galaxy_view::plugin::GalaxyViewPlugin;
 use crate::input_handler::plugin::InputHandlerPlugin;
 use crate::setup_simulation::plugin::SetupSimulationPlugin;
 use crate::planet_view::plugin::PlanetViewPlugin;
+use crate::setup_orchestrator::plugin::SetupOrchestratorPlugin;
 
 use galaxy_fryer::orchestrator::*;
 
 fn main() {
 
     let handle = thread::spawn(|| {
+        
 
-        galaxy_fryer::orchestrator::Orchestrator::new();
-
-        // orchestrator_code()
         /*
             Todo:
              - terminare thread orchestrator dall'app
@@ -46,8 +46,9 @@ fn main() {
         .add_plugins(GalaxyViewPlugin)
         .add_plugins(PlanetViewPlugin)
         .add_plugins(InputHandlerPlugin)
+        .add_plugins(SetupOrchestratorPlugin)
         // ===== Resources =====
-        // .insert_resource(rx)
+        //.insert_resource(rx)
         // ===== Message Systems =====
         // .add_systems(Update, core_messages_system) // This system handles messages from core and updates shared resources
         .run();
