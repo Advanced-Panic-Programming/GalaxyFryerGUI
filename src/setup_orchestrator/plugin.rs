@@ -13,8 +13,6 @@ impl Plugin for SetupOrchestratorPlugin {
             .add_systems(OnEnter(SetupOrchestrator),
                     setup_orchestrator
             )
-        // .insert_resource(ToOrchestrator)
-        // .insert_resource(FromOrchestrator)
         ;
     }
 }
