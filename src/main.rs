@@ -50,6 +50,14 @@ fn main() {
         .add_plugins(CutscenePlugin)
         // States init
         .init_state::<AppState>()
+        // PostStartup -> Sets fullscreen after startup bc bevy is bugged
+        .add_systems(PostStartup, set_fullscreen)
 
         .run();
+}
+
+fn set_fullscreen(mut windows: Query<&mut Window>) {
+    for mut win in windows.iter_mut() {
+        win.mode = WindowMode::BorderlessFullscreen(MonitorSelection::Current);
+    }
 }
