@@ -6,7 +6,9 @@ impl Plugin for InputHandlerPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(Update, (
-                change_app_state,
+                app_states_affected_inputs,
+                menu_updates_inputs,
+                game_related_inputs, //.run_if(no_active_cutscene),
             ))
         ;
     }

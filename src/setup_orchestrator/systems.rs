@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use crate::setup_orchestrator::resources::*;
 use galaxy_fryer::orchestrator::{ExplorerInfo, GUIToOrchestrator, PlanetInfo};
 use common_game::utils::ID;
-
+use crate::app_state_manager::messages::SetupOrchestratorCompleted;
 
 pub fn setup_orchestrator(mut commands: Commands) {
 
@@ -32,5 +32,8 @@ pub fn setup_orchestrator(mut commands: Commands) {
     // Adding channels as Bevy resources in order to use them in the GUI
     commands.insert_resource(ToOrchestrator(gui_to_orch_s));
     commands.insert_resource(FromOrchestrator(orch_to_gui_r));
+}
 
+pub fn setup_orchestrator_completed(mut writer: MessageWriter<SetupOrchestratorCompleted>) {
+    writer.write(SetupOrchestratorCompleted);
 }

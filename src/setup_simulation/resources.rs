@@ -4,11 +4,6 @@ use crate::app_states::AppState;
 // All resources are defined here
 
 #[derive(Resource, Default)]
-pub struct LastState {
-    pub state: AppState,
-}
-
-#[derive(Resource, Default)]
 pub struct Galaxy {
     pub planets: Vec<Entity>,
 }
