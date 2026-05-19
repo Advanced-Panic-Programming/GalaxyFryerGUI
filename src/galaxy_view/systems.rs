@@ -1,6 +1,8 @@
 use bevy::prelude::*;
+use common_game::utils::ID;
 use crate::setup_simulation::resources::*;
 use crate::galaxy_view::components::*;
+use crate::galaxy_view::messages::{ReceivedPlanetDestroyed, ReceivedPlanetState};
 use crate::galaxy_view::utils::*;
 
 // =====================
@@ -243,6 +245,25 @@ pub fn bound_explorer_arrows(
             (false, None) => {}
         }
     }
+}
+
+pub fn handle_orchestrator_updates(
+    mut planet_destroyed_reader: MessageReader<ReceivedPlanetDestroyed>,
+    mut planet_state_reader: MessageReader<ReceivedPlanetState>,
+    mut planets: ResMut<PlanetsData>,
+) {
+    if !planet_destroyed_reader.is_empty() {
+        for msg in planet_destroyed_reader.read() {
+            planets.planets[msg.planet_id as usize].alive = false;
+        }
+    }
+    
+    if !planet_state_reader.is_empty() {
+        for msg in planet_state_reader.read() {
+            // msg.dummy_planet_state.charged_cells_count
+        }
+    }
+    
 }
 
 /*

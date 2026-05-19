@@ -12,9 +12,6 @@ pub struct SetupOrchestratorPlugin;
 impl Plugin for SetupOrchestratorPlugin {
     fn build(&self, app: &mut App) {
         app
-            // Resources
-            // .init_resource::<ToOrchestrator>() //TODO Need to hava a Default value in GalaxyFryer definition
-            // .init_resource::<FromOrchestrator>() //TODO Need to hava a Default value in GalaxyFryer definition
             // OnEnter systems
             .add_systems(OnEnter(SetupOrchestrator),
                     setup_orchestrator

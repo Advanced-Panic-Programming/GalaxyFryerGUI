@@ -22,6 +22,7 @@ use crate::setup_orchestrator::plugin::SetupOrchestratorPlugin;
 use crate::pause_menu::plugin::PauseMenuPlugin;
 use crate::app_state_manager::plugin::AppStateManagerPlugin;
 use crate::app_states::AppState;
+use crate::communication::plugin::CommunicationPlugin;
 use crate::cutscene::plugin::CutscenePlugin;
 
 fn main() {
@@ -41,6 +42,7 @@ fn main() {
             })
         )
         // ===== Plugins =====
+        .add_plugins(CommunicationPlugin)
         .add_plugins(AppStateManagerPlugin)
         .add_plugins(SetupSimulationPlugin)
         .add_plugins(SetupOrchestratorPlugin)
