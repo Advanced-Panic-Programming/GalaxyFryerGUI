@@ -1,3 +1,3 @@
 pub mod plugin;
 mod systems;
-mod resources;
+pub mod resources;

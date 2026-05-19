@@ -1,19 +1,13 @@
 use bevy::prelude::*;
+use common_game::utils::ID;
 
 #[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
 pub enum AppState {
     #[default]
     SetupSimulation,
     SetupOrchestrator,
+    PauseMenu,
     GalaxyView,
     PlanetView,
-    PauseMenu,
-    CutScene(CutSceneType, u32),
-    SimulationEnd,
-}
-
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum CutSceneType {
-    PlanetDestroyed,
-    AsteroidDestroyed,
+    SimulationEnd, // Kill every resource and terminate app
 }

@@ -4,6 +4,7 @@ use crate::app_states::AppState;
 use crate::app_states::AppState::{GalaxyView, PlanetView, SetupOrchestrator};
 use crate::setup_simulation::utils::*;
 use crate::setup_simulation::resources::*;
+use crate::app_state_manager::messages::SetupSimulationCompleted;
 
 // ======================
 // === SetUp Systems ===
@@ -116,22 +117,6 @@ pub fn init_selected_planet_resource(
     selected_planet.clear();
 }
 
-pub fn set_up_orchestrator(
-    mut next_state: ResMut<NextState<AppState>>,
-    mut last_state: ResMut<LastState>,
-) {
-    next_state.set(SetupOrchestrator);
-    last_state.state = SetupOrchestrator;
-}
-
-pub fn set_galaxy_view_state(
-    mut next_state: ResMut<NextState<AppState>>,
-    mut last_state: ResMut<LastState>,
-) { 
-    next_state.set(GalaxyView);
-    last_state.state = GalaxyView; 
-}
-
 // ======================
 // === Update Systems ===
 // ======================
@@ -149,4 +134,10 @@ pub fn update_orbit_on_window_resized(
             orbit.b = new_orbit.b;
         }
     }
+}
+
+pub fn finish_simulation_setup(
+    mut writer: MessageWriter<SetupSimulationCompleted>,
+) {
+    writer.write(SetupSimulationCompleted);
 }

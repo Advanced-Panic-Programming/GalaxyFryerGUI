@@ -7,49 +7,49 @@ mod planet_view;
 mod common_systems;
 mod input_handler;
 mod setup_orchestrator;
+mod app_state_manager;
+mod cutscene;
+mod pause_menu;
 
-use std::thread;
 use bevy::prelude::*;
+use bevy::window::{WindowMode, WindowResolution};
 use crate::galaxy_view::plugin::GalaxyViewPlugin;
 use crate::input_handler::plugin::InputHandlerPlugin;
 use crate::setup_simulation::plugin::SetupSimulationPlugin;
 use crate::planet_view::plugin::PlanetViewPlugin;
 use crate::setup_orchestrator::plugin::SetupOrchestratorPlugin;
-
-use galaxy_fryer::orchestrator::*;
+use crate::pause_menu::plugin::PauseMenuPlugin;
+use crate::app_state_manager::plugin::AppStateManagerPlugin;
+use crate::app_states::AppState;
+use crate::cutscene::plugin::CutscenePlugin;
 
 fn main() {
 
-    let handle = thread::spawn(|| {
-        
-
-        /*
-            Todo:
-             - terminare thread orchestrator dall'app
-             - terminare l'app dal thread orchestrator
-
-             2 varianti di terminazione:
-
-             - Se l'orchestrator vuole terminare, killa i sotto-thread (planet, explorer, ...) e manda messaggio all'app nel main
-             L'app termina ed essendo l'orchestrator un thread, viene anch'esso terminato
-
-             - Se decido di terminare dall'app (quit), mando un messaggio al thread dell'orchestrator di terminare, lui uccide i sotto-thread
-             e poi termina.
-             Quando termina, l'app termina a sua volta
-
-        */
-    });
-
     App::new()
+        // ===== Plugins ===== (MUST be before everything else)
+        .add_plugins(DefaultPlugins
+            .set(ImagePlugin::default_nearest())
+            .set(WindowPlugin {
+                primary_window: Some(Window {
+                    mode: WindowMode::Windowed,
+                    resolution: WindowResolution::new(1920, 1080),
+                    title: "AirFryer".to_string(),
+                    ..default()
+                }),
+                ..default()
+            })
+        )
         // ===== Plugins =====
+        .add_plugins(AppStateManagerPlugin)
         .add_plugins(SetupSimulationPlugin)
+        .add_plugins(SetupOrchestratorPlugin)
+        .add_plugins(PauseMenuPlugin)
+        .add_plugins(InputHandlerPlugin)
         .add_plugins(GalaxyViewPlugin)
         .add_plugins(PlanetViewPlugin)
-        .add_plugins(InputHandlerPlugin)
-        .add_plugins(SetupOrchestratorPlugin)
-        // ===== Resources =====
-        //.insert_resource(rx)
-        // ===== Message Systems =====
-        // .add_systems(Update, core_messages_system) // This system handles messages from core and updates shared resources
+        .add_plugins(CutscenePlugin)
+        // States init
+        .init_state::<AppState>()
+
         .run();
 }

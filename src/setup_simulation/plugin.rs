@@ -10,28 +10,12 @@ pub struct SetupSimulationPlugin;
 impl Plugin for SetupSimulationPlugin {
     fn build(&self, app: &mut App) {
         app
-            // ===== Plugins ===== (MUST be before everything else)
-            .add_plugins(DefaultPlugins
-                .set(ImagePlugin::default_nearest())
-                .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        mode: WindowMode::Windowed,
-                        resolution: WindowResolution::new(1920, 1080),
-                        title: "AirFryer".to_string(),
-                        ..default()
-                    }),
-                    ..default()
-                })
-            )
-            // ===== Init State =====
-            .init_state::<AppState>() // Initialize AppStates : Default
             // ===== Resources =====
             .insert_resource(PlanetsData { planets: Vec::new() })
             .insert_resource(Galaxy::default())
             .insert_resource(GalaxyOrbit::default())
             .insert_resource(ExplorersData::default())
             .insert_resource(SelectedPlanet::default())
-            .insert_resource(LastState::default())
             // ===== OnEnter Setup =====
             .add_systems(OnEnter(SetupSimulation), (
                     spawn_camera,
@@ -42,13 +26,10 @@ impl Plugin for SetupSimulationPlugin {
                     init_selected_planet_resource,
                 )
             )
-            // ===== When SetupSimulation finishes -> go to SetupOrchestrator =====
-            .add_systems(Update, set_up_orchestrator.run_if(in_state(SetupSimulation))
-            )
-            // ===== When SetupOrchestrator finishes -> go to GalaxyView =====
-            .add_systems(Update, set_galaxy_view_state.run_if(in_state(SetupOrchestrator))
-            )
-            // ===== Normal Update systems =====
+            // Update system: sends SetupSimulationCompleted Message -> AppStateManager will change app state
+            // Bevy guarantees that "Update" systems will be executed only AFTER the "OnEnter" systems 
+            .add_systems(Update, finish_simulation_setup.run_if(in_state(SetupSimulation)))
+            // ===== Update systems =====
             .add_systems(Update, update_orbit_on_window_resized) // Runs even if the app is in a different state
         ;
     }
