@@ -10,6 +10,7 @@ mod setup_orchestrator;
 mod app_state_manager;
 mod cutscene;
 mod pause_menu;
+mod communication;
 
 use bevy::prelude::*;
 use bevy::window::{WindowMode, WindowResolution};

@@ -3,12 +3,26 @@ use galaxy_view::ui::plugin::GalaxyViewUiPlugin;
 use galaxy_view::systems::*;
 use crate::app_states::AppState::GalaxyView;
 use crate::galaxy_view;
+use crate::galaxy_view::messages::*;
 
 pub struct GalaxyViewPlugin;
 
 impl Plugin for GalaxyViewPlugin {
     fn build(&self, app: &mut App) {
         app
+            // Messages init
+            .add_message::<ReceivedPlanetDestroyed>()
+            .add_message::<PlanetDestroyedCutscene>()
+            .add_message::<ReceivedAsteroidDestroyed>()
+            .add_message::<AsteroidDestroyedCutscene>()
+            .add_message::<ReceivedPlanetState>()
+            .add_message::<ReceivedPlanetGenerate>()
+            .add_message::<ReceivedPlanetCombine>()
+            .add_message::<ReceivedExplorerMove>()
+            .add_message::<ReceivedExplorerBag>()
+            .add_message::<ReceivedKilledExplorer>()
+            .add_message::<ReceivedSimulationEnd>()
+
             // Plugins
             .add_plugins(GalaxyViewUiPlugin)
             // OnEnter Systems
