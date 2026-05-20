@@ -27,7 +27,7 @@ pub fn setup_orchestrator(mut commands: Commands) {
         orchestrator.initialize_galaxy();
     });
 
-    let _ = gui_to_orch_s.send(GUIToOrchestrator::AutomaticMode); //TODO REMOVE
+    let _ = gui_to_orch_s.send(GUIToOrchestrator::DefaultMessage); //TODO REMOVE
 
     // Adding channels as Bevy resources in order to use them in the GUI
     commands.insert_resource(ToOrchestrator(gui_to_orch_s));
