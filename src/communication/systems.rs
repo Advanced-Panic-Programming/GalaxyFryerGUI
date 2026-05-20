@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use common_game::utils::ID;
 use galaxy_fryer::orchestrator::{OrchestratorToGUI::*};
 use crate::setup_orchestrator::resources::{FromOrchestrator, ToOrchestrator};
 use crate::galaxy_view::messages::*;
@@ -16,6 +17,7 @@ pub fn receive_from_orchestrator(
     mut planet_generate_writer: MessageWriter<ReceivedPlanetGenerate>,
     mut planet_combine_writer: MessageWriter<ReceivedPlanetCombine>,
     // Explorer
+    mut explorer_position_writer: MessageWriter<ReceivedExplorerPosition>,
     mut explorer_moved_writer: MessageWriter<ReceivedExplorerMove>,
     mut explorer_bag_writer: MessageWriter<ReceivedExplorerBag>,
     mut explorer_kill_writer: MessageWriter<ReceivedKilledExplorer>,
@@ -55,10 +57,16 @@ pub fn receive_from_orchestrator(
                     combine,
                 });
             }
-            SendExplorerMoved {explorer_id, explorer_update_id} => {
+            SendExplorerPosition{explorer_id, planet_id} => {
+                explorer_position_writer.write(ReceivedExplorerPosition{
+                    explorer_id,
+                    planet_id,
+                });
+            }
+            SendExplorerMoved {explorer_id, planet_id} => {
                 explorer_moved_writer.write(ReceivedExplorerMove{ 
                     explorer_id,
-                    planet_id: explorer_update_id,
+                    planet_id,
                 });
             }
             SendExplorerBag{explorer_id, bag} => {

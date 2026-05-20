@@ -18,6 +18,7 @@ impl Plugin for GalaxyViewPlugin {
             .add_message::<ReceivedPlanetState>()
             .add_message::<ReceivedPlanetGenerate>()
             .add_message::<ReceivedPlanetCombine>()
+            .add_message::<ReceivedExplorerPosition>()
             .add_message::<ReceivedExplorerMove>()
             .add_message::<ReceivedExplorerBag>()
             .add_message::<ReceivedKilledExplorer>()

@@ -39,6 +39,11 @@ pub struct ReceivedPlanetCombine {
 }
 // Explorer
 #[derive(Message)]
+pub struct ReceivedExplorerPosition {
+    pub explorer_id: ID,
+    pub planet_id: ID,
+}
+#[derive(Message)]
 pub struct ReceivedExplorerMove {
     pub explorer_id: ID,
     pub planet_id: ID,
