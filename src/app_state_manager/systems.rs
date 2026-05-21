@@ -39,7 +39,7 @@ pub fn handle_pause_pressed(
 ) {
     if !message.is_empty() {
         message.clear();
-        info!("State transition: {:?} -> GalaxyView", next_state);
+        info!("State transition: {:?} -> PauseMenu", next_state);
         next_state.set(AppState::PauseMenu);
     }
 }

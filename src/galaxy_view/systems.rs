@@ -56,7 +56,7 @@ pub fn spawn_planets(
 // === Update Systems ===
 // ======================
 
-pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfig, &mut Sprite)>) {
+pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfig, &mut Sprite), With<SpawnedByGalaxyView>>) {
     for (mut config, mut sprite) in &mut query {
         config.frame_timer.tick(time.delta());
 
