@@ -15,6 +15,9 @@ pub struct PlayPressed;
 pub struct PausePressed;
 
 #[derive(Message)]
+pub struct ExitPressed;
+
+#[derive(Message)]
 pub struct GalaxyViewPressed;
 
 #[derive(Message)]

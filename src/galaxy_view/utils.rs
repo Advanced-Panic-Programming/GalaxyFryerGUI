@@ -1,7 +1,7 @@
 use bevy::prelude::Res;
 use common_game::components::resource::{BasicResourceType, ComplexResourceType};
 use common_game::utils::ID;
-use galaxy_fryer::orchestrator::{GUIToOrchestrator, Orchestrator};
+use galaxy_fryer::app::orchestrator::{GUIToOrchestrator, Orchestrator};
 use galaxy_fryer::orchestrator::GUIToOrchestrator::*;
 use crate::setup_orchestrator::resources::ToOrchestrator;
 

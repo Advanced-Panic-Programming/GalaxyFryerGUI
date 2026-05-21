@@ -11,6 +11,7 @@ mod app_state_manager;
 mod cutscene;
 mod pause_menu;
 mod communication;
+mod simulation_end;
 
 use bevy::prelude::*;
 use bevy::window::{WindowMode, WindowResolution};
@@ -55,7 +56,6 @@ fn main() {
         .init_state::<AppState>()
         // PostStartup -> Sets fullscreen after startup bc bevy is bugged
         .add_systems(PostStartup, set_fullscreen)
-
         .run();
 }
 

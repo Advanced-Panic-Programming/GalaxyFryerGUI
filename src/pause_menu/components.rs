@@ -7,6 +7,9 @@ pub struct PauseMenuUI;
 pub struct PlayButton;
 
 #[derive(Component)]
+pub struct ExitButton;
+
+#[derive(Component)]
 pub struct AnimatedLogo;
 
 #[derive(Component)]

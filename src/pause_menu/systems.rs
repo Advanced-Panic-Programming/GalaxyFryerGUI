@@ -1,5 +1,8 @@
+use bevy::color::palettes::css::WHITE;
 use bevy::prelude::*;
-use crate::app_state_manager::messages::PlayPressed;
+use crate::app_state_manager::messages::{PlayPressed, ExitPressed};
+use crate::app_states::AppState;
+use crate::app_states::AppState::PauseMenu;
 use crate::galaxy_view::components::AnimationConfig;
 use crate::galaxy_view::utils::{ANIMATION_FPS, PLANET_INITIAL_SPLAT};
 use crate::pause_menu::components::*;
@@ -66,53 +69,128 @@ pub fn setup_pause_menu(
         )),
     ));
 
-    // =========================
-    // === Play Button =========
-    // =========================
+    // ===============================
+    // === Play/Exit Buttons =========
+    // ===============================
 
-    commands
-        .spawn((
-            PauseMenuUI,
-            Node {
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                position_type: PositionType::Absolute,
-                ..default()
-            },
-        ))
-        .with_children(|parent| {
-            parent
-                .spawn((
-                    PauseMenuUI,
-                    PlayButton,
-                    Button,
-                    Node {
-                        width: Val::Px(PLAY_BUTTON_WIDTH),
-                        height: Val::Px(PLAY_BUTTON_HEIGHT),
+    let font = asset_server.load("fonts/FiraSans-Bold.ttf");
 
-                        // Push button LOWER than center
-                        margin: UiRect::top(Val::Px(320.0)),
-
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    BorderRadius::all(Val::Px(18.0)),
-                    BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
-                ))
-                .with_children(|parent| {
-                    parent.spawn((
-                        Text::new("PLAY"),
-                        TextFont {
-                            font_size: 42.0,
+    // First we create a Node that will contain the two buttons so that we can align them properly
+    commands.spawn((
+        DespawnOnExit(PauseMenu),
+        Node {
+            width: percent(100),
+            height: percent(100),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            ..default()
+        },
+        PauseMenuUI,
+        children![(
+                Node {
+                    flex_direction: FlexDirection::Row,
+                    align_items: AlignItems::Center,
+                    ..default()
+                },
+                children![
+                    // Play Button
+                    (
+                        PauseMenuUI,
+                        Button,
+                        PlayButton,
+                        Node {
+                            width: Val::Percent(100.0),
+                            height: Val::Percent(100.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
                             ..default()
                         },
-                        TextColor(Color::WHITE),
-                    ));
-                });
-        });
+                        BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
+                        children![
+                            (
+                                Text::new("PLAY"),
+                                TextFont {
+                                    font_size: 42.0,
+                                    font: font.clone(),
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ),
+                        ]
+                    ),
+                    // Exit Button
+                    (
+                        PauseMenuUI,
+                        Button,
+                        ExitButton,
+                        Node {
+                            width: Val::Percent(100.0),
+                            height: Val::Percent(100.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..default()
+                        },
+                        BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
+                        children![
+                            (
+                                Text::new("EXIT"),
+                                TextFont {
+                                    font_size: 42.0,
+                                    font: font.clone(),
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ),
+                        ]
+                    ),
+                ]
+            )],
+    ));
+
+    // Old Play button backup
+    // commands
+    //     .spawn((
+    //         PauseMenuUI,
+    //         Node {
+    //             width: Val::Percent(100.0),
+    //             height: Val::Percent(100.0),
+    //             justify_content: JustifyContent::Center,
+    //             align_items: AlignItems::Center,
+    //             position_type: PositionType::Absolute,
+    //             ..default()
+    //         },
+    //     ))
+    //     .with_children(|parent| {
+    //         parent
+    //             .spawn((
+    //                 PauseMenuUI,
+    //                 PlayButton,
+    //                 Button,
+    //                 Node {
+    //                     width: Val::Px(PLAY_BUTTON_WIDTH),
+    //                     height: Val::Px(PLAY_BUTTON_HEIGHT),
+    //
+    //                     // Push button LOWER than center
+    //                     margin: UiRect::top(Val::Px(320.0)),
+    //
+    //                     justify_content: JustifyContent::Center,
+    //                     align_items: AlignItems::Center,
+    //                     ..default()
+    //                 },
+    //                 BorderRadius::all(Val::Px(18.0)),
+    //                 BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
+    //             ))
+    //             .with_children(|parent| {
+    //                 parent.spawn((
+    //                     Text::new("PLAY"),
+    //                     TextFont {
+    //                         font_size: 42.0,
+    //                         ..default()
+    //                     },
+    //                     TextColor(Color::WHITE),
+    //                 ));
+    //             });
+    //     });
 }
 
 pub fn animate_logo(
@@ -157,6 +235,32 @@ pub fn play_button_system(
                 *color = BackgroundColor(Color::srgb(0.35, 0.75, 0.35));
                 // Generates event handled in app_state_manager
                 writer.write(PlayPressed);
+            }
+
+            Interaction::Hovered => {
+                *color = BackgroundColor(Color::srgb(0.25, 0.25, 0.25));
+            }
+
+            Interaction::None => {
+                *color = BackgroundColor(Color::srgb(0.15, 0.15, 0.15));
+            }
+        }
+    }
+}
+
+pub fn exit_button_system(
+    interaction_query: Query<
+        (&Interaction, &mut BackgroundColor),
+        (Changed<Interaction>, With<ExitButton>),
+    >,
+    mut writer: MessageWriter<ExitPressed>,
+) {
+    for (interaction, mut color) in interaction_query {
+        match *interaction {
+            Interaction::Pressed => {
+                *color = BackgroundColor(Color::srgb(0.75, 0.35, 0.35));
+                // Generates event handled in app_state_manager
+                writer.write(ExitPressed);
             }
 
             Interaction::Hovered => {

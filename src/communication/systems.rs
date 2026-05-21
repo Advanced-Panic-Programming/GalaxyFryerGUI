@@ -26,9 +26,7 @@ pub fn receive_from_orchestrator(
 ){
     while let Ok(msg) = receiver.0.try_recv() {
         match msg {
-            DefaultMessage => {
-                println!("FUNZIONA!!!");
-            }
+            DefaultMessage => {}
             SendPlanetState{p_id, planet_state} => {
                 planet_state_writer.write(ReceivedPlanetState{
                     planet_id: p_id,
