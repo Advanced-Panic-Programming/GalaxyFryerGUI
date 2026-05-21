@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use common_game::utils::ID;
-use galaxy_fryer::orchestrator::{OrchestratorToGUI::*};
+use galaxy_fryer::app::orchestrator::OrchestratorToGUI::*;
 use crate::setup_orchestrator::resources::{FromOrchestrator, ToOrchestrator};
 use crate::galaxy_view::messages::*;
 

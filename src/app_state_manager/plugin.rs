@@ -2,6 +2,7 @@ use bevy::asset::meta::Settings;
 use bevy::prelude::*;
 
 use crate::app_states::*;
+use crate::setup_orchestrator::resources::ToOrchestrator;
 use super::messages::*;
 use super::systems::*;
 
@@ -18,7 +19,6 @@ impl Plugin for AppStateManagerPlugin {
             .add_message::<ExitPressed>()
             .add_message::<GalaxyViewPressed>()
             .add_message::<PlanetViewPressed>()
-            .add_message::<SimulationCompleted>()
             .add_message::<ActiveManualMode>()
             .add_message::<ActiveAutomaticMode>()
             // ===== Init State =====
@@ -30,7 +30,7 @@ impl Plugin for AppStateManagerPlugin {
                 handle_setup_orchestrator_completed,
                 handle_play_pressed,
                 handle_pause_pressed,
-                handle_exit_pressed,
+                handle_exit_pressed.run_if(resource_exists::<ToOrchestrator>),
                 handle_galaxy_view_pressed,
                 handle_planet_view_pressed,
                 handle_simulation_completed,

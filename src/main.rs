@@ -25,6 +25,7 @@ use crate::app_state_manager::plugin::AppStateManagerPlugin;
 use crate::app_states::AppState;
 use crate::communication::plugin::CommunicationPlugin;
 use crate::cutscene::plugin::CutscenePlugin;
+use crate::simulation_end::plugin::SimulationEndPlugin;
 
 fn main() {
 
@@ -52,6 +53,7 @@ fn main() {
         .add_plugins(GalaxyViewPlugin)
         .add_plugins(PlanetViewPlugin)
         .add_plugins(CutscenePlugin)
+        .add_plugins(SimulationEndPlugin)
         // States init
         .init_state::<AppState>()
         // PostStartup -> Sets fullscreen after startup bc bevy is bugged

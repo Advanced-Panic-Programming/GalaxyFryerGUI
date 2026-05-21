@@ -1,6 +1,5 @@
-use bevy::app::ctrlc::SignalType::Termination;
 use bevy::prelude::*;
-
+use galaxy_fryer::app::orchestrator::GUIToOrchestrator::EndSimulation;
 use super::messages::*;
 use crate::app_states::*;
 use crate::AppState::*;
@@ -51,12 +50,12 @@ pub fn handle_pause_pressed(
 pub fn handle_exit_pressed(
     mut message: MessageReader<ExitPressed>,
     mut next_state: ResMut<NextState<AppState>>,
-    // mut gui_to_orch: ResMut<ToOrchestrator>,
+    mut gui_to_orch: ResMut<ToOrchestrator>,
 ) {
     if !message.is_empty() {
         message.clear();
         info!("Starting termination process"); // Send termination command to orchestrator and waits for response
-        //TODO! gui_to_orch.0.send(GuiToOrchestrator::EndSimulation)
+        let _ = gui_to_orch.0.send(EndSimulation);
         next_state.set(SimulationEnd);
     }
 }
@@ -83,12 +82,14 @@ pub fn handle_planet_view_pressed(
     }
 }
 pub fn handle_simulation_completed( //TODO! Ridondante, definito anche in communication/systems. Rimuovere
-    mut message: MessageReader<SimulationCompleted>,
-    mut writer: MessageWriter<ReceivedSimulationEnd>,
+    mut simulation_end_reader: MessageReader<ReceivedSimulationEnd>,
+    mut next_state: ResMut<NextState<AppState>>,
 ) {
-    if !message.is_empty() {
-        message.clear();
-        writer.write(ReceivedSimulationEnd);
+    if !simulation_end_reader.is_empty() {
+        simulation_end_reader.clear();
+        info!("State transition: {:?} -> SimulationCompleted", next_state);
+        next_state.set(SimulationEnd);
+        
     }
 }
 

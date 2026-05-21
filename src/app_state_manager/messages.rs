@@ -24,9 +24,6 @@ pub struct GalaxyViewPressed;
 pub struct PlanetViewPressed;
 
 #[derive(Message)]
-pub struct SimulationCompleted;
-
-#[derive(Message)]
 pub struct ActiveManualMode;
 
 #[derive(Message)]

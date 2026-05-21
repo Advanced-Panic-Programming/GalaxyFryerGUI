@@ -3,7 +3,7 @@ use bevy::prelude::{Message, Resource};
 use common_game::components::planet::DummyPlanetState;
 use common_game::components::resource::{BasicResourceType, ComplexResourceType, ResourceType};
 use common_game::utils::ID;
-use galaxy_fryer::bag::BagView;
+use galaxy_fryer::explorer::bag::BagView;
 
 // Planet
 #[derive(Message)]

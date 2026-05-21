@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::thread;
 use bevy::prelude::*;
 use crate::setup_orchestrator::resources::*;
-use galaxy_fryer::orchestrator::{ExplorerInfo, GUIToOrchestrator, PlanetInfo};
+use galaxy_fryer::app::orchestrator::{ExplorerInfo, GUIToOrchestrator, Orchestrator, PlanetInfo};
 use common_game::utils::ID;
 use crate::app_state_manager::messages::SetupOrchestratorCompleted;
 
@@ -18,7 +18,7 @@ pub fn setup_orchestrator(mut commands: Commands) {
 
     // Spawn Orchestrator thread
     thread::spawn(move || {
-        let mut orchestrator = galaxy_fryer::orchestrator::Orchestrator::new(
+        let mut orchestrator = Orchestrator::new(
             galaxy,
             explorers,
             orch_to_gui_s,
