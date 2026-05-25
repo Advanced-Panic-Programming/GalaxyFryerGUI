@@ -72,125 +72,59 @@ pub fn setup_pause_menu(
     // ===============================
     // === Play/Exit Buttons =========
     // ===============================
+    
+    let font = asset_server.load(FONT);
 
-    let font = asset_server.load("fonts/FiraSans-Bold.ttf");
-
-    // First we create a Node that will contain the two buttons so that we can align them properly
     commands.spawn((
         DespawnOnExit(PauseMenu),
         Node {
             width: percent(100),
             height: percent(100),
-            align_items: AlignItems::Center,
+            align_items: AlignItems::FlexEnd,
             justify_content: JustifyContent::Center,
+            padding: UiRect::bottom(Val::Px(48.0)),
             ..default()
         },
         PauseMenuUI,
         children![(
-                Node {
-                    flex_direction: FlexDirection::Row,
-                    align_items: AlignItems::Center,
-                    ..default()
-                },
-                children![
-                    // Play Button
-                    (
-                        PauseMenuUI,
-                        Button,
-                        PlayButton,
-                        Node {
-                            width: Val::Percent(100.0),
-                            height: Val::Percent(100.0),
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
-                            ..default()
-                        },
-                        BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
-                        children![
-                            (
-                                Text::new("PLAY"),
-                                TextFont {
-                                    font_size: 42.0,
-                                    font: font.clone(),
-                                    ..default()
-                                },
-                                TextColor(Color::WHITE),
-                            ),
-                        ]
-                    ),
-                    // Exit Button
-                    (
-                        PauseMenuUI,
-                        Button,
-                        ExitButton,
-                        Node {
-                            width: Val::Percent(100.0),
-                            height: Val::Percent(100.0),
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
-                            ..default()
-                        },
-                        BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
-                        children![
-                            (
-                                Text::new("EXIT"),
-                                TextFont {
-                                    font_size: 42.0,
-                                    font: font.clone(),
-                                    ..default()
-                                },
-                                TextColor(Color::WHITE),
-                            ),
-                        ]
-                    ),
-                ]
-            )],
+        Node {
+            flex_direction: FlexDirection::Row,
+            align_items: AlignItems::Center,
+            column_gap: Val::Px(BUTTON_SPACING), // Buttons spacing
+            ..default()
+        },
+        children![
+                // Play Button
+                (PlayButton, create_button(font.clone(), "PLAY")),
+                // Exit Button
+                (ExitButton, create_button(font.clone(), "EXIT")),
+            ]
+        )],
     ));
 
-    // Old Play button backup
-    // commands
-    //     .spawn((
-    //         PauseMenuUI,
-    //         Node {
-    //             width: Val::Percent(100.0),
-    //             height: Val::Percent(100.0),
-    //             justify_content: JustifyContent::Center,
-    //             align_items: AlignItems::Center,
-    //             position_type: PositionType::Absolute,
-    //             ..default()
-    //         },
-    //     ))
-    //     .with_children(|parent| {
-    //         parent
-    //             .spawn((
-    //                 PauseMenuUI,
-    //                 PlayButton,
-    //                 Button,
-    //                 Node {
-    //                     width: Val::Px(PLAY_BUTTON_WIDTH),
-    //                     height: Val::Px(PLAY_BUTTON_HEIGHT),
-    //
-    //                     // Push button LOWER than center
-    //                     margin: UiRect::top(Val::Px(320.0)),
-    //
-    //                     justify_content: JustifyContent::Center,
-    //                     align_items: AlignItems::Center,
-    //                     ..default()
-    //                 },
-    //                 BorderRadius::all(Val::Px(18.0)),
-    //                 BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
-    //             ))
-    //             .with_children(|parent| {
-    //                 parent.spawn((
-    //                     Text::new("PLAY"),
-    //                     TextFont {
-    //                         font_size: 42.0,
-    //                         ..default()
-    //                     },
-    //                     TextColor(Color::WHITE),
-    //                 ));
-    //             });
-    //     });
+}
+
+fn create_button(font: Handle<Font>, label: &str) -> impl Bundle {
+    (
+        Button,
+        PauseMenuUI,
+        Node {
+            width: Val::Px(BUTTON_WIDTH),
+            height: Val::Px(BUTTON_HEIGHT),
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+            border: UiRect::all(Val::Px(3.0)),
+            ..default()
+        },
+        BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
+        BorderColor::all(Color::srgb(0.05, 0.05, 0.05)),
+        BorderRadius::all(Val::Px(10.0)),
+        children![(
+            Text::new(label),
+            TextFont { font_size: FONT_SIZE, font, ..default() },
+            TextColor(Color::WHITE),
+        )],
+    )
 }
 
 pub fn animate_logo(
