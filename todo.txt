@@ -12,3 +12,7 @@ Quando lo implementi, fai in modo che i pulsanti inviino un messaggio PlayPresse
 
 - Aggiungere messaggi GuiTOOrchestrator:
     PauseSimulation
+
+!!! IMPORTANTE !!!
+I sistemi che utilizzano le risorse non inizializzate a valori di default DEVONO avere questo run_if: .run_if(resource_exists::<"nome_risorsa">)
+Le uniche risorse non inizializzate a defualt per ora sono ToOrchestrator e FromOrchestrator

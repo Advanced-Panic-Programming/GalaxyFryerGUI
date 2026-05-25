@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use galaxy_fryer::orchestrator::GUIToOrchestrator::*;
+use galaxy_fryer::app::orchestrator::GUIToOrchestrator::*;
 use crate::app_state_manager::messages::*;
 use crate::app_states::AppState;
 use crate::setup_simulation::resources::{Explorer, ExplorersData, SelectedPlanet};
@@ -42,11 +42,13 @@ pub fn app_states_affected_inputs(
 
 pub fn menu_updates_inputs(
     keyboard_input: Res<ButtonInput<KeyCode>>,
+    gui_to_orch: ResMut<ToOrchestrator>,
     mut pause_menu_writer: MessageWriter<PausePressed>,
 ) {
     // Pause Pressed
     if keyboard_input.just_pressed(KeyCode::Escape) {
         pause_menu_writer.write(PausePressed);
+        let _ = gui_to_orch.0.send(PauseSimulation);
     }
     // Play Pressed handled in app_state_manager since the Message is sent as the 'play' button is pressed
     
@@ -55,7 +57,7 @@ pub fn menu_updates_inputs(
 pub fn game_related_inputs(
     current_state: ResMut<State<AppState>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    // gui_to_orch: ResMut<ToOrchestrator>,
+    gui_to_orch: ResMut<ToOrchestrator>,
     mut explorer_data: ResMut<ExplorersData>,
     mut manual_mode_writer: MessageWriter<ActiveManualMode>,
     mut automatic_mode_writer: MessageWriter<ActiveAutomaticMode>,
@@ -63,17 +65,21 @@ pub fn game_related_inputs(
 ) {
     // Handle Manual Mode
     if keyboard_input.just_pressed(KeyCode::KeyM) && *current_state.get() != AppState::PauseMenu {
-        // let _ = gui_to_orch.0.send(ManualMode); // sends ManualMode message to orchestrator
+        let _ = gui_to_orch.0.send(ManualMode); // sends ManualMode message to orchestrator
         manual_mode_writer.write(ActiveManualMode);
     }
     // Handle Automatic Mode
     if keyboard_input.just_pressed(KeyCode::KeyA) && *current_state.get() != AppState::PauseMenu {
-        // let _ = gui_to_orch.0.send(AutomaticMode); // sends ManualMode message to orchestrator
+        let _ = gui_to_orch.0.send(AutomaticMode); // sends ManualMode message to orchestrator
         automatic_mode_writer.write(ActiveAutomaticMode);
     }
     // Pause Simulation
     if keyboard_input.just_pressed(KeyCode::KeyP) {
-        // gui_to_orch.0.send(PauseSimulation);
+        let _ = gui_to_orch.0.send(PauseSimulation);
+    }
+    // Resume Simulation
+    if keyboard_input.just_pressed(KeyCode::KeyR) {
+        let _ = gui_to_orch.0.send(ResumeSimulation);
     }
     // Cycle Explorer -> sets PlanetView
     if keyboard_input.just_pressed(KeyCode::KeyE) {

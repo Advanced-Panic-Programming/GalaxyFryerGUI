@@ -15,13 +15,13 @@ pub struct PlayPressed;
 pub struct PausePressed;
 
 #[derive(Message)]
+pub struct ExitPressed;
+
+#[derive(Message)]
 pub struct GalaxyViewPressed;
 
 #[derive(Message)]
 pub struct PlanetViewPressed;
-
-#[derive(Message)]
-pub struct SimulationCompleted;
 
 #[derive(Message)]
 pub struct ActiveManualMode;

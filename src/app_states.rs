@@ -9,5 +9,5 @@ pub enum AppState {
     PauseMenu,
     GalaxyView,
     PlanetView,
-    SimulationEnd, // Kill every resource and terminate app
+    SimulationEnd, // App termination
 }
