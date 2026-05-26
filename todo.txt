@@ -2,6 +2,10 @@
 I sistemi che utilizzano le risorse non inizializzate a valori di default DEVONO avere questo run_if: .run_if(resource_exists::<"nome_risorsa">)
 Le uniche risorse non inizializzate a defualt per ora sono ToOrchestrator e FromOrchestrator
 
+- OGNI SISTEMA CHE USA run_if(resource_changed) STA CREANDO UNA RACE CONDITION !!!! MODIFICALI COME FATTO CON UPDATE SYSTEM DEL MODULO LEGEND
+
+- sistemare testo automatic mode / manual mode quando viene aggiornato
+
 Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?Creare un nuovo modulo galaxy_update?)
 
 I pianeti/esploratori della GUI non usano ID definito in common_game. provare HashMap(ID, ...) oppure vettore particolare?
@@ -15,7 +19,7 @@ Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva b
 
 Creare risorsa per current mode (manual/auto) e messaggio ack dall’orchestrator
 
-- create legend plugin so that its spawned independently
+- remove cycle explorer? Currently not working
 
 - LA LEGENDA ATTUALMENTE NON VIENE AGGIORNATA, ECCO PK NON VIENE MOSTRATO IL TASTO CORRETTO
 //TODO! Add cleanup function and run it whenever the resource CurrentOrchestratorModeChanges

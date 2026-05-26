@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use galaxy_view::ui::plugin::GalaxyViewUiPlugin;
 use galaxy_view::systems::*;
 use crate::app_states::AppState::GalaxyView;
 use crate::galaxy_view;
@@ -25,9 +24,7 @@ impl Plugin for GalaxyViewPlugin {
             .add_message::<ReceivedManualModeAck>()
             .add_message::<ReceivedAutomaticModeAck>()
             .add_message::<ReceivedSimulationEnd>()
-
-            // Plugins
-            .add_plugins(GalaxyViewUiPlugin)
+            
             // OnEnter Systems
             .add_systems(OnEnter(GalaxyView), (
                 spawn_planets,

@@ -2,8 +2,10 @@ use bevy::ecs::relationship::RelatedSpawnerCommands;
 use bevy::prelude::*;
 use crate::legend::utils::*;
 use crate::legend::bundles::*;
+use crate::legend::components::{LegendUI, ModeLegendText};
 use crate::setup_orchestrator::resources::{CurrentOrchestratorMode, OrchestratorMode};
 
+// Builder functions
 fn keycap() -> KeyCapBundle {
 
     KeyCapBundle {
@@ -33,6 +35,35 @@ fn legend_text_bundle(content: &str, font: Handle<Font>) -> LegendTextBundle {
     }
 }
 
+fn legend_root_node() -> Node {
+    Node {
+        position_type: PositionType::Absolute,
+
+        top: Val::Px(LEGEND_TOP_POSITION),
+        right: Val::Px(LEGEND_RIGHT_POSITION),
+
+        display: Display::Flex,
+        flex_direction: FlexDirection::Column,
+
+        row_gap: Val::Px(10.0),
+        padding: UiRect::all(Val::Px(8.0)),
+
+        ..default()
+    }
+}
+
+fn legend_row_node() -> Node {
+    Node {
+        width: Val::Auto,
+        height: Val::Auto, // Val::Px(30.0),
+        display: Display::Flex,
+        flex_direction: FlexDirection::Row,
+        align_items: AlignItems::Center,
+        column_gap: Val::Px(8.0),
+        ..default()
+    }
+}
+
 fn legend_row(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     key: &str,
@@ -40,94 +71,153 @@ fn legend_row(
     font: Handle<Font>,
 ) {
     parent
-        .spawn(Node {
-            width: Val::Auto,
-            height: Val::Px(30.0),
-            display: Display::Flex,
-            flex_direction: FlexDirection::Row,
-            align_items: AlignItems::Center,
-            column_gap: Val::Px(8.0),
-            ..default()
-        })
+        .spawn(legend_row_node())
         .with_children(|row| {
-            // KEYCAP
-            row.spawn(keycap()).with_children(|kc| {
-                kc.spawn(legend_text_bundle(key, font.clone()));
-            });
+            row.spawn(keycap())
+                .with_children(|kc| {
+                    kc.spawn(legend_text_bundle(key, font.clone()));
+                });
 
-            // LABEL TEXT
             row.spawn(legend_text_bundle(label, font.clone()));
         });
 }
 
-fn legend_row_planet_range(parent: &mut RelatedSpawnerCommands<ChildOf>, font: Handle<Font>) {
+// This function marks the text that needs to be updated so that we can later find it and edit it
+fn legend_row_mode(
+    parent: &mut RelatedSpawnerCommands<ChildOf>,
+    key: &str,
+    label: &str,
+    font: Handle<Font>,
+) {
     parent
-        .spawn(Node {
-            display: Display::Flex,
-            flex_direction: FlexDirection::Row,
-            align_items: AlignItems::Center,
-            column_gap: Val::Px(8.0),
-            ..default()
-        })
+        .spawn(legend_row_node())
         .with_children(|row| {
-            // [1]
-            row.spawn(keycap()).with_children(|kc| {
-                kc.spawn(legend_text_bundle("1", font.clone()));
-            });
 
-            // -
+            row.spawn(keycap())
+                .with_children(|kc| {
+                    kc.spawn((
+                        legend_text_bundle(key, font.clone()),
+                        ModeLegendText,
+                    ));
+                });
+
+            row.spawn((
+                legend_text_bundle(label, font.clone()),
+                ModeLegendText,
+            ));
+        });
+}
+
+fn legend_row_planet_range(
+    parent: &mut RelatedSpawnerCommands<ChildOf>,
+    font: Handle<Font>,
+) {
+    parent
+        .spawn(legend_row_node())
+        .with_children(|row| {
+            row.spawn(keycap())
+                .with_children(|kc| {
+                    kc.spawn(legend_text_bundle("1", font.clone()));
+                });
+
             row.spawn(legend_text_bundle("-", font.clone()));
 
-            // [7]
-            row.spawn(keycap()).with_children(|kc| {
-                kc.spawn(legend_text_bundle("7", font.clone()));
-            });
+            row.spawn(keycap())
+                .with_children(|kc| {
+                    kc.spawn(legend_text_bundle("7", font.clone()));
+                });
 
-            // Planet View
             row.spawn(legend_text_bundle("Planet View", font.clone()));
         });
 }
 
+// Spawn/Despawn functions
 pub fn spawn_legend(
-    parent: &mut RelatedSpawnerCommands<ChildOf>,
-    asset_server: &Res<AssetServer>,
-    current_mode: ResMut<CurrentOrchestratorMode>
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    current_mode: Res<CurrentOrchestratorMode>,
 ) {
     let font = asset_server.load(FONT_PATH);
 
-    parent
-        .spawn(Node {
-            display: Display::Flex,
-            flex_direction: FlexDirection::Column,
-            row_gap: Val::Px(10.0),
-            padding: UiRect::all(Val::Px(8.0)),
-            ..default()
-        })
+    let (key, label) = correct_mode_key_name(&current_mode);
+
+    commands
+        .spawn((
+            LegendUI,
+            legend_root_node(),
+        ))
         .with_children(|root| {
+
             legend_row_planet_range(root, font.clone());
-            legend_row(root, "G", "Galaxy View", font.clone());
-            legend_row(root, "E", "Cycle Explorer", font.clone());
-            let (key, name) = correct_mode_key_name(current_mode);
-            legend_row(root, key, name, font.clone());
-            legend_row(root, "Esc", "Pause", font.clone());
+
+            legend_row(
+                root,
+                "G",
+                "Galaxy View",
+                font.clone(),
+            );
+
+            legend_row(
+                root,
+                "E",
+                "Cycle Explorer",
+                font.clone(),
+            );
+
+            legend_row_mode(
+                root,
+                key,
+                label,
+                font.clone(),
+            );
+
+            legend_row(
+                root,
+                "Esc",
+                "Pause",
+                font.clone(),
+            );
         });
 }
 
 // helper function to show the correct input key
 fn correct_mode_key_name(
-    current_mode: ResMut<'_, CurrentOrchestratorMode>
-) -> (&str, &str) {
+    current_mode: &Res<CurrentOrchestratorMode>
+) -> (&'static str, &'static str) {
     match current_mode.mode {
         OrchestratorMode::AutomaticMode => ("M", "Manual Mode"),
         OrchestratorMode::ManualMode => ("A", "Automatic Mode"),
     }
 }
 
-//TODO! Add cleanup function and run it whenever the resource CurrentOrchestratorModeChanges
-// NB When the legend module will be up, no need for that
-// implement it so that OnEnter(GalaxyView AND PlanetView) and Update con .run_if(resource_changed::<CurrentOrchestratorMode>)
 pub fn cleanup_legend(
-
+    mut commands: Commands,
+    mut query: Query<Entity, With<LegendUI>>,
 ) {
+    for element in query.iter_mut() {
+        commands.entity(element).despawn();
+    }
+}
 
+// Update systems
+/// We define a separated system in order to avoid race conditions on the CurrentOrchestratorMode resource
+pub fn update_legend_mode(
+    current_mode: Res<CurrentOrchestratorMode>,
+    mut query: Query<&mut Text, With<ModeLegendText>>,
+) {
+    if !current_mode.is_changed() {
+        return;
+    }
+
+    let (key, label) = correct_mode_key_name(&current_mode);
+
+    let mut texts = query.iter_mut();
+
+    if let Some(mut key_text) = texts.next() {
+        *key_text = Text::new(key);
+    }
+
+    if let Some(mut label_text) = texts.next() {
+        *label_text = Text::new(label);
+    }
 }

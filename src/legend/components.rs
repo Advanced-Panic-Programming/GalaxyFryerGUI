@@ -1,7 +1,5 @@
 use bevy::prelude::*;
-
 #[derive(Component)]
-pub struct GalaxyViewUiRoot;
-
+pub struct LegendUI;
 #[derive(Component)]
-pub struct GalaxyViewUI;
+pub struct ModeLegendText;

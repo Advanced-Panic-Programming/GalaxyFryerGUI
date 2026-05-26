@@ -26,6 +26,7 @@ use crate::app_state_manager::plugin::AppStateManagerPlugin;
 use crate::app_states::AppState;
 use crate::communication::plugin::CommunicationPlugin;
 use crate::cutscene::plugin::CutscenePlugin;
+use crate::legend::plugin::LegendPlugin;
 use crate::simulation_end::plugin::SimulationEndPlugin;
 
 fn main() {
@@ -51,6 +52,7 @@ fn main() {
         .add_plugins(SetupOrchestratorPlugin)
         .add_plugins(ResourceManagerPlugin)
         .add_plugins(PauseMenuPlugin)
+        .add_plugins(LegendPlugin)
         .add_plugins(InputHandlerPlugin)
         .add_plugins(GalaxyViewPlugin)
         .add_plugins(PlanetViewPlugin)
