@@ -59,4 +59,8 @@ pub struct ReceivedKilledExplorer {
 }
 // Simulation
 #[derive(Message)]
+pub struct ReceivedManualModeAck;
+#[derive(Message)]
+pub struct ReceivedAutomaticModeAck;
+#[derive(Message)]
 pub struct ReceivedSimulationEnd;

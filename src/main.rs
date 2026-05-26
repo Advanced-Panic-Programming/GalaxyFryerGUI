@@ -18,6 +18,7 @@ use bevy::window::{WindowMode, WindowResolution};
 use crate::galaxy_view::plugin::GalaxyViewPlugin;
 use crate::input_handler::plugin::InputHandlerPlugin;
 use crate::setup_simulation::plugin::SetupSimulationPlugin;
+use crate::resources_manager::plugin::ResourceManagerPlugin;
 use crate::planet_view::plugin::PlanetViewPlugin;
 use crate::setup_orchestrator::plugin::SetupOrchestratorPlugin;
 use crate::pause_menu::plugin::PauseMenuPlugin;
@@ -48,6 +49,7 @@ fn main() {
         .add_plugins(AppStateManagerPlugin)
         .add_plugins(SetupSimulationPlugin)
         .add_plugins(SetupOrchestratorPlugin)
+        .add_plugins(ResourceManagerPlugin)
         .add_plugins(PauseMenuPlugin)
         .add_plugins(InputHandlerPlugin)
         .add_plugins(GalaxyViewPlugin)

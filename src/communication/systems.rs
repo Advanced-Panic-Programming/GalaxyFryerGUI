@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use common_game::utils::ID;
 use galaxy_fryer::app::orchestrator::OrchestratorToGUI::*;
-use crate::setup_orchestrator::resources::{FromOrchestrator, ToOrchestrator};
+use crate::setup_orchestrator::resources::{FromOrchestrator, OrchestratorMode, ToOrchestrator};
 use crate::galaxy_view::messages::*;
 
 /// This function manages the orchestrator messages and generates the corresponding events 
@@ -22,11 +22,19 @@ pub fn receive_from_orchestrator(
     mut explorer_bag_writer: MessageWriter<ReceivedExplorerBag>,
     mut explorer_kill_writer: MessageWriter<ReceivedKilledExplorer>,
     // Simulation
+    mut manual_mode_writer: MessageWriter<ReceivedManualModeAck>,
+    mut automatic_mode_writer: MessageWriter<ReceivedAutomaticModeAck>,
     mut simulation_end_writer: MessageWriter<ReceivedSimulationEnd>
 ){
     while let Ok(msg) = receiver.0.try_recv() {
         match msg {
             DefaultMessage => {}
+            ManualModeAck => {
+                manual_mode_writer.write(ReceivedManualModeAck);
+            }
+            AutomaticModeAck => {
+                automatic_mode_writer.write(ReceivedAutomaticModeAck);
+            }
             SendPlanetState{p_id, planet_state} => {
                 planet_state_writer.write(ReceivedPlanetState{
                     planet_id: p_id,

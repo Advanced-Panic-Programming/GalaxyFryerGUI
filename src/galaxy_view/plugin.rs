@@ -22,6 +22,8 @@ impl Plugin for GalaxyViewPlugin {
             .add_message::<ReceivedExplorerMove>()
             .add_message::<ReceivedExplorerBag>()
             .add_message::<ReceivedKilledExplorer>()
+            .add_message::<ReceivedManualModeAck>()
+            .add_message::<ReceivedAutomaticModeAck>()
             .add_message::<ReceivedSimulationEnd>()
 
             // Plugins
