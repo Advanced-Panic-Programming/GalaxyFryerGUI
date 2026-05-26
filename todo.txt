@@ -1,8 +1,16 @@
-- Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?Creare un nuovo modulo galaxy_update?)
-
-- Aggiungere messaggi GuiTOOrchestrator:
-    PauseSimulation
-
 !!! IMPORTANTE !!!
 I sistemi che utilizzano le risorse non inizializzate a valori di default DEVONO avere questo run_if: .run_if(resource_exists::<"nome_risorsa">)
 Le uniche risorse non inizializzate a defualt per ora sono ToOrchestrator e FromOrchestrator
+
+Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?Creare un nuovo modulo galaxy_update?)
+
+I pianeti/esploratori della GUI non usano ID definito in common_game. provare HashMap(ID, ...) oppure vettore particolare?
+
+Cambia inizializzazione risorsa pianeti per far sì che abbiamo lo stesso tipo dei pianeti dell’orchestrator
+(numero corretto di celle, razzo ecc). Oppure lascia generico per fare un planetview unico
+
+passandoti già tutte le varie info non basta che tu vai a costruirti il log in base a quello che l’orch mandah
+
+Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva bottonen
+
+Creare risorsa per current mode (manual/auto) e messaggio ack dall’orchestrator

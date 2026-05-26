@@ -59,19 +59,15 @@ pub fn game_related_inputs(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     gui_to_orch: ResMut<ToOrchestrator>,
     mut explorer_data: ResMut<ExplorersData>,
-    mut manual_mode_writer: MessageWriter<ActiveManualMode>,
-    mut automatic_mode_writer: MessageWriter<ActiveAutomaticMode>,
     mut planet_view_writer: MessageWriter<PlanetViewPressed>, 
 ) {
-    // Handle Manual Mode
+    // Set Manual Mode
     if keyboard_input.just_pressed(KeyCode::KeyM) && *current_state.get() != AppState::PauseMenu {
         let _ = gui_to_orch.0.send(ManualMode); // sends ManualMode message to orchestrator
-        manual_mode_writer.write(ActiveManualMode);
     }
-    // Handle Automatic Mode
+    // Set Automatic Mode
     if keyboard_input.just_pressed(KeyCode::KeyA) && *current_state.get() != AppState::PauseMenu {
         let _ = gui_to_orch.0.send(AutomaticMode); // sends ManualMode message to orchestrator
-        automatic_mode_writer.write(ActiveAutomaticMode);
     }
     // Pause Simulation
     if keyboard_input.just_pressed(KeyCode::KeyP) {
