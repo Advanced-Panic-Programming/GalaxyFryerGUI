@@ -1,6 +1,5 @@
 use bevy::ecs::system::command::insert_resource;
 use bevy::prelude::*;
-use galaxy_fryer::app::orchestrator::OrchestratorToGUI;
 use crate::app_state_manager::messages::SetupOrchestratorCompleted;
 use crate::app_states::AppState;
 use crate::app_states::AppState::*;

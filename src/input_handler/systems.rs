@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use galaxy_fryer::app::orchestrator::GUIToOrchestrator::*;
+use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::*;
 use crate::app_state_manager::messages::*;
 use crate::app_states::AppState;
 use crate::setup_simulation::resources::{Explorer, ExplorersData, SelectedPlanet};

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use galaxy_fryer::app::orchestrator::GUIToOrchestrator::EndSimulation;
+use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::EndSimulation;
 use super::messages::*;
 use crate::app_states::*;
 use crate::AppState::*;

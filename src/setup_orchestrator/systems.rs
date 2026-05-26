@@ -2,7 +2,10 @@ use std::collections::HashMap;
 use std::thread;
 use bevy::prelude::*;
 use crate::setup_orchestrator::resources::*;
-use galaxy_fryer::app::orchestrator::{ExplorerInfo, GUIToOrchestrator, Orchestrator, PlanetInfo};
+use galaxy_fryer::app::orchestrator::Orchestrator;
+use galaxy_fryer::app::gui_protocol::GUIToOrchestrator;
+use galaxy_fryer::app::planet_info::PlanetInfo;
+use galaxy_fryer::app::explorer_info::ExplorerInfo;
 use common_game::utils::ID;
 use crate::app_state_manager::messages::SetupOrchestratorCompleted;
 
