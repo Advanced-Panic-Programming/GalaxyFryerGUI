@@ -2,7 +2,7 @@ use bevy::asset::meta::Settings;
 use bevy::prelude::*;
 
 use crate::app_states::*;
-use crate::setup_orchestrator::resources::ToOrchestrator;
+use crate::setup_orchestrator::resources::{CurrentOrchestratorMode, ToOrchestrator};
 use super::messages::*;
 use super::systems::*;
 
@@ -25,6 +25,7 @@ impl Plugin for AppStateManagerPlugin {
             // .init_state::<AppState>() // Initialize AppStates : Default (SetUpSimulation)
 
             // Update systems executed in every AppState
+            // Systems with ResMut<NextState<AppState>> do NOT need run_if bc the resource is created with init_resource()
             .add_systems(Update, (
                 handle_setup_simulation_completed,
                 handle_setup_orchestrator_completed,
@@ -34,8 +35,10 @@ impl Plugin for AppStateManagerPlugin {
                 handle_galaxy_view_pressed,
                 handle_planet_view_pressed,
                 handle_simulation_completed,
-                handle_manual_mode,
-                handle_automatic_mode,
+                (
+                    handle_manual_mode,
+                    handle_automatic_mode
+                ).run_if(resource_exists::<CurrentOrchestratorMode>),
             ));
     }
 }

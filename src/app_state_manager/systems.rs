@@ -98,7 +98,7 @@ pub fn handle_simulation_completed(
 /// 2) Orchestrator sends 'ManualModeAck' to the GUI
 /// 3) GUI generates 'ReceivedManualModeAck' event and sets the 'CurrentOrchestratorMode' resource to ManualMode
 /// 4) The event ReceivedManualModeAck is here handled:
-///         - another event is generated: 'ActiveManualMode' 
+///         - another event is generated: 'ActiveManualMode'
 ///         - and the 'CurrentOrchestratorMode' resource is set to ManualMode
 /// 5) The new 'ActiveManualMode' event is handled in the game systems in order to enable the manual mode menu
 pub fn handle_manual_mode(
@@ -119,7 +119,7 @@ pub fn handle_manual_mode(
 /// 2) Orchestrator sends 'AutomaticModeAck' to the GUI
 /// 3) GUI generates 'ReceivedAutomaticModeAck' event
 /// 4) The event ReceivedAutomaticModeAck is here handled:
-///         - another event is generated: 'ActiveAutomaticMode' 
+///         - another event is generated: 'ActiveAutomaticMode'
 ///         - and the 'CurrentOrchestratorMode' resource is set to AutomaticMode
 /// 5) The new 'ActiveAutomaticMode' event is handled in the game systems in order to disable the manual mode menu
 pub fn handle_automatic_mode(

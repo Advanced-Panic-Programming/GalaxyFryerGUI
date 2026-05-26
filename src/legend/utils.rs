@@ -7,3 +7,4 @@ pub const KEYCAP_BORDER_RADIUS: f32 = 6.0;
 pub const KEYCAP_BORDER_WIDTH: f32 = 2.0;
 pub const KEYCAP_SIZE: f32 = 28.0; // It's a square
 pub const FONT_PATH: &str = "fonts/MediumPixel.otf";
+pub const FONT_SIZE: f32 = 28.0;

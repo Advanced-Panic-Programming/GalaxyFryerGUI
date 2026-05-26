@@ -2,10 +2,12 @@ use bevy::prelude::*;
 use crate::legend::systems::*;
 use crate::galaxy_view::ui::components::*;
 use crate::galaxy_view::ui::utils::*;
+use crate::setup_orchestrator::resources::CurrentOrchestratorMode;
 
 pub fn spawn_galaxy_view_ui(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    current_mode: ResMut<CurrentOrchestratorMode>
 ) {
     commands.spawn(
         (Node { // Transparent full block
@@ -26,7 +28,7 @@ pub fn spawn_galaxy_view_ui(
         },
         GalaxyViewUI
         )).with_children(|legend_box| {
-                (spawn_legend(legend_box, &asset_server), GalaxyViewUI);
+                (spawn_legend(legend_box, &asset_server, current_mode), GalaxyViewUI);
             });
     });
 }

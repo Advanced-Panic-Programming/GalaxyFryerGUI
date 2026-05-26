@@ -1,11 +1,13 @@
 use bevy::prelude::*;
 use crate::legend::systems::spawn_legend;
+use crate::setup_orchestrator::resources::CurrentOrchestratorMode;
 use super::utils::*;
 use super::components::*;
 
 pub fn spawn_planet_view_ui(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    current_mode: ResMut<CurrentOrchestratorMode>,
 ) {
     commands.spawn(
         (Node { // Transparent full block
@@ -26,7 +28,7 @@ pub fn spawn_planet_view_ui(
         },
         PlanetViewUI
         )).with_children(|legend_box| {
-            (spawn_legend(legend_box, &asset_server), PlanetViewUI);
+            (spawn_legend(legend_box, &asset_server, current_mode), PlanetViewUI);
         });
     });
 }

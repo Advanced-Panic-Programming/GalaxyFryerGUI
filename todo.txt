@@ -14,3 +14,11 @@ passandoti già tutte le varie info non basta che tu vai a costruirti il log in 
 Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva bottonen
 
 Creare risorsa per current mode (manual/auto) e messaggio ack dall’orchestrator
+
+- create legend plugin so that its spawned independently
+
+- LA LEGENDA ATTUALMENTE NON VIENE AGGIORNATA, ECCO PK NON VIENE MOSTRATO IL TASTO CORRETTO
+//TODO! Add cleanup function and run it whenever the resource CurrentOrchestratorModeChanges
+// NB When the legend module will be up, no need for that
+// implement it so that OnEnter(GalaxyView AND PlanetView) and Update con .run_if(resource_changed::<CurrentOrchestratorMode>)
+IMPLEMENTA MODULO SEPARATO

@@ -2,6 +2,7 @@ use bevy::ecs::relationship::RelatedSpawnerCommands;
 use bevy::prelude::*;
 use crate::legend::utils::*;
 use crate::legend::bundles::*;
+use crate::setup_orchestrator::resources::{CurrentOrchestratorMode, OrchestratorMode};
 
 fn keycap() -> KeyCapBundle {
 
@@ -25,7 +26,7 @@ fn legend_text_bundle(content: &str, font: Handle<Font>) -> LegendTextBundle {
         text: Text::new(content),
         text_font: TextFont {
             font,
-            font_size: 18.0,
+            font_size: FONT_SIZE,
             ..default()
         },
         text_color: TextColor::WHITE,
@@ -90,6 +91,7 @@ fn legend_row_planet_range(parent: &mut RelatedSpawnerCommands<ChildOf>, font: H
 pub fn spawn_legend(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     asset_server: &Res<AssetServer>,
+    current_mode: ResMut<CurrentOrchestratorMode>
 ) {
     let font = asset_server.load(FONT_PATH);
 
@@ -105,7 +107,27 @@ pub fn spawn_legend(
             legend_row_planet_range(root, font.clone());
             legend_row(root, "G", "Galaxy View", font.clone());
             legend_row(root, "E", "Cycle Explorer", font.clone());
-            legend_row(root, "M", "Manual Mode", font.clone());
+            let (key, name) = correct_mode_key_name(current_mode);
+            legend_row(root, key, name, font.clone());
             legend_row(root, "Esc", "Pause", font.clone());
         });
+}
+
+// helper function to show the correct input key
+fn correct_mode_key_name(
+    current_mode: ResMut<'_, CurrentOrchestratorMode>
+) -> (&str, &str) {
+    match current_mode.mode {
+        OrchestratorMode::AutomaticMode => ("M", "Manual Mode"),
+        OrchestratorMode::ManualMode => ("A", "Automatic Mode"),
+    }
+}
+
+//TODO! Add cleanup function and run it whenever the resource CurrentOrchestratorModeChanges
+// NB When the legend module will be up, no need for that
+// implement it so that OnEnter(GalaxyView AND PlanetView) and Update con .run_if(resource_changed::<CurrentOrchestratorMode>)
+pub fn cleanup_legend(
+
+) {
+
 }

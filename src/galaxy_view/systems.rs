@@ -254,7 +254,7 @@ pub fn handle_orchestrator_updates(
 ) {
     if !planet_destroyed_reader.is_empty() {
         for msg in planet_destroyed_reader.read() {
-            planets.planets[msg.planet_id as usize].alive = false;
+            planets.planets[msg.planet_id as usize - 1].alive = false;
         }
     }
     
