@@ -15,7 +15,7 @@ impl Plugin for SetupSimulationPlugin {
             .insert_resource(PlanetsData { planets: Vec::new() })
             .insert_resource(Galaxy::default())
             .insert_resource(GalaxyOrbit::default())
-            .insert_resource(ExplorersData::default())
+            .insert_resource(ExplorersData::new())
             .insert_resource(SelectedPlanet::default())
             // ===== OnEnter Setup =====
             .add_systems(OnEnter(SetupSimulation), (
@@ -24,7 +24,6 @@ impl Plugin for SetupSimulationPlugin {
                     init_galaxy_orbit,
                     init_planets_sprites_data_resource,
                     init_planets_data_resource,
-                    init_explorers_resource,
                     init_selected_planet_resource,
                 )
             )

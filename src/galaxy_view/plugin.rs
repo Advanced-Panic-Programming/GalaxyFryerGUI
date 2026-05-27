@@ -38,9 +38,10 @@ impl Plugin for GalaxyViewPlugin {
                 // animate_explorer_arrows,
             ).run_if(in_state(GalaxyView)))
             // Update Systems (always)
-            .add_systems(Update,
-                 update_planets_data,
-            )
+            .add_systems(Update, (
+                update_planets_data,
+                update_explorer_data
+            ))
             // OnExit Systems
             .add_systems(OnExit(GalaxyView), cleanup)
         ;

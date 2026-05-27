@@ -1,10 +1,12 @@
 use std::collections::HashSet;
 use bevy::prelude::*;
 use std::result::Result;
+use std::thread::current;
 use common_game::components::planet::DummyPlanetState;
 use common_game::components::resource::{BasicResource, BasicResourceType, ComplexResource, ComplexResourceType};
 use common_game::utils::ID;
 use galaxy_fryer::app::gui_protocol::OrchestratorToGUI;
+use galaxy_fryer::explorer::bag::{Bag, BagView};
 
 // Galaxy
 #[derive(Resource, Default)]
@@ -110,7 +112,7 @@ impl PlanetInfo {
 }
 
 // Explorers
-#[derive(Resource, Default)]
+#[derive(Resource)]
 pub struct ExplorersData {
     pub explorer1: Explorer,
     pub explorer2: Explorer,
@@ -118,43 +120,50 @@ pub struct ExplorersData {
 }
 
 impl ExplorersData {
-    pub fn switch(&mut self) {
+    pub fn new() -> ExplorersData {
+        ExplorersData {
+            explorer1: Explorer::new(0, BagView::new()),
+            explorer2: Explorer::new(4, BagView::new()),
+            last_cycle: false,
+        }
+    }
+    // Setters
+    pub fn switch_last_cycle(&mut self) {
         self.last_cycle = !self.last_cycle;
     }
     
-    pub fn get(&self) -> bool {
+    // Getters
+    pub fn get_last_cycle(&self) -> bool {
         self.last_cycle
     }
 }
 
-#[derive(Default)]
 pub struct Explorer {
     alive: bool,
-    current_planet: usize,
+    current_planet_index: usize,
+    bag: BagView,
 }
 
 impl Explorer {
-    pub fn new(current_planet: usize) -> Self {
-        Self {
+    // New
+    pub fn new(current_planet_index: usize, bag: BagView) -> Explorer {
+        Explorer {
             alive: true,
-            current_planet,
+            current_planet_index,
+            bag,
         }
     }
     
+    // Getters
+    pub fn is_alive(&self) -> bool { self.alive }
+    pub fn get_current_planet_index(&self) -> usize { self.current_planet_index }
+    pub fn get_bag(&self) -> &BagView { &self.bag }
+    
+    // Setters
     pub fn kill(&mut self) {
         self.alive = false;
     }
-    
-    pub fn travel_to_planet(&mut self, destination_planet_index: usize) {
-        self.current_planet = destination_planet_index;
-    }
-    
-    pub fn is_alive(&self) -> bool {
-        self.alive
-    }
-    
-    pub fn get_current_planet_index(&self) -> usize {
-        self.current_planet
-    }
+    pub fn set_current_planet_index(&mut self, index: usize) { self.current_planet_index = index; }
+    pub fn set_bag(&mut self, bag: BagView) { self.bag = bag; }
     
 }

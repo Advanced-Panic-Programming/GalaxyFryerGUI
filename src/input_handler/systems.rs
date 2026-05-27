@@ -60,6 +60,7 @@ pub fn game_related_inputs(
     gui_to_orch: ResMut<ToOrchestrator>,
     mut explorer_data: ResMut<ExplorersData>,
     mut planet_view_writer: MessageWriter<PlanetViewPressed>, 
+    mut selected_planet: ResMut<SelectedPlanet>,
 ) {
     // Set Manual Mode
     if keyboard_input.just_pressed(KeyCode::KeyM) && *current_state.get() != AppState::PauseMenu {
@@ -80,8 +81,23 @@ pub fn game_related_inputs(
     // Cycle Explorer -> sets PlanetView
     if keyboard_input.just_pressed(KeyCode::KeyE) {
         if *current_state.get() != AppState::PauseMenu {
-            explorer_data.switch();
+            explorer_data.switch_last_cycle();
             planet_view_writer.write(PlanetViewPressed);
+            if explorer_data.get_last_cycle() {
+                match selected_planet.set(explorer_data.explorer1.get_current_planet_index()) {
+                    Ok(_) => {}
+                    Err(_) => {
+                        panic!("Out of bounds planet index");
+                    }
+                }
+            } else {
+                match selected_planet.set(explorer_data.explorer2.get_current_planet_index()) {
+                    Ok(_) => {}
+                    Err(_) => {
+                        panic!("Out of bounds planet index");
+                    }
+                }
+            }
         }
     }
 }

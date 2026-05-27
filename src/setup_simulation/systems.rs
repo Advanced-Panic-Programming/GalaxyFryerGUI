@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use bevy::prelude::*;
 use bevy::window::WindowResized;
+use galaxy_fryer::explorer::bag::BagView;
 use crate::app_states::AppState;
 use crate::app_states::AppState::{GalaxyView, PlanetView, SetupOrchestrator};
 use crate::setup_simulation::utils::*;
@@ -127,14 +128,6 @@ pub fn init_planets_data_resource(
     planets_data.planets.push(trip);
 }
 
-
-pub fn init_explorers_resource(
-    mut explorers_data: ResMut<ExplorersData>,
-) {
-    explorers_data.explorer1 = Explorer::new(0);
-    explorers_data.explorer2 = Explorer::new(4);
-}
-
 pub fn init_selected_planet_resource(
     mut selected_planet: ResMut<SelectedPlanet>,
 ) {
@@ -160,6 +153,7 @@ pub fn update_orbit_on_window_resized(
     }
 }
 
+// SetupSimulationEnd
 pub fn finish_simulation_setup(
     mut writer: MessageWriter<SetupSimulationCompleted>,
 ) {

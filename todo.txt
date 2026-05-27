@@ -26,3 +26,7 @@ Creare risorsa per current mode (manual/auto) e messaggio ack dall’orchestrato
 // NB When the legend module will be up, no need for that
 // implement it so that OnEnter(GalaxyView AND PlanetView) and Update con .run_if(resource_changed::<CurrentOrchestratorMode>)
 IMPLEMENTA MODULO SEPARATO
+
+COntrolla quando inserire il reader.clear() negli event handlers. E aggiorna tutti i readers!!!
+
+FIX EPLORER ARROWS -> REWRITE EVERY SYSTEM/DEFINITION

@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use common_game::utils::ID;
 use crate::setup_simulation::resources::*;
 use crate::galaxy_view::components::*;
-use crate::galaxy_view::messages::{ReceivedPlanetCombine, ReceivedPlanetDestroyed, ReceivedPlanetGenerate, ReceivedPlanetState};
+use crate::galaxy_view::messages::{ReceivedExplorerBag, ReceivedExplorerMove, ReceivedExplorerPosition, ReceivedKilledExplorer, ReceivedPlanetCombine, ReceivedPlanetDestroyed, ReceivedPlanetGenerate, ReceivedPlanetState};
 use crate::galaxy_view::utils::*;
 
 // =====================
@@ -248,6 +248,12 @@ pub fn bound_explorer_arrows(
     }
 }
 
+pub fn update_explorer_arrows_planet_binding(
+    mut commands: Commands,
+) {
+
+}
+
 pub fn update_planets_data(
     // Event readers
     mut planet_state_reader: MessageReader<ReceivedPlanetState>,
@@ -298,6 +304,10 @@ pub fn update_planets_data(
         }
     }
 }
+
+// ====================
+// ===== Explorer =====
+// ====================
 
 /*
 pub fn bound_explorer_arrows(
@@ -430,6 +440,63 @@ pub fn update_explorer_arrows_planet_binding(
     }
 }
 */
+
+pub fn update_explorer_data (
+    // Event readers
+    mut explorer_position_reader: MessageReader<ReceivedExplorerPosition>,
+    mut explorer_bag_reader: MessageReader<ReceivedExplorerBag>,
+    mut explorer_move_reader: MessageReader<ReceivedExplorerMove>,
+    mut killed_explorer_message: MessageReader<ReceivedKilledExplorer>,
+    // Resource
+    mut explorer_data: ResMut<ExplorersData>,
+) {
+
+    // Before updating I should check if the explorer is alive, BUT, if the explorer is dead, no updated will arrive!
+
+    if !explorer_position_reader.is_empty() {
+        for msg in explorer_position_reader.read() {
+            match msg.explorer_id {
+                1 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize - 1)}
+                2 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize - 1)}
+                _ => {}
+            }
+        }
+        explorer_position_reader.clear(); //TODO! check when to put the clear()
+    }
+
+    if !explorer_bag_reader.is_empty() {
+        for msg in explorer_bag_reader.read() {
+            match msg.explorer_id {
+                1 => {explorer_data.explorer1.set_bag(msg.explorer_bag.clone())}
+                2 => {explorer_data.explorer2.set_bag(msg.explorer_bag.clone())}
+                _ => {}
+            }
+        }
+        explorer_bag_reader.clear();
+    }
+
+    if !explorer_move_reader.is_empty() {
+        for msg in explorer_move_reader.read() {
+            match msg.explorer_id {
+                1 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize - 1)}
+                2 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize - 1)}
+                _ => {}
+            }
+        }
+        explorer_move_reader.clear();
+    }
+
+    if !killed_explorer_message.is_empty() {
+        for msg in killed_explorer_message.read() {
+            match msg.explorer_id {
+                1 => {explorer_data.explorer1.kill()}
+                2 => {explorer_data.explorer2.kill()}
+                _ => {}
+            }
+        }
+        killed_explorer_message.clear();
+    }
+}
 
 
 // ======================
