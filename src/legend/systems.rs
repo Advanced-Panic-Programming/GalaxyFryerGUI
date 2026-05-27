@@ -2,7 +2,7 @@ use bevy::ecs::relationship::RelatedSpawnerCommands;
 use bevy::prelude::*;
 use crate::legend::utils::*;
 use crate::legend::bundles::*;
-use crate::legend::components::{LegendUI, ModeLegendText};
+use crate::legend::components::{LegendUI, ModeLegendKey, ModeLegendLabel};
 use crate::setup_orchestrator::resources::{CurrentOrchestratorMode, OrchestratorMode};
 
 // Builder functions
@@ -97,13 +97,13 @@ fn legend_row_mode(
                 .with_children(|kc| {
                     kc.spawn((
                         legend_text_bundle(key, font.clone()),
-                        ModeLegendText,
+                        ModeLegendKey,
                     ));
                 });
 
             row.spawn((
                 legend_text_bundle(label, font.clone()),
-                ModeLegendText,
+                ModeLegendLabel,
             ));
         });
 }
@@ -160,10 +160,10 @@ pub fn spawn_legend(
             legend_row(
                 root,
                 "E",
-                "Cycle Explorer",
+                "Visit Explorer",
                 font.clone(),
             );
-
+            // Special function because the text here needs to be updated during execution
             legend_row_mode(
                 root,
                 key,
@@ -195,7 +195,7 @@ pub fn cleanup_legend(
     mut query: Query<Entity, With<LegendUI>>,
 ) {
     for element in query.iter_mut() {
-        commands.entity(element).despawn();
+        commands.entity(element).despawn(); //_related::<ChildOf>
     }
 }
 
@@ -203,7 +203,9 @@ pub fn cleanup_legend(
 /// We define a separated system in order to avoid race conditions on the CurrentOrchestratorMode resource
 pub fn update_legend_mode(
     current_mode: Res<CurrentOrchestratorMode>,
-    mut query: Query<&mut Text, With<ModeLegendText>>,
+    // Different queries in order to find the correct text to edit
+    mut key_query: Query<&mut Text, (With<ModeLegendKey>, Without<ModeLegendLabel>)>,
+    mut text_query: Query<&mut Text, (With<ModeLegendLabel>, Without<ModeLegendKey>)>,
 ) {
     if !current_mode.is_changed() {
         return;
@@ -211,13 +213,14 @@ pub fn update_legend_mode(
 
     let (key, label) = correct_mode_key_name(&current_mode);
 
-    let mut texts = query.iter_mut();
+    let mut key_entity = key_query.iter_mut();
+    let mut label_entity = text_query.iter_mut();
 
-    if let Some(mut key_text) = texts.next() {
+    if let Some(mut key_text) = key_entity.next() {
         *key_text = Text::new(key);
     }
 
-    if let Some(mut label_text) = texts.next() {
+    if let Some(mut label_text) = label_entity.next() {
         *label_text = Text::new(label);
     }
 }
