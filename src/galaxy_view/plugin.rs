@@ -31,7 +31,7 @@ impl Plugin for GalaxyViewPlugin {
             ))
             // Update Systems in_state
             .add_systems(Update, (
-                update_planets,
+                update_planets_sprites,
                 execute_animations,
                 bound_explorer_arrows,
                 // update_explorer_arrows_planet_binding,
@@ -39,7 +39,7 @@ impl Plugin for GalaxyViewPlugin {
             ).run_if(in_state(GalaxyView)))
             // Update Systems (always)
             .add_systems(Update,
-                 handle_orchestrator_updates,
+                 update_planets_data,
             )
             // OnExit Systems
             .add_systems(OnExit(GalaxyView), cleanup)

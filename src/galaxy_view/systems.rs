@@ -1,8 +1,9 @@
+use std::ops::DerefMut;
 use bevy::prelude::*;
 use common_game::utils::ID;
 use crate::setup_simulation::resources::*;
 use crate::galaxy_view::components::*;
-use crate::galaxy_view::messages::{ReceivedPlanetDestroyed, ReceivedPlanetState};
+use crate::galaxy_view::messages::{ReceivedPlanetCombine, ReceivedPlanetDestroyed, ReceivedPlanetGenerate, ReceivedPlanetState};
 use crate::galaxy_view::utils::*;
 
 // =====================
@@ -13,7 +14,7 @@ pub fn spawn_planets(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
-    planet_data: Res<PlanetsData>,
+    planet_data: Res<PlanetsSpritesData>,
     mut galaxy: ResMut<Galaxy>,
 ) {
     // Every planet has 144 frames of 72x72 pixels (v: parameter)
@@ -72,11 +73,11 @@ pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfi
     }
 }
 
-pub fn update_planets(
+pub fn update_planets_sprites(
     time: Res<Time>,
     orbit: Res<GalaxyOrbit>,
     asset_server: Res<AssetServer>,
-    mut planets: ResMut<PlanetsData>,
+    mut planets: ResMut<PlanetsSpritesData>,
     mut query: Query<(&mut Transform, &mut Sprite, &mut Planet)>,
 ) {
     for (mut transform, mut sprite, planet) in query.iter_mut() {
@@ -247,23 +248,55 @@ pub fn bound_explorer_arrows(
     }
 }
 
-pub fn handle_orchestrator_updates(
-    mut planet_destroyed_reader: MessageReader<ReceivedPlanetDestroyed>,
+pub fn update_planets_data(
+    // Event readers
     mut planet_state_reader: MessageReader<ReceivedPlanetState>,
-    mut planets: ResMut<PlanetsData>,
+    mut planet_destroyed_reader: MessageReader<ReceivedPlanetDestroyed>,
+    mut planet_generate_reader: MessageReader<ReceivedPlanetGenerate>,
+    mut planet_combine_reader: MessageReader<ReceivedPlanetCombine>,
+    // Resources
+    mut planets_sprites: ResMut<PlanetsSpritesData>,
+    mut planets_data: ResMut<PlanetsData>,
 ) {
-    if !planet_destroyed_reader.is_empty() {
-        for msg in planet_destroyed_reader.read() {
-            planets.planets[msg.planet_id as usize - 1].alive = false;
-        }
-    }
-    
     if !planet_state_reader.is_empty() {
         for msg in planet_state_reader.read() {
-            // msg.dummy_planet_state.charged_cells_count
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize - 1) {
+                let charged_cells_count = msg.dummy_planet_state.charged_cells_count;
+                planet.set_charged_cells_count(charged_cells_count);
+                let has_rocket = msg.dummy_planet_state.has_rocket;
+                planet.set_has_rocket(has_rocket);
+                let energy_cells = msg.dummy_planet_state.energy_cells.clone();
+                planet.set_energy_cells(energy_cells);
+            }
         }
     }
-    
+
+    if !planet_destroyed_reader.is_empty() {
+        for msg in planet_destroyed_reader.read() {
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize - 1) {
+                if planet.get_alive() {
+                    planet.kill();
+                }
+            }
+            planets_sprites.planets[msg.planet_id as usize - 1].alive = false; //TODO! Implement methods for the struct
+        }
+    }
+
+    if !planet_generate_reader.is_empty() {
+        for msg in planet_generate_reader.read() {
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize - 1) {
+                planet.set_generate(msg.generate.clone());
+            }
+        }
+    }
+
+    if !planet_combine_reader.is_empty() {
+        for msg in planet_combine_reader.read() {
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize - 1) {
+                planet.set_combine(msg.combine.clone());
+            }
+        }
+    }
 }
 
 /*

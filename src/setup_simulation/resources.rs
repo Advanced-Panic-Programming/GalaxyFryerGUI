@@ -1,8 +1,12 @@
+use std::collections::HashSet;
 use bevy::prelude::*;
 use std::result::Result;
-use crate::app_states::AppState;
-// All resources are defined here
+use common_game::components::planet::DummyPlanetState;
+use common_game::components::resource::{BasicResource, BasicResourceType, ComplexResource, ComplexResourceType};
+use common_game::utils::ID;
+use galaxy_fryer::app::gui_protocol::OrchestratorToGUI;
 
+// Galaxy
 #[derive(Resource, Default)]
 pub struct Galaxy {
     pub planets: Vec<Entity>,
@@ -16,12 +20,12 @@ pub struct GalaxyOrbit {
 }
 
 #[derive(Resource)]
-pub struct PlanetsData {
-    pub planets: Vec<PlanetInfo>,
+pub struct PlanetsSpritesData {
+    pub planets: Vec<PlanetSpriteInfo>,
 }
 
-pub struct PlanetInfo {
-    pub name: String,
+// Struct with the planet sprite info
+pub struct PlanetSpriteInfo {
     pub index: usize,
     pub alive: bool,
     pub angle: f32,
@@ -53,6 +57,59 @@ impl SelectedPlanet {
     pub fn clear(&mut self) { self.index = None; }
 }
 
+// Planet Resource with the actual planet data inside
+#[derive(Resource)]
+pub struct PlanetsData {
+    pub planets: Vec<PlanetInfo>,
+}
+#[derive(Resource)]
+pub struct PlanetInfo {
+    id: ID,
+    alive: bool,
+    energy_cells: Vec<bool>,
+    charged_cells_count: usize,
+    can_have_rocket: bool,
+    has_rocket: bool,
+    generate: HashSet<BasicResourceType>,
+    combine: HashSet<ComplexResourceType>,
+}
+
+impl PlanetInfo {
+    // new
+    pub fn new(id: ID, alive: bool, energy_cells: Vec<bool>, charged_cells_count: usize, can_have_rocket: bool, has_rocket: bool, generate: HashSet<BasicResourceType>, combine: HashSet<ComplexResourceType>,) -> PlanetInfo {
+        PlanetInfo {
+            id,
+            alive,
+            energy_cells,
+            charged_cells_count,
+            can_have_rocket,
+            has_rocket,
+            generate,
+            combine,
+        }
+    }
+
+    // Getters
+    pub fn get_id(&self) -> ID { self.id }
+    pub fn get_alive(&self) -> bool { self.alive }
+    pub fn get_charged_energy_cells_count(&self) -> usize { self.charged_cells_count }
+    pub fn can_have_rocket(&self) -> bool { self.can_have_rocket }
+    pub fn get_rocket(&self) -> bool { self.has_rocket }
+    pub fn get_generate(&self) -> &HashSet<BasicResourceType> { &self.generate }
+    pub fn get_combine(&self) -> &HashSet<ComplexResourceType> { &self.combine }
+
+    // Setters
+    pub fn set_id(&mut self, id: ID) { self.id = id; }
+    pub fn kill(&mut self) { self.alive = false; }
+    pub fn set_energy_cells(&mut self, energy_cells: Vec<bool>) { self.energy_cells = energy_cells; }
+    pub fn set_charged_cells_count(&mut self, charged_cells_count: usize) { self.charged_cells_count = charged_cells_count; }
+    pub fn set_can_have_rocket(&mut self, can_have_rocket: bool) { self.can_have_rocket = can_have_rocket; }
+    pub fn set_has_rocket(&mut self, rocket: bool) { self.has_rocket = rocket; }
+    pub fn set_generate(&mut self, generate: HashSet<BasicResourceType>) { self.generate = generate; }
+    pub fn set_combine(&mut self, combine: HashSet<ComplexResourceType>) { self.combine = combine; }
+}
+
+// Explorers
 #[derive(Resource, Default)]
 pub struct ExplorersData {
     pub explorer1: Explorer,

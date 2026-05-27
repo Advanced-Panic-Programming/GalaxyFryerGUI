@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::galaxy_view::components::{AnimationConfig, Planet};
 use crate::planet_view::components::SpawnedByPlanetView;
 use crate::planet_view::utils::*;
-use crate::setup_simulation::resources::{ExplorersData, PlanetsData, SelectedPlanet};
+use crate::setup_simulation::resources::{ExplorersData, PlanetsSpritesData, SelectedPlanet};
 
 
 // =====================
@@ -53,7 +53,7 @@ pub fn refresh_planet_view(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
-    planet_data: Res<PlanetsData>,
+    planet_data: Res<PlanetsSpritesData>,
     current_entities: Query<Entity, With<SpawnedByPlanetView>>,
 ) {
     if !selected.is_changed() {
