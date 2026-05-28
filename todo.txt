@@ -30,3 +30,5 @@ IMPLEMENTA MODULO SEPARATO
 COntrolla quando inserire il reader.clear() negli event handlers. E aggiorna tutti i readers!!!
 
 FIX EPLORER ARROWS -> REWRITE EVERY SYSTEM/DEFINITION
+
+quando l'explorer muore, metti una freccia grigia/con teschio

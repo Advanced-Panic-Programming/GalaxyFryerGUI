@@ -3,6 +3,7 @@ use galaxy_view::systems::*;
 use crate::app_states::AppState::GalaxyView;
 use crate::galaxy_view;
 use crate::galaxy_view::messages::*;
+use crate::setup_simulation::resources::ExplorersData;
 
 pub struct GalaxyViewPlugin;
 
@@ -28,15 +29,22 @@ impl Plugin for GalaxyViewPlugin {
             // OnEnter Systems
             .add_systems(OnEnter(GalaxyView), (
                 spawn_planets,
+                setup_explorer_arrow_atlas,
             ))
             // Update Systems in_state
             .add_systems(Update, (
                 update_planets_sprites,
                 execute_animations,
-                bound_explorer_arrows,
-                // update_explorer_arrows_planet_binding,
-                // animate_explorer_arrows,
             ).run_if(in_state(GalaxyView)))
+            .add_systems(Update, (
+                spawn_explorer_arrows,
+                update_explorer_arrow_binding,
+                update_explorer_arrow_offsets,
+                despawn_dead_explorer_arrows,
+            )
+                // .run_if(resource_changed::<ExplorersData>)
+                .run_if(in_state(GalaxyView))
+            )
             // Update Systems (always)
             .add_systems(Update, (
                 update_planets_data,
