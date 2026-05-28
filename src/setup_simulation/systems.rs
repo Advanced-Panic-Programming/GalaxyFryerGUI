@@ -100,31 +100,31 @@ pub fn init_planets_data_resource(
     mut planets_data: ResMut<PlanetsData>,
 ) {
     // Planet 1 - Rustrelli - D
-    let rustrelli = PlanetInfo::new(1, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
+    let rustrelli = PlanetInfo::new(0, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(rustrelli);
     
     // Planet 2 - Houston we have a borrow
-    let huston_we_have_a_borrow = PlanetInfo::new(2, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    let huston_we_have_a_borrow = PlanetInfo::new(1, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(huston_we_have_a_borrow);
     
     // Planet 3 - Enterprise - C
-    let entrerprise = PlanetInfo::new(3, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    let entrerprise = PlanetInfo::new(2, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(entrerprise);
     
     // Planet 4 - One-Million-Crabs - D
-    let one_million_crabs = PlanetInfo::new(4, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
+    let one_million_crabs = PlanetInfo::new(3, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(one_million_crabs);
     
     // Planet 5 - Rusty Crab - C
-    let rusty_crab = PlanetInfo::new(5, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    let rusty_crab = PlanetInfo::new(4, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(rusty_crab);
     
     // Planet 6 - Orbitron - D
-    let orbitron = PlanetInfo::new(6, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
+    let orbitron = PlanetInfo::new(5, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(orbitron);
     
     // Planet 7 - Trip - A
-    let trip = PlanetInfo::new(7, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    let trip = PlanetInfo::new(6, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(trip);
 }
 

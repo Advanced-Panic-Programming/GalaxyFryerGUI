@@ -333,7 +333,7 @@ pub fn update_planets_data(
 ) {
     if !planet_state_reader.is_empty() {
         for msg in planet_state_reader.read() {
-            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize - 1) {
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) {
                 let charged_cells_count = msg.dummy_planet_state.charged_cells_count;
                 planet.set_charged_cells_count(charged_cells_count);
                 let has_rocket = msg.dummy_planet_state.has_rocket;
@@ -346,18 +346,18 @@ pub fn update_planets_data(
 
     if !planet_destroyed_reader.is_empty() {
         for msg in planet_destroyed_reader.read() {
-            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize - 1) {
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) {
                 if planet.get_alive() {
                     planet.kill();
                 }
             }
-            planets_sprites.planets[msg.planet_id as usize - 1].alive = false; //TODO! Implement methods for the struct
+            planets_sprites.planets[msg.planet_id as usize].alive = false; //TODO! Implement methods for the struct
         }
     }
 
     if !planet_generate_reader.is_empty() {
         for msg in planet_generate_reader.read() {
-            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize - 1) {
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) {
                 planet.set_generate(msg.generate.clone());
             }
         }
@@ -365,7 +365,7 @@ pub fn update_planets_data(
 
     if !planet_combine_reader.is_empty() {
         for msg in planet_combine_reader.read() {
-            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize - 1) {
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) {
                 planet.set_combine(msg.combine.clone());
             }
         }
@@ -481,8 +481,8 @@ pub fn update_explorer_data (
     if !explorer_position_reader.is_empty() {
         for msg in explorer_position_reader.read() {
             match msg.explorer_id {
-                1 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize - 1)}
-                2 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize - 1)}
+                0 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize)}
+                1 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize)}
                 _ => {}
             }
         }
@@ -492,8 +492,8 @@ pub fn update_explorer_data (
     if !explorer_bag_reader.is_empty() {
         for msg in explorer_bag_reader.read() {
             match msg.explorer_id {
-                1 => {explorer_data.explorer1.set_bag(msg.explorer_bag.clone())}
-                2 => {explorer_data.explorer2.set_bag(msg.explorer_bag.clone())}
+                0 => {explorer_data.explorer1.set_bag(msg.explorer_bag.clone())}
+                1 => {explorer_data.explorer2.set_bag(msg.explorer_bag.clone())}
                 _ => {}
             }
         }
@@ -503,8 +503,8 @@ pub fn update_explorer_data (
     if !explorer_move_reader.is_empty() {
         for msg in explorer_move_reader.read() {
             match msg.explorer_id {
-                1 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize - 1)}
-                2 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize - 1)}
+                0 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize)}
+                1 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize)}
                 _ => {}
             }
         }
@@ -514,8 +514,8 @@ pub fn update_explorer_data (
     if !killed_explorer_message.is_empty() {
         for msg in killed_explorer_message.read() {
             match msg.explorer_id {
-                1 => {explorer_data.explorer1.kill()}
-                2 => {explorer_data.explorer2.kill()}
+                0 => {explorer_data.explorer1.kill()}
+                1 => {explorer_data.explorer2.kill()}
                 _ => {}
             }
         }

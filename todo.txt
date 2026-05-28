@@ -32,3 +32,9 @@ COntrolla quando inserire il reader.clear() negli event handlers. E aggiorna tut
 FIX EPLORER ARROWS -> REWRITE EVERY SYSTEM/DEFINITION
 
 quando l'explorer muore, metti una freccia grigia/con teschio
+
+quando vado in PlanetState, manda richiesta all'orchestrator per aggiornare lo stato del pianeta. MANDA ID da 0 a 6
+
+!!TODO! CAMBIARE TUTTI GLI ID, ORA SONO INDIRIZZATI DA 0 A 6
+
+aggiungi modulu aggiornamento dati: Ogni tot manda un messaggio all'orchestrator per aggiornare le risporse ???
