@@ -27,14 +27,14 @@ Creare risorsa per current mode (manual/auto) e messaggio ack dall’orchestrato
 // implement it so that OnEnter(GalaxyView AND PlanetView) and Update con .run_if(resource_changed::<CurrentOrchestratorMode>)
 IMPLEMENTA MODULO SEPARATO
 
-COntrolla quando inserire il reader.clear() negli event handlers. E aggiorna tutti i readers!!!
-
-FIX EPLORER ARROWS -> REWRITE EVERY SYSTEM/DEFINITION
+Controlla quando inserire il reader.clear() negli event handlers. E aggiorna tutti i readers!!!
 
 quando l'explorer muore, metti una freccia grigia/con teschio
 
-quando vado in PlanetState, manda richiesta all'orchestrator per aggiornare lo stato del pianeta. MANDA ID da 0 a 6
+!!! quando vado in PlanetState, manda richiesta all'orchestrator per aggiornare lo stato del pianeta. MANDA ID da 0 a 6 !!!
 
-!!TODO! CAMBIARE TUTTI GLI ID, ORA SONO INDIRIZZATI DA 0 A 6
+??? aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all'orchestrator per aggiornare le risporse ???
 
-aggiungi modulu aggiornamento dati: Ogni tot manda un messaggio all'orchestrator per aggiornare le risporse ???
+TODO Fix scrolling:
+- messages exit (down) the log box
+- the autoscroll doesn't work until you scroll once

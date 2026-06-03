@@ -12,6 +12,7 @@ mod cutscene;
 mod pause_menu;
 mod communication;
 mod simulation_end;
+mod log;
 
 use bevy::prelude::*;
 use bevy::window::{WindowMode, WindowResolution};
@@ -27,6 +28,7 @@ use crate::app_states::AppState;
 use crate::communication::plugin::CommunicationPlugin;
 use crate::cutscene::plugin::CutscenePlugin;
 use crate::legend::plugin::LegendPlugin;
+use crate::log::plugin::LogPlugin;
 use crate::simulation_end::plugin::SimulationEndPlugin;
 
 fn main() {
@@ -53,6 +55,7 @@ fn main() {
         .add_plugins(ResourceManagerPlugin)
         .add_plugins(PauseMenuPlugin)
         .add_plugins(LegendPlugin)
+        .add_plugins(LogPlugin)
         .add_plugins(InputHandlerPlugin)
         .add_plugins(GalaxyViewPlugin)
         .add_plugins(PlanetViewPlugin)
