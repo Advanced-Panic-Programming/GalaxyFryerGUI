@@ -9,7 +9,7 @@ pub struct LogUIPlugin;
 impl Plugin for LogUIPlugin {
     fn build(&self, app: &mut App) {
         app
-            .insert_resource(LogAutoScroll { enabled: true, })
+            .init_resource::<LogAutoScroll>()
             .init_resource::<DisplayedLogEntries>()
             .insert_resource(PreviousPosition { previous: 0.0, })
             // .init_resource::<PreviousPosition>()

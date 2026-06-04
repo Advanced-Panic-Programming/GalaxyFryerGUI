@@ -6,9 +6,13 @@ pub struct DisplayedLogEntries {
     // pub last_rendered: usize,
 }
 
-#[derive(Resource, Default)]
+#[derive(Resource)]
 pub struct LogAutoScroll {
     pub enabled: bool,
+}
+
+impl Default for LogAutoScroll {
+    fn default() -> Self { Self { enabled: true } }
 }
 
 #[derive(Resource, Default)]

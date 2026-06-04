@@ -137,7 +137,7 @@ pub fn update_log_ui(
     // If autoscroll is active, we scroll the log and show the new messages
     if auto_scroll.enabled {
         if let Ok(mut scroll) = scroll_query.single_mut() {
-                scroll.y += f32::MAX; // forces to go as down as possible
+                scroll.y = f32::MAX; // forces to go as down as possible
         }
     }
 }
@@ -172,7 +172,7 @@ pub fn scroll_log_ui(
     if user_scrolling_up {
         auto_scroll.enabled = false;
     } else if user_scrolling_down { // when the user scrolls down a bit (10.0), I take him to the last message
-        scroll.y = displayed.count as f32;
+        scroll.y = f32::MAX;
         auto_scroll.enabled = true;
     }
     previous_position.previous = scroll.y; // Update previous scroll position
