@@ -8,51 +8,51 @@ impl LogMessage {
     // Planet
     pub fn planet_destroyed(p_id: ID) -> Self {
         Self {
-            level: Error,
-            message: format!("Planet #{p_id} was destroyed"),
+            level: Fatal,
+            message: format!("Planet #{} was destroyed", p_id+1),
         }
     }
 
     pub fn asteroid_destroyed(p_id: ID) -> Self {
         Self {
-            level: Info,
-            message: format!("Planet #{p_id} | destroyed incoming asteroid"),
+            level: Basic,
+            message: format!("Planet #{} | destroyed incoming asteroid", p_id+1),
         }
     }
 
     // Explorer
     pub fn explorer_moved(explorer_id: ID, planet_id: ID) -> Self {
         Self {
-            level: Info,
-            message: format!("Explorer #{explorer_id} | moved to planet #{planet_id}"),
+            level: Basic,
+            message: format!("Explorer #{} | moved to planet #{}", explorer_id+1, planet_id+1),
         }
     }
 
     pub fn explorer_killed(explorer_id: ID) -> Self {
         Self {
-            level: Error,
-            message: format!("Explorer #{explorer_id} | killed"),
+            level: Fatal,
+            message: format!("Explorer #{} | killed", explorer_id+1),
         }
     }
 
     // Simulation
     pub fn automatic_mode_ack() -> Self {
         Self {
-            level: Warning,
+            level: Info,
             message: "Simulation | automatic mode activated".into(),
         }
     }
 
     pub fn manual_mode_ack() -> Self {
         Self {
-            level: Warning,
+            level: Info,
             message: "Simulation | manual mode activated".into(),
         }
     }
 
     pub fn simulation_end() -> Self {
         Self {
-            level: Warning,
+            level: Info,
             message: "Simulation | ended".into(),
         }
     }

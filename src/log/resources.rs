@@ -10,9 +10,9 @@ pub struct LogMessage {
 // Still don't know if useful
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LogLevel {
+    Basic,
     Info,
-    Warning,
-    Error,
+    Fatal,
 }
 
 #[derive(Clone)]

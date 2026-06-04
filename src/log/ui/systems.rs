@@ -112,9 +112,9 @@ pub fn update_log_ui(
     commands.entity(container).with_children(|parent| {
         for entry in entries.iter().rev() {
             let color = match entry.level {
-                LogLevel::Info => Color::WHITE,
-                LogLevel::Warning => Color::srgb(1.0, 0.8, 0.2),
-                LogLevel::Error => Color::srgb(1.0, 0.2, 0.2),
+                LogLevel::Basic => Color::WHITE,
+                LogLevel::Info => Color::srgb(1.0, 0.8, 0.2),
+                LogLevel::Fatal => Color::srgb(1.0, 0.2, 0.2),
             };
 
             let text = format!("[{:.1}] {}", entry.timestamp, entry.message,);
@@ -137,7 +137,7 @@ pub fn update_log_ui(
     // If autoscroll is active, we scroll the log and show the new messages
     if auto_scroll.enabled {
         if let Ok(mut scroll) = scroll_query.single_mut() {
-                scroll.y = f32::MAX; // forces to go as down as possible
+                scroll.y = displayed.count as f32 * (LOG_FONT_SIZE + LOG_ROW_GAP);
         }
     }
 }
@@ -166,13 +166,13 @@ pub fn scroll_log_ui(
     }
 
     let user_scrolling_up = scroll.y < previous_position.previous;
-    let user_scrolling_down = scroll.y >= previous_position.previous + 10.0;
+    let user_scrolling_down = scroll.y >= previous_position.previous + 8.0;
                                                 // +10 is to avoid that micro adjustments take
                                                 // the user to the bottom of the log
     if user_scrolling_up {
         auto_scroll.enabled = false;
     } else if user_scrolling_down { // when the user scrolls down a bit (10.0), I take him to the last message
-        scroll.y = f32::MAX;
+        scroll.y = displayed.count as f32 * (LOG_FONT_SIZE + LOG_ROW_GAP);
         auto_scroll.enabled = true;
     }
     previous_position.previous = scroll.y; // Update previous scroll position
