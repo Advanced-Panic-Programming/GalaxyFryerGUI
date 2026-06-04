@@ -47,12 +47,15 @@ pub fn spawn_log_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     Node {
                         flex_grow: 1.0,
                         width: Val::Percent(100.0),
-                        height: Val::Percent(100.0),
                         overflow: Overflow::scroll_y(),
                         flex_direction: FlexDirection::Column,
                         margin: UiRect {
                             top: Val::Px(25.0),
-                            bottom: Val::Px(30.0),
+                            bottom: Val::Px(25.0),
+                            ..default()
+                        },
+                        padding: UiRect {
+                            bottom: Val::Px(10.0),
                             ..default()
                         },
                         ..default()
@@ -65,9 +68,12 @@ pub fn spawn_log_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                         LogMessagesContainer,
                         Node {
                             width: Val::Percent(100.0),
-                            height: Val::Percent(80.0),
                             flex_direction: FlexDirection::Column,
                             row_gap: Val::Px(LOG_ROW_GAP),
+                            margin: UiRect {
+                                bottom: Val::Px(25.0),
+                                ..default()
+                            },
                             ..default()
                         },
                     ));
@@ -131,7 +137,7 @@ pub fn update_log_ui(
     // If autoscroll is active, we scroll the log and show the new messages
     if auto_scroll.enabled {
         if let Ok(mut scroll) = scroll_query.single_mut() {
-                scroll.y += 1.0; // forces to go as down as possible
+                scroll.y += f32::MAX; // forces to go as down as possible
         }
     }
 }
@@ -147,7 +153,9 @@ pub fn scroll_log_ui(
         return;
     };
 
-    auto_scroll.enabled = false; // User is scrolling
+    if !wheel_events.is_empty() {
+        auto_scroll.enabled = false; // User is scrolling
+    }
 
     for event in wheel_events.read() {
         let delta = match event.unit {
