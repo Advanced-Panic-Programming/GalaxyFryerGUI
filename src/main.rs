@@ -13,6 +13,7 @@ mod pause_menu;
 mod communication;
 mod simulation_end;
 mod log;
+mod manual_mode;
 
 use bevy::prelude::*;
 use bevy::window::{WindowMode, WindowResolution};
@@ -29,6 +30,7 @@ use crate::communication::plugin::CommunicationPlugin;
 use crate::cutscene::plugin::CutscenePlugin;
 use crate::legend::plugin::LegendPlugin;
 use crate::log::plugin::LogPlugin;
+use crate::manual_mode::plugin::ManualModePlugin;
 use crate::simulation_end::plugin::SimulationEndPlugin;
 
 fn main() {
@@ -56,6 +58,7 @@ fn main() {
         .add_plugins(PauseMenuPlugin)
         .add_plugins(LegendPlugin)
         .add_plugins(LogPlugin)
+        .add_plugins(ManualModePlugin)
         .add_plugins(InputHandlerPlugin)
         .add_plugins(GalaxyViewPlugin)
         .add_plugins(PlanetViewPlugin)

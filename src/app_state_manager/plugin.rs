@@ -1,7 +1,5 @@
-use bevy::asset::meta::Settings;
 use bevy::prelude::*;
-
-use crate::app_states::*;
+use crate::app_state_manager::resources::*;
 use crate::setup_orchestrator::resources::{CurrentOrchestratorMode, ToOrchestrator};
 use super::messages::*;
 use super::systems::*;
@@ -11,6 +9,8 @@ pub struct AppStateManagerPlugin;
 impl Plugin for AppStateManagerPlugin {
     fn build(&self, app: &mut App) {
         app
+            // Resource init
+            .init_resource::<CurrentMode>()
             // Messages init
             .add_message::<SetupSimulationCompleted>()
             .add_message::<SetupOrchestratorCompleted>()
