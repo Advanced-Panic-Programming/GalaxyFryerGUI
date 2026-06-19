@@ -122,8 +122,8 @@ pub struct ExplorersData {
 impl ExplorersData {
     pub fn new() -> ExplorersData {
         ExplorersData {
-            explorer1: Explorer::new(0, BagView::new()),
-            explorer2: Explorer::new(4, BagView::new()),
+            explorer1: Explorer::new(1, BagView::new()),
+            explorer2: Explorer::new(1, BagView::new()),
             last_cycle: false,
         }
     }

@@ -7,6 +7,9 @@ Le uniche risorse non inizializzate a default per ora sono ToOrchestrator e From
 - OGNI SISTEMA CHE USA run_if(resource_changed) STA CREANDO UNA RACE CONDITION !!!! MODIFICALI COME FATTO CON UPDATE SYSTEM DEL MODULO LEGEND
 
 - sistemare testo automatic mode / manual mode quando viene aggiornato
+- cambia indexing explorers in manual mode systems
+
+- Aggiungere Titolo "GalaxyFryer" al menu di pausa
 
 Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?Creare un nuovo modulo galaxy_update?)
 

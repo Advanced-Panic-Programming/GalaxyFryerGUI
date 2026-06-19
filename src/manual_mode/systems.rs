@@ -593,7 +593,7 @@ pub fn update_panel_visibility(
             if *interaction == Interaction::Pressed {
                 if let Some(s) = &sender {
                     let id = state.galaxy_target;
-                    let _ = s.0.send(GUIToOrchestrator::SendSunray { planet_id: id });
+                    let _ = s.0.send(GUIToOrchestrator::SendSunray { planet_id: id - 1 });
                 }
             }
         }
@@ -608,7 +608,7 @@ pub fn update_panel_visibility(
             if *interaction == Interaction::Pressed {
                 if let Some(s) = &sender {
                     let id = state.galaxy_target;
-                    let _ = s.0.send(GUIToOrchestrator::SendAsteroid { planet_id: id });
+                    let _ = s.0.send(GUIToOrchestrator::SendAsteroid { planet_id: id - 1 });
                 }
             }
         }
@@ -652,7 +652,7 @@ pub fn update_panel_visibility(
                 if let Some(s) = &sender {
                     let e_id = btn.0;
                     let p_id = state.explorer(e_id).move_target;
-                    let _ = s.0.send(GUIToOrchestrator::MoveExplorer { explorer_id: e_id, planet_id: p_id });
+                    let _ = s.0.send(GUIToOrchestrator::MoveExplorer { explorer_id: e_id - 1, planet_id: p_id - 1 });
                 }
             }
         }

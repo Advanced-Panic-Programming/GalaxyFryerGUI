@@ -78,7 +78,7 @@ impl Default for ManualModeState {
             active_tab: ManualModeTab::default(),
             explorer1: ExplorerPanelState::default(),
             explorer2: ExplorerPanelState::default(),
-            galaxy_target: 0,
+            galaxy_target: 1,
         }
     }
 }
