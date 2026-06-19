@@ -1,6 +1,8 @@
 !!! IMPORTANTE !!!
 I sistemi che utilizzano le risorse non inizializzate a valori di default DEVONO avere questo run_if: .run_if(resource_exists::<"nome_risorsa">)
-Le uniche risorse non inizializzate a defualt per ora sono ToOrchestrator e FromOrchestrator
+Le uniche risorse non inizializzate a default per ora sono ToOrchestrator e FromOrchestrator
+
+- Indici degli esploratori sono offset quindi non viene registrato lo spostamento dell'esploratore 3 (anche indici pianeti)
 
 - OGNI SISTEMA CHE USA run_if(resource_changed) STA CREANDO UNA RACE CONDITION !!!! MODIFICALI COME FATTO CON UPDATE SYSTEM DEL MODULO LEGEND
 
@@ -10,14 +12,14 @@ Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?
 
 I pianeti/esploratori della GUI non usano ID definito in common_game. provare HashMap(ID, ...) oppure vettore particolare?
 
-Cambia inizializzazione risorsa pianeti per far sì che abbiamo lo stesso tipo dei pianeti dell’orchestrator
-(numero corretto di celle, razzo ecc). Oppure lascia generico per fare un planetview unico
+Cambia inizializzazione risorsa pianeti per far sì che abbiamo lo stesso tipo dei pianeti dell’ orchestrator
+(numero corretto di celle, razzo ecc). Oppure lascia generico per fare un planet-view unico
 
-passandoti già tutte le varie info non basta che tu vai a costruirti il log in base a quello che l’orch mandah
+Passandomi già tutte le varie info non basta che tu vai a costruirti il log in base a quello che l’ orchestrator manda
 
-Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva bottonen
+Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva bottone
 
-Creare risorsa per current mode (manual/auto) e messaggio ack dall’orchestrator
+Creare risorsa per current mode (manual/auto) e messaggio ack dall’ orchestrator
 
 - remove cycle explorer? Currently not working
 
@@ -29,11 +31,11 @@ IMPLEMENTA MODULO SEPARATO
 
 Controlla quando inserire il reader.clear() negli event handlers. E aggiorna tutti i readers!!!
 
-quando l'explorer muore, metti una freccia grigia/con teschio
+Quando explorer muore, metti una freccia grigia/con teschio
 
-!!! quando vado in PlanetState, manda richiesta all'orchestrator per aggiornare lo stato del pianeta. MANDA ID da 0 a 6 !!!
+!!! Quando vado in PlanetState, manda richiesta all' orchestrator per aggiornare lo stato del pianeta. MANDA ID da 0 a 6 !!!
 
-??? aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all'orchestrator per aggiornare le risporse ???
+??? Aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all' orchestrator per aggiornare le risorse ???
 
 TODO Fix scrolling:
 - messages exit (down) the log box
