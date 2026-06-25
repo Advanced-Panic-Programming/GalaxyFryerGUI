@@ -142,6 +142,8 @@ pub struct Explorer {
     alive: bool,
     current_planet_index: usize,
     bag: BagView,
+    // alive_sprite: Handle<Image>,
+    // dead_sprite: Handle<Image>
 }
 
 impl Explorer {

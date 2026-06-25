@@ -5,6 +5,31 @@ use common_game::components::resource::{BasicResource, BasicResourceType, Comple
 use common_game::utils::ID;
 
 // ---------------------------------------------------------------
+//      ManualModePanel
+// ---------------------------------------------------------------
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum Tab {
+    Galaxy,
+    Explorer1,
+    Explorer2,
+}
+
+#[derive(Resource)]
+pub struct ManualModePanel {
+    /// defines if the panel has to be visible or not
+    pub visible: bool,
+    /// define the current selected tab
+    pub active_tab: Tab,
+}
+
+impl Default for ManualModePanel {
+    fn default() -> Self {
+        ManualModePanel { visible:false, active_tab: Tab::Galaxy }
+    }
+}
+
+// ---------------------------------------------------------------
 //      Spinners
 // ---------------------------------------------------------------
 #[derive(Resource)]
@@ -62,8 +87,17 @@ impl Default for GeneratableResourcesOnPlanet {
 }
 
 impl GeneratableResourcesOnPlanet {
-    /// Returns the corresponding GenerateResourceSpinner of the planet indexed 0-6
-    pub fn get_generate(&mut self, id: ID) -> &mut GenerateResourceSpinner {
+    /// Returns the corresponding GenerateResourceSpinner of the planet indexed 0-6 
+    pub fn get_generate(&self, id: ID) -> &GenerateResourceSpinner {
+        match id as usize {
+            0..7 => {
+                &self.planet[id as usize]
+            }
+            _ => panic!("GeneratableResourcesOnPlanet::get_generate called with invalid id"),
+        }
+    }
+    /// Returns a mutable reference to the corresponding GenerateResourceSpinner of the planet indexed 0-6
+    pub fn get_generate_mut(&mut self, id: ID) -> &mut GenerateResourceSpinner {
         match id as usize {
             0..7 => {
                 &mut self.planet[id as usize]
@@ -102,8 +136,18 @@ impl Default for CombinableResourcesOnPlanet {
 }
 
 impl CombinableResourcesOnPlanet {
-    /// Returns the corresponding GenerateResourceSpinner of the planet indexed 0-6
-    pub fn get_generate(&mut self, id: ID) -> &mut CombineResourceSpinner {
+    
+    pub fn get_combine(&self, id: ID) -> &CombineResourceSpinner {
+        match id as usize {
+            0..7 => {
+                &self.planet[id as usize]
+            }
+            _ => panic!("GeneratableResourcesOnPlanet::get_generate called with invalid id"),
+        }
+    }
+    
+    /// Returns a mutable reference to the corresponding GenerateResourceSpinner of the planet indexed 0-6
+    pub fn get_combine_mut(&mut self, id: ID) -> &mut CombineResourceSpinner {
         match id as usize {
             0..7 => {
                 &mut self.planet[id as usize]
@@ -200,28 +244,8 @@ impl_spinner_display!(GenerateResourceSpinner);
 
 
 // ---------------------------------------------------------------
-//      ExplorerPanel
+//      ExplorerPanel -> Info in Res<ExplorersData>
 // ---------------------------------------------------------------
-
-//----Explorer
-// SendExplorerPosition {
-//      explorer_id: ID,
-//      planet_id: ID,
-// },
-//
-// SendExplorerMoved {
-//      explorer_id: ID,
-//      planet_id: ID,
-// },
-//
-// SendExplorerBag { // Inviata ogni volta che e' modificata
-//      explorer_id: ID,
-//      bag: BagView,
-// },
-#[derive(Resource)]
-pub struct ExplorerPanel {
-
-}
 
 #[cfg(test)]
 mod tests {
@@ -237,7 +261,7 @@ mod tests {
             generatable.set_planet_spinner(i, create_gen_res_spinner());
         }
         println!("{}", generatable.get_generate(0));
-        let spinner = generatable.get_generate(0);
+        let spinner = generatable.get_generate_mut(0);
         println!("{:?}",  spinner.get_current_value());
         spinner.increase();
         println!("{:?}", spinner.get_current_value());
@@ -248,8 +272,8 @@ mod tests {
         let mut combinable = CombinableResourcesOnPlanet::default();
         for i in 0..7 {
             combinable.set_planet_spinner(i, create_comb_res_spinner());
-            println!("{}", combinable.get_generate(0));
-            let spinner = combinable.get_generate(0);
+            println!("{}", combinable.get_combine_mut(0));
+            let spinner = combinable.get_combine_mut(0);
             println!("{:?}",  spinner.get_current_value());
             spinner.increase();
             println!("{:?}", spinner.get_current_value());
