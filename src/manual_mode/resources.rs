@@ -1,93 +1,309 @@
+use std::collections::HashSet;
 use bevy::prelude::*;
-use common_game::components::resource::{BasicResourceType, ComplexResourceType};
+use std::fmt;
+use common_game::components::resource::{BasicResource, BasicResourceType, ComplexResourceType};
+use common_game::utils::ID;
 
-/// Which tab of the manual-mode panel is currently shown.
-#[derive(Default, PartialEq, Clone, Copy, Debug)]
-pub enum ManualModeTab {
-    #[default]
-    Galaxy,
-    Explorer1,
-    Explorer2,
-    Other,
-}
-
-/// Cached display state for one explorer's panel column.
-pub struct ExplorerPanelState {
-    /// Display string for the current planet (updated after AskCurrentPlanet).
-    pub current_planet: String,
-    /// Display string for energy cells (updated after AskEnergyCells).
-    pub energy_cells: String,
-    /// Display string for bag contents (updated after BagContentRequest).
-    pub bag: String,
-    /// Populated after SupportedResourceRequest is answered.
-    pub supported_resources: Vec<BasicResourceType>,
-    pub resource_cursor: usize,
-    /// Populated after SupportedCombinationRequest is answered.
-    pub supported_combinations: Vec<ComplexResourceType>,
-    pub combination_cursor: usize,
-    /// Planet ID the player has dialled in to move to (1-7).
-    pub move_target: u32,
-}
-
-impl Default for ExplorerPanelState {
-    fn default() -> Self {
-        Self {
-            current_planet: "?".into(),
-            energy_cells: "?".into(),
-            bag: "(empty)".into(),
-            supported_resources: Vec::new(),
-            resource_cursor: 0,
-            supported_combinations: Vec::new(),
-            combination_cursor: 0,
-            move_target: 1,
-        }
-    }
-}
-
-impl ExplorerPanelState {
-    pub fn selected_resource_name(&self) -> String {
-        if self.supported_resources.is_empty() {
-            return "—  (to ask)".into();
-        }
-        format!("{:?}", self.supported_resources[self.resource_cursor])
-    }
-
-    pub fn selected_combination_name(&self) -> String {
-        if self.supported_combinations.is_empty() {
-            return "—  (to ask)".into();
-        }
-        format!("{:?}", self.supported_combinations[self.combination_cursor])
-    }
-}
-
-/// Drives the entire manual-mode bottom panel.
+// ---------------------------------------------------------------
+//      Spinners
+// ---------------------------------------------------------------
 #[derive(Resource)]
-pub struct ManualModeState {
-    pub active: bool,
-    pub active_tab: ManualModeTab,
-    pub explorer1: ExplorerPanelState,
-    pub explorer2: ExplorerPanelState,
-    /// Planet ID targeted in the Galaxy tab (1-7).
-    pub galaxy_target: u32,
+pub struct PlanetSpinner {
+    value: usize,
 }
 
-impl Default for ManualModeState {
+impl PlanetSpinner {
+    pub fn new() -> Self {
+        Self { value: 0 }
+    }
+    pub fn increase(&mut self) {
+        self.value = if self.value >= 6 { 0 } else { self.value + 1 };
+    }
+    pub fn decrease(&mut self) {
+        self.value = if self.value <= 0 { 6 } else { self.value - 1 };
+    }
+    /// Returns the actual planet index 0-6
+    pub fn get_current_value(&self) -> usize {
+        self.value
+    }
+}
+
+impl Default for PlanetSpinner {
     fn default() -> Self {
+        PlanetSpinner { value: 0 }
+    }
+}
+
+impl fmt::Display for PlanetSpinner {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.value + 1)
+    }
+}
+
+/// This Resource contains the generatable resource of each planet
+/// When 'SendPlanetGenerate' message is received, the resource is updated
+#[derive(Resource)]
+pub struct GeneratableResourcesOnPlanet {
+    planet: Vec<GenerateResourceSpinner>,
+}
+
+impl Default for GeneratableResourcesOnPlanet {
+    fn default() -> Self {
+        let mut spinners = Vec::new();
+        for i in 0..7 {
+            let spinner = GenerateResourceSpinner::new_empty();
+            spinners.push(spinner);
+        }
+        assert_eq!(spinners.len(), 7);
         Self {
-            active: true, // simulation starts in manual mode
-            active_tab: ManualModeTab::default(),
-            explorer1: ExplorerPanelState::default(),
-            explorer2: ExplorerPanelState::default(),
-            galaxy_target: 1,
+            planet: spinners,
         }
     }
 }
 
-impl ManualModeState {
-    pub fn explorer(&self, id: u32) -> &ExplorerPanelState {
-        if id == 1 { &self.explorer1 } else { &self.explorer2 }
+impl GeneratableResourcesOnPlanet {
+    /// Returns the corresponding GenerateResourceSpinner of the planet indexed 0-6
+    pub fn get_generate(&mut self, id: ID) -> &mut GenerateResourceSpinner {
+        match id as usize {
+            0..7 => {
+                &mut self.planet[id as usize]
+            }
+            _ => panic!("GeneratableResourcesOnPlanet::get_generate called with invalid id"),
+        }
     }
-    pub fn explorer_mut(&mut self, id: u32) -> &mut ExplorerPanelState {
-        if id == 1 { &mut self.explorer1 } else { &mut self.explorer2 }
+    /// Substitutes the current spinner with a new one
+    pub fn set_planet_spinner(&mut self, id: ID, spinner: GenerateResourceSpinner) {
+        match id as usize {
+            0..7 => {
+                self.planet[id as usize] = spinner;
+            }
+            _ => panic!("GeneratableResourcesOnPlanet::set_planet_spinner called with invalid id"),
+        }
+    }
+}
+
+#[derive(Resource)]
+pub struct CombinableResourcesOnPlanet {
+    planet: Vec<CombineResourceSpinner>,
+}
+
+impl Default for CombinableResourcesOnPlanet {
+    fn default() -> Self {
+        let mut spinners = Vec::new();
+        for i in 0..7 {
+            let spinner = CombineResourceSpinner::new_empty();
+            spinners.push(spinner);
+        }
+        assert_eq!(spinners.len(), 7);
+        Self {
+            planet: spinners,
+        }
+    }
+}
+
+impl CombinableResourcesOnPlanet {
+    /// Returns the corresponding GenerateResourceSpinner of the planet indexed 0-6
+    pub fn get_generate(&mut self, id: ID) -> &mut CombineResourceSpinner {
+        match id as usize {
+            0..7 => {
+                &mut self.planet[id as usize]
+            }
+            _ => panic!("GeneratableResourcesOnPlanet::get_generate called with invalid id"),
+        }
+    }
+    /// Substitutes the current spinner with a new one
+    pub fn set_planet_spinner(&mut self, id: ID, spinner: CombineResourceSpinner) {
+        match id as usize {
+            0..7 => {
+                self.planet[id as usize] = spinner;
+            }
+            _ => panic!("CombinableResourcesOnPlanet::set_planet_spinner called with invalid id"),
+        }
+    }
+}
+
+pub struct GenerateResourceSpinner {
+    resources: Vec<BasicResourceType>,
+    size: usize,
+    index: usize,
+}
+
+impl GenerateResourceSpinner {
+    /// Creates an empty Spinner
+    pub fn new_empty() -> Self {
+        GenerateResourceSpinner { resources: Vec::<BasicResourceType>::new(), size: 0, index: 0 }
+    }
+    /// Converts the HashSet of generable resource of a planet into a Vec in order to display it
+    pub fn new(set: HashSet<BasicResourceType>) -> Self {
+        let size = set.len();
+        let resources = set.into_iter().collect::<Vec<BasicResourceType>>();
+        GenerateResourceSpinner { resources, size, index: 0 }
+    }
+    pub fn increase(&mut self) {
+        self.index = if self.index < self.size - 1 { self.index + 1 } else { 0 };
+    }
+    pub fn decrease(&mut self) {
+        self.index = if self.index <= 0 { self.size - 1 } else { self.index - 1 };
+    }
+    /// Returns a reference to BasicResourceType
+    pub fn get_current_value(&self) -> &BasicResourceType {
+        &self.resources[self.index]
+    }
+}
+
+pub struct CombineResourceSpinner {
+    resources: Vec<ComplexResourceType>,
+    size: usize,
+    index: usize,
+}
+
+impl CombineResourceSpinner {
+    /// Creates an empty Spinner
+    pub fn new_empty() -> Self {
+        CombineResourceSpinner { resources: Vec::<ComplexResourceType>::new(), size: 0, index: 0 }
+    }
+    /// Converts the HashSet of generable resource of a planet into a Vec in order to display it
+    pub fn new(set: HashSet<ComplexResourceType>) -> Self {
+        let size = set.len();
+        let resources = set.into_iter().collect::<Vec<ComplexResourceType>>();
+        CombineResourceSpinner { resources, size, index: 0 }
+    }
+    pub fn increase(&mut self) {
+        self.index = if self.index < self.size - 1 { self.index + 1 } else { 0 };
+    }
+    pub fn decrease(&mut self) {
+        self.index = if self.index <= 0 { self.size - 1 } else { self.index - 1 };
+    }
+    /// Returns a reference to ComplexResourceType
+    pub fn get_current_value(&self) -> &ComplexResourceType {
+        &self.resources[self.index]
+    }
+}
+
+// Implement the Display trait for both CombineResourceSpinner and GenerateResourceSpinner
+macro_rules! impl_spinner_display {
+    ($t:ty) => {
+        impl fmt::Display for $t {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                if self.resources.is_empty() {
+                    write!(f, "← ASK FIRST")
+                } else {
+                    write!(f, "{:?}", self.resources[self.index])
+                }
+            }
+        }
+    };
+}
+
+impl_spinner_display!(CombineResourceSpinner);
+impl_spinner_display!(GenerateResourceSpinner);
+
+
+// ---------------------------------------------------------------
+//      ExplorerPanel
+// ---------------------------------------------------------------
+
+//----Explorer
+// SendExplorerPosition {
+//      explorer_id: ID,
+//      planet_id: ID,
+// },
+//
+// SendExplorerMoved {
+//      explorer_id: ID,
+//      planet_id: ID,
+// },
+//
+// SendExplorerBag { // Inviata ogni volta che e' modificata
+//      explorer_id: ID,
+//      bag: BagView,
+// },
+#[derive(Resource)]
+pub struct ExplorerPanel {
+
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+    use bevy::ecs::error::panic;
+    use common_game::components::resource::{BasicResourceType, ComplexResourceType};
+    use crate::manual_mode::resources::{CombinableResourcesOnPlanet, CombineResourceSpinner, GeneratableResourcesOnPlanet, GenerateResourceSpinner, PlanetSpinner};
+
+    #[test]
+    fn test_generate_resource_on_planet() {
+        let mut generatable = GeneratableResourcesOnPlanet::default();
+        for i in 0..7 {
+            generatable.set_planet_spinner(i, create_gen_res_spinner());
+        }
+        println!("{}", generatable.get_generate(0));
+        let spinner = generatable.get_generate(0);
+        println!("{:?}",  spinner.get_current_value());
+        spinner.increase();
+        println!("{:?}", spinner.get_current_value());
+    }
+
+    #[test]
+    fn test_combine_resource_on_planet() {
+        let mut combinable = CombinableResourcesOnPlanet::default();
+        for i in 0..7 {
+            combinable.set_planet_spinner(i, create_comb_res_spinner());
+            println!("{}", combinable.get_generate(0));
+            let spinner = combinable.get_generate(0);
+            println!("{:?}",  spinner.get_current_value());
+            spinner.increase();
+            println!("{:?}", spinner.get_current_value());
+        }
+    }
+
+    #[test]
+    fn test_planet_spinner_display() {
+        let mut planet_spinner = PlanetSpinner::new();
+        assert_eq!(planet_spinner.get_current_value(), 0);
+        println!("{}", planet_spinner); // 1
+        planet_spinner.decrease();
+        assert_eq!(planet_spinner.get_current_value(), 6);
+        println!("{}", planet_spinner); // 7
+        planet_spinner.increase();
+        println!("{}", planet_spinner); // 1
+        assert_eq!(planet_spinner.get_current_value(), 0);
+    }
+
+    #[test]
+    fn test_basic_resource_spinner_display() {
+        let mut basic_resource = create_gen_res_spinner();
+        assert_eq!(basic_resource.size, 3);
+        assert_eq!(basic_resource.index, 0);
+        basic_resource.decrease();
+        assert_eq!(basic_resource.index, 2);
+        basic_resource.increase();
+        assert_eq!(basic_resource.index, 0);
+    }
+
+    #[test]
+    fn test_combine_resource_spinner_display() {
+        let mut combine_resource = create_comb_res_spinner();
+        assert_eq!(combine_resource.size, 3);
+        assert_eq!(combine_resource.index, 0);
+        combine_resource.decrease();
+        assert_eq!(combine_resource.index, 2);
+        combine_resource.increase();
+        assert_eq!(combine_resource.index, 0);
+    }
+
+    fn create_gen_res_spinner() -> GenerateResourceSpinner {
+        let mut set: HashSet<BasicResourceType> = HashSet::new();
+        set.insert(BasicResourceType::Oxygen);
+        set.insert(BasicResourceType::Carbon);
+        set.insert(BasicResourceType::Hydrogen);
+        GenerateResourceSpinner::new(set)
+    }
+
+    fn create_comb_res_spinner() -> CombineResourceSpinner {
+        let mut set: HashSet<ComplexResourceType> = HashSet::new();
+        set.insert(ComplexResourceType::Diamond);
+        set.insert(ComplexResourceType::Life);
+        set.insert(ComplexResourceType::AIPartner);
+        CombineResourceSpinner::new(set)
     }
 }

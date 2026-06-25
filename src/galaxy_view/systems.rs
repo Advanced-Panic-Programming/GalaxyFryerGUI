@@ -6,7 +6,7 @@ use crate::galaxy_view::components::*;
 use crate::galaxy_view::messages::{ReceivedExplorerBag, ReceivedExplorerMove, ReceivedExplorerPosition, ReceivedKilledExplorer, ReceivedPlanetCombine, ReceivedPlanetDestroyed, ReceivedPlanetGenerate, ReceivedPlanetState};
 use crate::galaxy_view::resources::ExplorerArrowAtlas;
 use crate::galaxy_view::utils::*;
-
+use crate::manual_mode::resources::{CombinableResourcesOnPlanet, CombineResourceSpinner, GeneratableResourcesOnPlanet, GenerateResourceSpinner};
 // =====================
 // === Setup Systems ===
 // =====================
@@ -330,6 +330,8 @@ pub fn update_planets_data(
     // Resources
     mut planets_sprites: ResMut<PlanetsSpritesData>,
     mut planets_data: ResMut<PlanetsData>,
+    mut generatable_resources_on_planet: ResMut<GeneratableResourcesOnPlanet>,
+    mut combinable_resources_on_planet: ResMut<CombinableResourcesOnPlanet>,
 ) {
     if !planet_state_reader.is_empty() {
         for msg in planet_state_reader.read() {
@@ -359,6 +361,7 @@ pub fn update_planets_data(
         for msg in planet_generate_reader.read() {
             if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) {
                 planet.set_generate(msg.generate.clone());
+                generatable_resources_on_planet.set_planet_spinner(msg.planet_id, GenerateResourceSpinner::new(msg.generate.clone()));
             }
         }
     }
@@ -367,6 +370,7 @@ pub fn update_planets_data(
         for msg in planet_combine_reader.read() {
             if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) {
                 planet.set_combine(msg.combine.clone());
+                combinable_resources_on_planet.set_planet_spinner(msg.planet_id, CombineResourceSpinner::new(msg.combine.clone()));
             }
         }
     }

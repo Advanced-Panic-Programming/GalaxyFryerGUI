@@ -1,5 +1,5 @@
 mod components;
 pub(crate) mod resources;
-pub mod utils;
-mod systems;
+mod utils;
+pub mod systems;
 pub(crate) mod plugin;

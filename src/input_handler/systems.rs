@@ -3,7 +3,7 @@ use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::*;
 use crate::app_state_manager::messages::*;
 use crate::app_state_manager::resources::{CurrentMode, Mode};
 use crate::app_states::AppState;
-use crate::manual_mode::resources::ManualModeState;
+// use crate::manual_mode::resources::ManualModeState;
 use crate::setup_simulation::resources::{Explorer, ExplorersData, SelectedPlanet};
 use crate::setup_orchestrator::resources::*;
 
@@ -63,16 +63,16 @@ pub fn game_related_inputs(
     mut explorer_data: ResMut<ExplorersData>,
     mut planet_view_writer: MessageWriter<PlanetViewPressed>, 
     mut selected_planet: ResMut<SelectedPlanet>,
-    mut manual_mode: Option<ResMut<ManualModeState>>,
+    // mut manual_mode: Option<ResMut<ManualModeState>>,
     mut current_mode: ResMut<CurrentMode>,
 ) {
     // Set Manual Mode
     if keyboard_input.just_pressed(KeyCode::KeyM) && *current_state.get() != AppState::PauseMenu && current_mode.current == Mode::Automatic {
         let _ = gui_to_orch.0.send(ManualMode); // sends ManualMode message to orchestrator
         // Active Manual Mode Panel
-        if let Some(ref mut mm) = manual_mode {
-            mm.active = !mm.active;
-        }
+        // if let Some(ref mut mm) = manual_mode {
+        //     mm.active = !mm.active;
+        // }
         // Update Resource
         current_mode.current = Mode::Manual;
 
