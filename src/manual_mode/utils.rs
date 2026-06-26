@@ -5,7 +5,6 @@ use common_game::utils::ID;
 // Fonts
 pub const FONT: &str = "fonts/FiraMono-Medium.ttf";
 pub const FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
-pub const FS_SM: f32 = 12.0;
 pub const FS_NM: f32 = 14.0;
 pub const FS_LG: f32 = 15.0;
 
@@ -22,12 +21,16 @@ pub const TAB_HEIGHT: f32 = 36.0;
 pub const PANEL_BG: Color = Color::srgba(0.05, 0.05, 0.08, 0.80);
 pub const PANEL_BORDER_RADIUS: f32 = 12.0;
 pub const PANEL_BORDER_COLOR: Color = Color::srgba(0.7, 0.7, 0.7, 0.9);
-pub const TAB_ACTIVE_BG: Color = Color::srgb(0.16, 0.28, 0.52);
-pub const TAB_INACTIVE_BG: Color = Color::srgba(0.18, 0.08, 0.18, 1.0);
-pub const TAB_BORDER: Color = Color::srgb(0.25, 0.38, 0.65);
-pub const BTN_BG: Color = Color::srgb(0.12, 0.22, 0.42);
-pub const BTN_HOVER_BG: Color = Color::srgb(0.42, 0.18, 0.42);
-pub const BTN_BORDER: Color = Color::srgb(0.35, 0.55, 0.85);
+pub const PANEL_PADDING: f32 = 20.0;
+pub const BORDER_WIDTH: f32 = 2.0;
+pub const TAB_ACTIVE_BG: Color = Color::srgb(0.35, 0.24, 0.52); // Color::srgb(0.16, 0.28, 0.52);
+pub const TAB_INACTIVE_BG: Color = Color::srgb(0.22, 0.17, 0.32); // Color::srgba(0.18, 0.08, 0.18, 1.0);
+pub const TAB_BORDER: Color = Color::srgba(0.7, 0.7, 0.7, 0.9); // Color::srgb(0.25, 0.38, 0.65);
+pub const TAB_PADDING: f32 = 6.0;
+pub const TAB_WIDTH: f32 = 170.0;
+pub const BTN_BG: Color = Color::srgb(0.26, 0.18, 0.40); // Color::srgb(0.12, 0.22, 0.42);
+pub const BTN_HOVER_BG: Color = Color::srgb(0.30, 0.22, 0.44); // Color::srgb(0.42, 0.18, 0.42);
+pub const BTN_BORDER: Color = Color::WHITE; // Color::srgb(0.35, 0.55, 0.85);
 
 // Text
 pub const TEXT_WHITE: Color = Color::WHITE;

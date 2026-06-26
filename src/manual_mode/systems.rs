@@ -68,11 +68,12 @@ pub fn spawn_manual_mode_panel(
         .spawn((
             Node {
                 position_type: PositionType::Absolute,
-                bottom: Val::Px(0.0),
-                left: Val::Px(0.0),
+                bottom: Px(PANEL_PADDING),
+                left: Px(PANEL_PADDING),
                 width: Val::Percent(PANEL_WIDTH),
-                height: Val::Px(PANEL_HEIGHT),
+                height: Px(PANEL_HEIGHT),
                 flex_direction: FlexDirection::Column,
+                border: UiRect::all(Px(BORDER_WIDTH)),
                 ..default()
             },
             BackgroundColor(PANEL_BG),
@@ -133,13 +134,30 @@ pub fn despawn_manual_mode_panel(
 // ---------------------------------------------------------------
 fn spawn_tab_bar(parent: &mut RelatedSpawnerCommands<ChildOf>, font: Handle<Font>) {
     parent
-        .spawn(Node {
+        .spawn((Node {
             width: Val::Percent(100.0),
             height: Val::Px(TAB_HEIGHT),
             flex_direction: FlexDirection::Row,
-            border: UiRect::bottom(Val::Px(1.5)),
+            align_items: AlignItems::FlexStart,
+            justify_content: JustifyContent::FlexStart,
+            border: UiRect::bottom(Px(BORDER_WIDTH)),
+            column_gap: Val::Px(6.0),
+            // padding: UiRect::horizontal(Val::Px(TAB_PADDING)),
+            padding: UiRect::new(
+                Val::Px(TAB_PADDING), // left
+                Val::Px(TAB_PADDING), // right
+                Val::Px(TAB_PADDING), // top
+                Val::Px(0.0), // bottom
+            ),
             ..default()
-        })
+            },
+            BorderRadius::new(
+                Val::Px(8.0),
+                Val::Px(8.0),
+                Val::Px(0.0),
+                Val::Px(0.0),
+            ),
+        ))
         .with_children(|bar| {
             for (label, tab) in [
                 ("Galaxy", Tab::Galaxy),
@@ -149,15 +167,22 @@ fn spawn_tab_bar(parent: &mut RelatedSpawnerCommands<ChildOf>, font: Handle<Font
                 bar.spawn((
                     Button,
                     Node {
-                        width: Val::Px(130.0),
+                        width: Val::Px(TAB_WIDTH),
                         height: Val::Percent(100.0),
                         justify_content: JustifyContent::Center,
                         align_items: AlignItems::Center,
-                        border: UiRect::right(Val::Px(1.5)),
+                        border: UiRect::all(Val::Px(BORDER_WIDTH)),
+                        padding: UiRect::horizontal(Val::Px(TAB_PADDING)),
                         ..default()
                     },
                     BackgroundColor(TAB_INACTIVE_BG),
                     BorderColor::all(TAB_BORDER),
+                    BorderRadius::new(
+                        Val::Px(8.0),
+                        Val::Px(8.0),
+                        Val::Px(0.0),
+                        Val::Px(0.0),
+                    ),
                     TabButton{ tab },
                 ))
                     .with_children(|b| {

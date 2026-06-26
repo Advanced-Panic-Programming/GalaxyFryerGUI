@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use common_game::utils::ID;
 use galaxy_fryer::app::gui_protocol::GUIToOrchestrator;
-use crate::manual_mode::components::{AskCombineButton, AskGenerateButton, CombineButton, GenerateButton, ManualModePanelRoot, MoveButton, PlanetSpinnerDecrementButton, PlanetSpinnerIncrementButton, PlanetSpinnerValue, SendAsteroidButton, SendSunrayButton, StartAIButton, StopAIButton, TabButton};
+use crate::manual_mode::components::{AskCombineButton, AskGenerateButton, CombinableResourceSpinnerDecrementButton, CombinableResourceSpinnerIncrementButton, CombineButton, GenerateButton, GenerateResourceSpinnerDecrementButton, GenerateResourceSpinnerIncrementButton, ManualModePanelRoot, MoveButton, PlanetSpinnerDecrementButton, PlanetSpinnerIncrementButton, PlanetSpinnerValue, SendAsteroidButton, SendSunrayButton, StartAIButton, StopAIButton, TabButton};
 use crate::manual_mode::resources::{CombinableResourcesOnPlanet, GeneratableResourcesOnPlanet, GenerateResourceSpinner, ManualModePanel, PlanetSpinner, Tab};
 use crate::setup_orchestrator::resources::ToOrchestrator;
 use crate::setup_simulation::resources::ExplorersData;
@@ -126,7 +126,7 @@ pub fn handle_ask_generate_button(
     for (interaction, btn) in query.iter() {
         if *interaction == Interaction::Pressed {
             if let Some(s) = &sender {
-                // let _ = s.0.send(GUIToOrchestrator::AskAvailableGenerate {explorer_id: btn.explorer_id}); //TODO! Add message to GuiToOrchestrator protocol
+                let _ = s.0.send(GUIToOrchestrator::AskAvailableGenerate {explorer_id: btn.explorer_id});
             }
         }
     }
@@ -168,12 +168,48 @@ pub fn handle_generate_button(
     }
 }
 
-pub fn handle_generate_increment_button() {
-    //TODO!
+pub fn handle_generate_increment_button(
+    check_root: Query<Entity, With<ManualModePanelRoot>>,
+    query: Query<(&Interaction, &GenerateResourceSpinnerIncrementButton), (Changed<Interaction>, With<GenerateResourceSpinnerIncrementButton>)>,
+    explorers_data: Res<ExplorersData>,
+    mut generatable_resources_on_planet: ResMut<GeneratableResourcesOnPlanet>,
+) {
+    if check_root.is_empty() {
+        return;
+    }
+    
+    for (interaction, btn) in query.iter() {
+        if *interaction == Interaction::Pressed {
+            let current_planet = match btn.explorer_id {
+                0 => explorers_data.explorer1.get_current_planet_index() as ID,
+                1 => explorers_data.explorer2.get_current_planet_index() as ID,
+                _ => { panic!("Explorer index out of bounds")}
+            };
+            generatable_resources_on_planet.get_generate_mut(current_planet).increase();
+        }
+    }
 }
 
-pub fn handle_generate_decrement_button() {
-    //TODO!
+pub fn handle_generate_decrement_button(
+    check_root: Query<Entity, With<ManualModePanelRoot>>,
+    query: Query<(&Interaction, &GenerateResourceSpinnerDecrementButton), (Changed<Interaction>, With<GenerateResourceSpinnerDecrementButton>)>,
+    explorers_data: Res<ExplorersData>,
+    mut generatable_resources_on_planet: ResMut<GeneratableResourcesOnPlanet>,
+) {
+    if check_root.is_empty() {
+        return;
+    }
+
+    for (interaction, btn) in query.iter() {
+        if *interaction == Interaction::Pressed {
+            let current_planet = match btn.explorer_id {
+                0 => explorers_data.explorer1.get_current_planet_index() as ID,
+                1 => explorers_data.explorer2.get_current_planet_index() as ID,
+                _ => { panic!("Explorer index out of bounds")}
+            };
+            generatable_resources_on_planet.get_generate_mut(current_planet).decrease();
+        }
+    }
 }
 
 pub fn handle_ask_combine_button(
@@ -189,7 +225,7 @@ pub fn handle_ask_combine_button(
     for (interaction, btn) in query.iter() {
         if *interaction == Interaction::Pressed {
             if let Some(s) = &sender {
-                // let _ = s.0.send(GUIToOrchestrator::AskAvailableCombinable {explorer_id: btn.explorer_id} ); //TODO! Add message to GuiToOrchestrator protocol
+                let _ = s.0.send(GUIToOrchestrator::AskAvailableCombine {explorer_id: btn.explorer_id} );
             }
         }
     }
@@ -232,12 +268,49 @@ pub fn handle_combine_button(
     }
 }
 
-pub fn handle_combine_increment_button() {
-    //TODO!
+pub fn handle_combine_increment_button(
+    check_root: Query<Entity, With<ManualModePanelRoot>>,
+    query: Query<(&Interaction, &CombinableResourceSpinnerIncrementButton), (Changed<Interaction>, With<CombinableResourceSpinnerIncrementButton>)>,
+    explorers_data: Res<ExplorersData>,
+    mut combinable_resources_on_planet: ResMut<CombinableResourcesOnPlanet>,
+) {
+    if check_root.is_empty() {
+        return;
+    }
+
+    for (interaction, btn) in query.iter() {
+        if *interaction == Interaction::Pressed {
+            let current_planet = match btn.explorer_id {
+                0 => explorers_data.explorer1.get_current_planet_index() as ID,
+                1 => explorers_data.explorer2.get_current_planet_index() as ID,
+                _ => { panic!("Explorer index out of bounds")}
+            };
+            combinable_resources_on_planet.get_combine_mut(current_planet).increase();
+        }
+    }
 }
 
-pub fn handle_combine_decrement_button() {
-    //TODO!
+pub fn handle_combine_decrement_button(
+    check_root: Query<Entity, With<ManualModePanelRoot>>,
+    query: Query<(&Interaction, &CombinableResourceSpinnerDecrementButton), (Changed<Interaction>, With<CombinableResourceSpinnerDecrementButton>)>,
+    explorers_data: Res<ExplorersData>,
+    mut combinable_resources_on_planet: ResMut<CombinableResourcesOnPlanet>,
+) {
+    
+    if check_root.is_empty() {
+       return ; 
+    }
+    
+    for (interaction, btn) in query.iter() {
+        if *interaction == Interaction::Pressed {
+            let current_planet = match btn.explorer_id {
+                0 => explorers_data.explorer1.get_current_planet_index() as ID,
+                1 => explorers_data.explorer2.get_current_planet_index() as ID,
+                _ => { panic!("Explorer index out of bounds")}
+            };
+            combinable_resources_on_planet.get_combine_mut(current_planet).decrease();
+        }
+    }
 }
 
 pub fn handle_start_ai_button(

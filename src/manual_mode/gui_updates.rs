@@ -95,10 +95,8 @@ pub fn update_generate_spinner_value(
     if check_root.is_empty() {
         return;
     }
-    
-    if !generate_resource_on_planet.is_changed() {
-        return;
-    }
+
+    // If the explorer moves, I want to update the spinner value to be coherent with the current planet
 
     for (mut text, value) in query.iter_mut() {
         let current_planet = match value.explorer_id {
@@ -124,10 +122,8 @@ pub fn update_combine_spinner_value(
     if check_root.is_empty() {
         return;
     }
-    
-    if !combine_resource_on_planet.is_changed() {
-        return;
-    }
+
+    // If the explorer moves, I want to update the spinner value to be coherent with the current planet
 
     for (mut text, value) in query.iter_mut() {
         let current_planet = match value.explorer_id {

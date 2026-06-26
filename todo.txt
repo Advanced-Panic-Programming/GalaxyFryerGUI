@@ -5,7 +5,7 @@ Le uniche risorse non inizializzate a default per ora sono ToOrchestrator e From
 BUG NOTI:
 - 2026-06-26T10:24:56.018073Z  WARN bevy_ecs::error::handler: Encountered an error in command `<bevy_ecs::system::commands::entity_command::despawn::{{closure}} as bevy_ecs::error::command_handling::CommandWithEntity<core::result::Result<(), bevy_ecs::world::error::EntityMutableFetchError>>>::with_entity::{{closure}}`: The entity with ID 227v2 does not exist (enable `track_location` feature for more details)
     Questo errore appare solo come WARN -> Bevy non manda un panic e continua a girare ma cmq va risolto
-- A volte la move degli esploratori genera 2 messaggi del log invece che 1 solo
+- A volte la move degli esploratori genera 2 messaggi del log invece che 1 solo (sospetto sia colpa dell'orchestrator)
 - OGNI SISTEMA CHE USA run_if(resource_changed) STA CREANDO UNA RACE CONDITION !!!! MODIFICALI COME FATTO CON UPDATE SYSTEM DEL MODULO LEGEND
 
 TODO:
@@ -17,6 +17,7 @@ TODO:
 ??? Aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all' orchestrator per aggiornare le risorse ???
 - Aggiungere risorsa per sprite explorer
 - Modificare stile Manual Mode Panel
+- PlanetView Mostrare anche la bag dell'esploratore
 
 Esc -> manda stop simulation che triggera stop planet AI
 Play -> Deve mandare Resume Simulation che fa ripartire i pianeti
