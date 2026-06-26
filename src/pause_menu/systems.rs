@@ -9,6 +9,7 @@ use crate::galaxy_view::components::AnimationConfig;
 use crate::galaxy_view::utils::{ANIMATION_FPS, PLANET_INITIAL_SPLAT};
 use crate::pause_menu::components::*;
 use crate::pause_menu::utils::*;
+use crate::setup_orchestrator::resources::ToOrchestrator;
 
 pub fn setup_pause_menu(
     mut commands: Commands,

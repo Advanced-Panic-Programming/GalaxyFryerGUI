@@ -38,8 +38,8 @@ pub fn spawn_manual_mode_panel(
     let explorer1_bag = explorers_data.explorer1.get_bag();
     let explorer2_bag = explorers_data.explorer2.get_bag();
 
-    let explorer1_current_planet_id = ID::from(explorers_data.explorer1.get_current_planet_index() as u32);
-    let explorer2_current_planet_id = ID::from(explorers_data.explorer2.get_current_planet_index() as u32);
+    let explorer1_current_planet_id = explorers_data.explorer1.get_current_planet_index() as ID;
+    let explorer2_current_planet_id = explorers_data.explorer2.get_current_planet_index() as ID;
 
     let generate_resource_spinner1 = generatable_resources_on_planet.get_generate(explorer1_current_planet_id).get_current_value();
     let generate_resource_spinner2 = generatable_resources_on_planet.get_generate(explorer2_current_planet_id).get_current_value();
@@ -47,9 +47,21 @@ pub fn spawn_manual_mode_panel(
     let combine_resource_spinner1 = combinable_resources_on_planet.get_combine(explorer1_current_planet_id).get_current_value();
     let combine_resource_spinner2 = combinable_resources_on_planet.get_combine(explorer2_current_planet_id).get_current_value();
 
-    let visibility = match manual_mode_panel.visible {
+    let panel_visibility = match manual_mode_panel.visible {
         true =>  Visibility::Visible,
         false => Visibility::Hidden,
+    };
+    let galaxy_tab_visibility = match manual_mode_panel.active_tab {
+        Tab::Galaxy => Visibility::Visible,
+        _ => Visibility::Hidden,
+    };
+    let explorer1_tab_visibility = match manual_mode_panel.active_tab {
+        Tab::Explorer1 => Visibility::Visible,
+        _ => Visibility::Hidden,
+    };
+    let explorer2_tab_visibility = match manual_mode_panel.active_tab {
+        Tab::Explorer2 => Visibility::Visible,
+        _ => Visibility::Hidden,
     };
 
     commands
@@ -66,7 +78,7 @@ pub fn spawn_manual_mode_panel(
             BackgroundColor(PANEL_BG),
             BorderRadius::all(Px(PANEL_BORDER_RADIUS)),
             BorderColor::all(PANEL_BORDER_COLOR),
-            visibility,
+            panel_visibility,
             ManualModePanelRoot,
         ))
         .with_children(|panel| {
@@ -80,26 +92,28 @@ pub fn spawn_manual_mode_panel(
                     ..default()
                 })
                 .with_children(|area| {
-                    spawn_galaxy_tab(area, font.clone(), font_bold.clone(), planet_spinner.get_current_value() + 1);
+                    spawn_galaxy_tab(area, font.clone(), font_bold.clone(), planet_spinner.get_current_value() + 1, galaxy_tab_visibility);
                     spawn_explorer_tab(area, 0, font.clone(), font_bold.clone(),
                                        explorer1_state,
                                        explorer1_alive_sprite,
                                        explorer1_dead_sprite,
-                                       explorers_data.explorer1.get_current_planet_index(),
+                                       explorers_data.explorer1.get_current_planet_index() + 1,
                                        explorer1_bag,
                                        planet_spinner.get_current_value() + 1,
                                        generate_resource_spinner1,
                                        combine_resource_spinner1,
+                                       explorer1_tab_visibility,
                     );
                     spawn_explorer_tab(area, 1, font.clone(), font_bold.clone(),
                                        explorer2_state,
                                        explorer2_alive_sprite,
                                        explorer2_dead_sprite,
-                                       explorers_data.explorer2.get_current_planet_index(),
+                                       explorers_data.explorer2.get_current_planet_index() + 1,
                                        explorer2_bag,
                                        planet_spinner.get_current_value() + 1,
                                        generate_resource_spinner2,
                                        combine_resource_spinner2,
+                                       explorer2_tab_visibility,
                     );
                 });
         });
@@ -165,6 +179,7 @@ fn spawn_galaxy_tab(
     font: Handle<Font>,
     _fb: Handle<Font>,
     planet_spinner_value: usize,
+    visibility: Visibility,
 ) {
     parent
         .spawn((
@@ -177,6 +192,7 @@ fn spawn_galaxy_tab(
                 row_gap: Val::Px(14.0),
                 ..default()
             },
+            visibility,
             TabContent{ tab: Tab::Galaxy },
         ))
         .with_children(|tab| {
@@ -235,6 +251,7 @@ fn spawn_explorer_tab(
     planet_spinner_value: usize,
     current_generate: Option<&BasicResourceType>,
     current_combine: Option<&ComplexResourceType>,
+    visibility: Visibility,
 ) {
     let tab_kind = if explorer_id == 0 {
         Tab::Explorer1
@@ -250,7 +267,7 @@ fn spawn_explorer_tab(
                 height: Val::Percent(100.0),
                 ..default()
             },
-            Visibility::Hidden,
+            visibility,
             TabContent { tab: tab_kind },
         ))
         .with_children(|tab| {
@@ -263,8 +280,8 @@ fn spawn_explorer_tab(
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Row,
-                column_gap: Val::Px(20.0),
-                padding: UiRect::axes(Val::Px(14.0), Val::Px(8.0)),
+                column_gap: Val::Px(40.0),
+                padding: UiRect::axes(Val::Px(25.0), Val::Px(8.0)),
                 ..default()
             })
                 .with_children(|main_row| {
@@ -275,7 +292,7 @@ fn spawn_explorer_tab(
 
                     main_row.spawn(Node {
                         flex_direction: FlexDirection::Column,
-                        row_gap: Val::Px(6.0),
+                        row_gap: Val::Px(20.0),
                         flex_grow: 1.0,
                         ..default()
                     })
@@ -320,7 +337,7 @@ fn spawn_explorer_tab(
                             })
                                 .with_children(|row| {
                                     row.spawn((
-                                        Text::new("Bag "),
+                                        Text::new(""),
                                         TextFont {
                                             font: font.clone(),
                                             font_size: FS_NM,

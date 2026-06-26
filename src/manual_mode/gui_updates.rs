@@ -177,10 +177,10 @@ pub fn update_explorers_info(
     for (mut text, marker) in queries.p0().iter_mut() {
         match marker.explorer_id {
             0 => {
-                *text = Text::new(explorers_data.explorer1.get_current_planet_index().to_string());
+                *text = Text::new((explorers_data.explorer1.get_current_planet_index() + 1).to_string());
             }
             1 => {
-                *text = Text::new(explorers_data.explorer2.get_current_planet_index().to_string());
+                *text = Text::new((explorers_data.explorer2.get_current_planet_index() + 1).to_string());
             }
             _ => { panic!("Explorer Index out of bounds!") }
         }

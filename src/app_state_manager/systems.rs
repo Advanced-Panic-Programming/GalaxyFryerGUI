@@ -1,9 +1,11 @@
 use bevy::prelude::*;
-use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::EndSimulation;
+use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::{EndSimulation, PauseSimulation, ResumeSimulation};
+use crate::app_state_manager::resources::{CurrentMode, Mode};
 use super::messages::*;
 use crate::app_states::*;
 use crate::AppState::*;
 use crate::galaxy_view::messages::{ReceivedAutomaticModeAck, ReceivedManualModeAck, ReceivedSimulationEnd};
+use crate::manual_mode::resources::ManualModePanel;
 use crate::setup_orchestrator::resources::{CurrentOrchestratorMode, OrchestratorMode, ToOrchestrator};
 
 pub fn handle_setup_simulation_completed(
@@ -29,28 +31,43 @@ pub fn handle_setup_orchestrator_completed(
 pub fn handle_play_pressed(
     mut message: MessageReader<PlayPressed>,
     mut next_state: ResMut<NextState<AppState>>,
+    gui_to_orchestrator: Res<ToOrchestrator>,
+    current_mode: Res<CurrentMode>,
 ) {
     if !message.is_empty() {
         message.clear();
         info!("State transition: Pause Menu -> GalaxyView");
         next_state.set(GalaxyView);
+
+        //TODO!
+        // Al momento non distinguendo il Resume simulation se viene da manual mode o da automatic mode, fa partire l'AI di pianeti ed explorer
+        // quindi l'app si avvia graficamente in manual mode, ma l'orchestrator e' in automatic mode
+
+        // if current_mode.current == Mode::Automatic {
+        //     let _ = gui_to_orchestrator.0.send(ResumeSimulation); //TODO! ResumeSimulationFromAutomatic
+        // } else if current_mode.current == Mode::Manual {
+        //     let _ = gui_to_orchestrator.0.send(ResumeSimulation); //TODO! ResumeSimulationFromManual
+        // }
     }
 }
 pub fn handle_pause_pressed(
     mut message: MessageReader<PausePressed>,
     mut next_state: ResMut<NextState<AppState>>,
+    gui_to_orchestrator: Res<ToOrchestrator>,
 ) {
     if !message.is_empty() {
         message.clear();
         info!("State transition: {:?} -> PauseMenu", next_state);
         next_state.set(PauseMenu);
+
+        let _ = gui_to_orchestrator.0.send(PauseSimulation);
     }
 }
 
 pub fn handle_exit_pressed(
     mut message: MessageReader<ExitPressed>,
     mut next_state: ResMut<NextState<AppState>>,
-    mut gui_to_orch: ResMut<ToOrchestrator>,
+    gui_to_orch: Res<ToOrchestrator>,
 ) {
     if !message.is_empty() {
         message.clear();

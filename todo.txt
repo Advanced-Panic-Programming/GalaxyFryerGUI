@@ -7,14 +7,16 @@ BUG NOTI:
     Questo errore appare solo come WARN -> Bevy non manda un panic e continua a girare ma cmq va risolto
 - A volte la move degli esploratori genera 2 messaggi del log invece che 1 solo
 - OGNI SISTEMA CHE USA run_if(resource_changed) STA CREANDO UNA RACE CONDITION !!!! MODIFICALI COME FATTO CON UPDATE SYSTEM DEL MODULO LEGEND
-- La BagView non si aggiorna (la risorsa si aggiorna correttamente, va solo mostrata. Il problema e la modifica del *text?)
 
 TODO:
 - Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?Creare un nuovo modulo galaxy_update?)
-- Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva bottone
+- Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva bottone (cambia colore)
 - remove cycle explorer? Currently not working
 - Quando explorer muore, metti una freccia grigia/con teschio
 !!! Quando vado in PlanetState, manda richiesta all' orchestrator per aggiornare lo stato del pianeta
 ??? Aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all' orchestrator per aggiornare le risorse ???
 - Aggiungere risorsa per sprite explorer
 - Modificare stile Manual Mode Panel
+
+Esc -> manda stop simulation che triggera stop planet AI
+Play -> Deve mandare Resume Simulation che fa ripartire i pianeti

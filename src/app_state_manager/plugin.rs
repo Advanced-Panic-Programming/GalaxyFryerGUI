@@ -29,15 +29,14 @@ impl Plugin for AppStateManagerPlugin {
             .add_systems(Update, (
                 handle_setup_simulation_completed,
                 handle_setup_orchestrator_completed,
-                handle_play_pressed,
-                handle_pause_pressed,
-                handle_exit_pressed.run_if(resource_exists::<ToOrchestrator>),
                 handle_galaxy_view_pressed,
                 handle_planet_view_pressed,
                 handle_simulation_completed,
-                (
-                    handle_manual_mode,
-                    handle_automatic_mode
+                (handle_play_pressed,
+                handle_pause_pressed,
+                handle_exit_pressed).run_if(resource_exists::<ToOrchestrator>),
+                (handle_manual_mode,
+                 handle_automatic_mode
                 ).run_if(resource_exists::<CurrentOrchestratorMode>),
             ));
     }
