@@ -76,7 +76,6 @@ pub fn setup_pause_menu(
     let font = asset_server.load(FONT);
 
     commands.spawn((
-        DespawnOnExit(PauseMenu),
         Node {
             width: percent(100),
             height: percent(100),
@@ -107,7 +106,6 @@ pub fn setup_pause_menu(
 fn create_button(font: Handle<Font>, label: &str) -> impl Bundle {
     (
         Button,
-        PauseMenuUI,
         Node {
             width: Val::Px(BUTTON_WIDTH),
             height: Val::Px(BUTTON_HEIGHT),

@@ -37,22 +37,24 @@ pub const TEXT_SECTION: Color = Color::srgb(0.45, 0.60, 0.85);
 // Others
 pub const ORBIT_Y_SHIFT_ACTIVE: f32 = 110.0; // When the panel is active, we shift the planets' orbit up so that they're not covered
 
-pub fn basic_resource_type_to_string(res: &BasicResourceType) -> String {
+pub fn basic_resource_type_to_string(res: Option<&BasicResourceType>) -> String {
     match res {
-        BasicResourceType::Silicon => "Silicon".to_string(),
-        BasicResourceType::Oxygen => "Oxygen".to_string(),
-        BasicResourceType::Hydrogen => "Hydrogen".to_string(),
-        BasicResourceType::Carbon => "Carbon".to_string(),
+        Some(BasicResourceType::Silicon) => "Silicon".to_string(),
+        Some(BasicResourceType::Oxygen) => "Oxygen".to_string(),
+        Some(BasicResourceType::Hydrogen) => "Hydrogen".to_string(),
+        Some(BasicResourceType::Carbon) => "Carbon".to_string(),
+        None => "".to_string(),
     }
 }
 
-pub fn complex_resource_type_to_string(res: &ComplexResourceType) -> String {
+pub fn complex_resource_type_to_string(res: Option<&ComplexResourceType>) -> String {
     match res {
-        ComplexResourceType::Diamond => "Diamond".to_string(),
-        ComplexResourceType::Water => "Water".to_string(),
-        ComplexResourceType::Life => "Life".to_string(),
-        ComplexResourceType::Robot => "Robot".to_string(),
-        ComplexResourceType::Dolphin => "Dolphin".to_string(),
-        ComplexResourceType::AIPartner => "AIPartner".to_string(),
+        Some(ComplexResourceType::Diamond) => "Diamond".to_string(),
+        Some(ComplexResourceType::Water) => "Water".to_string(),
+        Some(ComplexResourceType::Life) => "Life".to_string(),
+        Some(ComplexResourceType::Robot) => "Robot".to_string(),
+        Some(ComplexResourceType::Dolphin) => "Dolphin".to_string(),
+        Some(ComplexResourceType::AIPartner) => "AIPartner".to_string(),
+        None => "".to_string(),
     }
 }

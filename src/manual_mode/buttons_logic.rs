@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use common_game::utils::ID;
 use galaxy_fryer::app::gui_protocol::GUIToOrchestrator;
-use crate::manual_mode::components::{AskCombineButton, AskGenerateButton, CombineButton, GenerateButton, ManualModePanelRoot, MoveButton, PlanetSpinnerDecrementButton, PlanetSpinnerIncrementButton, PlanetSpinnerValue, SendAsteroidButton, SendSunrayButton, StartAIButton, StopAIButton};
-use crate::manual_mode::resources::{CombinableResourcesOnPlanet, GeneratableResourcesOnPlanet, GenerateResourceSpinner, ManualModePanel, PlanetSpinner};
+use crate::manual_mode::components::{AskCombineButton, AskGenerateButton, CombineButton, GenerateButton, ManualModePanelRoot, MoveButton, PlanetSpinnerDecrementButton, PlanetSpinnerIncrementButton, PlanetSpinnerValue, SendAsteroidButton, SendSunrayButton, StartAIButton, StopAIButton, TabButton};
+use crate::manual_mode::resources::{CombinableResourcesOnPlanet, GeneratableResourcesOnPlanet, GenerateResourceSpinner, ManualModePanel, PlanetSpinner, Tab};
 use crate::setup_orchestrator::resources::ToOrchestrator;
 use crate::setup_simulation::resources::ExplorersData;
 // This module contains all the buttons logic
@@ -23,7 +23,7 @@ pub fn handle_planet_spinner_dec(
 
     for interaction in &query {
         if *interaction == Interaction::Pressed {
-            planet_spinner.increase();
+            planet_spinner.decrease();
         }
     }
 }
@@ -40,7 +40,7 @@ pub fn handle_planet_spinner_inc(
 
     for interaction in &query {
         if *interaction == Interaction::Pressed {
-            planet_spinner.decrease();
+            planet_spinner.increase();
         }
     }
 }
@@ -126,7 +126,7 @@ pub fn handle_ask_generate_button(
     for (interaction, btn) in query.iter() {
         if *interaction == Interaction::Pressed {
             if let Some(s) = &sender {
-                // let _ = s.0.send(GUIToOrchestrator::AskGeneratable {explorer_id: btn.explorer_id}); //TODO! Add message to GuiToOrchestrator protocol
+                // let _ = s.0.send(GUIToOrchestrator::AskAvailableGenerate {explorer_id: btn.explorer_id}); //TODO! Add message to GuiToOrchestrator protocol
             }
         }
     }
@@ -136,7 +136,7 @@ pub fn handle_generate_button(
     check_root: Query<Entity, With<ManualModePanelRoot>>,
     query: Query<(&Interaction, &GenerateButton), Changed<Interaction>>,
     sender: Option<Res<ToOrchestrator>>,
-    mut generate_spinner: ResMut<GeneratableResourcesOnPlanet>,
+    generate_spinner: Res<GeneratableResourcesOnPlanet>,
     explorers_data: Res<ExplorersData>,
 ) {
 
@@ -158,8 +158,11 @@ pub fn handle_generate_button(
                     _ => { panic!("Explorer index out of bounds")}
                 };
 
-                let to_generate = generate_spinner.get_generate(current_planet).get_current_value();
-                let _ = s.0.send(GUIToOrchestrator::AskToGenerate {explorer_id: btn.explorer_id, resource: *to_generate});
+                if let Some(to_generate) =
+                    generate_spinner.get_generate(current_planet).get_current_value() {
+                        let _ = s.0.send(GUIToOrchestrator::AskToGenerate {
+                            explorer_id: btn.explorer_id, resource: *to_generate });
+                }
             }
         }
     }
@@ -186,7 +189,7 @@ pub fn handle_ask_combine_button(
     for (interaction, btn) in query.iter() {
         if *interaction == Interaction::Pressed {
             if let Some(s) = &sender {
-                // let _ = s.0.send(GUIToOrchestrator::AskCombinable {explorer_id: btn.explorer_id} ); //TODO! Add message to GuiToOrchestrator protocol
+                // let _ = s.0.send(GUIToOrchestrator::AskAvailableCombinable {explorer_id: btn.explorer_id} ); //TODO! Add message to GuiToOrchestrator protocol
             }
         }
     }
@@ -196,7 +199,7 @@ pub fn handle_combine_button(
     check_root: Query<Entity, With<ManualModePanelRoot>>,
     query: Query<(&Interaction, &CombineButton), Changed<Interaction>>,
     sender: Option<Res<ToOrchestrator>>,
-    mut combine_spinner: ResMut<CombinableResourcesOnPlanet>,
+    combine_spinner: Res<CombinableResourcesOnPlanet>,
     explorers_data: Res<ExplorersData>,
 ) {
 
@@ -218,8 +221,12 @@ pub fn handle_combine_button(
                     _ => { panic!("Explorer index out of bounds")}
                 };
 
-                let to_combine = combine_spinner.get_combine(current_planet).get_current_value();
-                let _ = s.0.send(GUIToOrchestrator::AskToCombine {explorer_id: btn.explorer_id, combine: *to_combine});
+                if let Some(to_combine) =
+                    combine_spinner.get_combine(current_planet).get_current_value() {
+                    let _ = s.0.send(GUIToOrchestrator::AskToCombine {
+                        explorer_id: btn.explorer_id, combine: *to_combine });
+                }
+
             }
         }
     }
@@ -271,3 +278,16 @@ pub fn handle_stop_ai_button(
     }
 }
 
+// ---------------------------------------------------------------
+//      change tab handlers
+// ---------------------------------------------------------------
+pub fn update_selected_tab(
+    query: Query<(&Interaction, &TabButton), Changed<Interaction>>,
+    mut manual_mode_panel: ResMut<ManualModePanel>,
+) {
+    for (interaction, btn) in query.iter() {
+        if *interaction == Interaction::Pressed {
+            manual_mode_panel.active_tab = btn.tab;
+        }
+    }
+}

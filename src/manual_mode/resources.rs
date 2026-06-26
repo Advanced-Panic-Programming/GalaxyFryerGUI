@@ -25,7 +25,7 @@ pub struct ManualModePanel {
 
 impl Default for ManualModePanel {
     fn default() -> Self {
-        ManualModePanel { visible:false, active_tab: Tab::Galaxy }
+        ManualModePanel { visible:true, active_tab: Tab::Galaxy } // The application starts in manual mode -> visibile: true
     }
 }
 
@@ -184,14 +184,16 @@ impl GenerateResourceSpinner {
         GenerateResourceSpinner { resources, size, index: 0 }
     }
     pub fn increase(&mut self) {
+        if self.size == 0 { return; }
         self.index = if self.index < self.size - 1 { self.index + 1 } else { 0 };
     }
     pub fn decrease(&mut self) {
-        self.index = if self.index <= 0 { self.size - 1 } else { self.index - 1 };
+        if self.size == 0 { return; }
+        self.index = if self.index == 0 { self.size - 1 } else { self.index - 1 };
     }
     /// Returns a reference to BasicResourceType
-    pub fn get_current_value(&self) -> &BasicResourceType {
-        &self.resources[self.index]
+    pub fn get_current_value(&self) -> Option<&BasicResourceType> {
+        self.resources.get(self.index)
     }
 }
 
@@ -213,14 +215,16 @@ impl CombineResourceSpinner {
         CombineResourceSpinner { resources, size, index: 0 }
     }
     pub fn increase(&mut self) {
+        if self.size == 0 { return; }
         self.index = if self.index < self.size - 1 { self.index + 1 } else { 0 };
     }
     pub fn decrease(&mut self) {
-        self.index = if self.index <= 0 { self.size - 1 } else { self.index - 1 };
+        if self.size == 0 { return; }
+        self.index = if self.index == 0 { self.size - 1 } else { self.index - 1 };
     }
     /// Returns a reference to ComplexResourceType
-    pub fn get_current_value(&self) -> &ComplexResourceType {
-        &self.resources[self.index]
+    pub fn get_current_value(&self) -> Option<&ComplexResourceType> {
+        self.resources.get(self.index)
     }
 }
 

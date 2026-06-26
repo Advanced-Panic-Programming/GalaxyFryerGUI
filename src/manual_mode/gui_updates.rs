@@ -1,9 +1,70 @@
 use bevy::prelude::*;
-use crate::manual_mode::components::{BagViewMarker, CombineResourceSpinnerValue, ExplorerCurrentPlanetMarker, ExplorerSpriteMarker, GenerateResourceSpinnerValue, ManualModePanelRoot, PlanetSpinnerValue};
-use crate::manual_mode::resources::{CombinableResourcesOnPlanet, GeneratableResourcesOnPlanet, PlanetSpinner};
+use crate::manual_mode::components::{BagViewMarker, CombineResourceSpinnerValue, ExplorerCurrentPlanetMarker, ExplorerSpriteMarker, GenerateResourceSpinnerValue, ManualModePanelRoot, PlanetSpinnerValue, TabButton, TabContent};
+use crate::manual_mode::resources::{CombinableResourcesOnPlanet, GeneratableResourcesOnPlanet, ManualModePanel, PlanetSpinner};
 use crate::manual_mode::utils::*;
-use crate::setup_simulation::resources::ExplorersData;
+use crate::setup_simulation::resources::{ExplorersData, GalaxyOrbit};
 // This module contains the systems that update the graphics part
+
+/// Shows/hides the manual mode panel according to `ManualModePanel.visible`,
+/// toggled by the M/A key bindings in `input_handler`.
+pub fn update_panel_visibility(
+    manual_mode_panel: Res<ManualModePanel>,
+    mut query: Query<&mut Visibility, With<ManualModePanelRoot>>,
+) {
+    if manual_mode_panel.is_changed() {
+        for mut visibility in &mut query {
+            *visibility = if manual_mode_panel.visible {
+                Visibility::Visible
+            } else {
+                Visibility::Hidden
+            };
+        }
+    }
+}
+
+/// Shows the content node that matches the active tab; hides the rest.
+/// Uses `Visibility::Inherited` (not `Visible`) for the active tab so that it
+/// still inherits `Hidden` from the parent panel when manual mode is off.
+pub fn update_tab_visibility(
+    manual_mode_panel: Res<ManualModePanel>,
+    mut tab_q: Query<(&TabContent, &mut Visibility)>,
+) {
+    if !manual_mode_panel.is_changed() {
+        return;
+    }
+
+    for (tab, mut vis) in &mut tab_q {
+        *vis = if tab.tab == manual_mode_panel.active_tab {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
+    }
+}
+
+pub fn update_tab_selector_colors(
+    state: Res<ManualModePanel>,
+    mut query: Query<(&Interaction, &mut BackgroundColor, &TabButton)>,
+) {
+    for (interaction, mut bg, btn) in &mut query {
+        *bg = BackgroundColor(match interaction {
+            Interaction::Hovered | Interaction::Pressed => BTN_HOVER_BG,
+            Interaction::None => {
+                if btn.tab == state.active_tab { TAB_ACTIVE_BG } else { TAB_INACTIVE_BG }
+            }
+        });
+    }
+}
+
+pub fn update_orbit_for_manual_mode(
+    state: Res<ManualModePanel>,
+    mut orbit: ResMut<GalaxyOrbit>,
+) {
+    if !state.is_changed() {
+        return;
+    }
+    orbit.center.y = if state.visible { ORBIT_Y_SHIFT_ACTIVE } else { 0.0 };
+}
 
 /// Updates the planet index shown according to the PlanetSpinner Resource
 pub fn update_planet_spinner_value(

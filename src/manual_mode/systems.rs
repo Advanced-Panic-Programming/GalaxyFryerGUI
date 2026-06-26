@@ -40,11 +40,11 @@ pub fn spawn_manual_mode_panel(
     let explorer1_current_planet_id = ID::from(explorers_data.explorer1.get_current_planet_index() as u32);
     let explorer2_current_planet_id = ID::from(explorers_data.explorer2.get_current_planet_index() as u32);
 
-    let generate_resource_spinner1 = &generatable_resources_on_planet.get_generate(explorer1_current_planet_id).get_current_value().clone();
-    let generate_resource_spinner2 = &generatable_resources_on_planet.get_generate(explorer2_current_planet_id).get_current_value().clone();
+    let generate_resource_spinner1 = generatable_resources_on_planet.get_generate(explorer1_current_planet_id).get_current_value();
+    let generate_resource_spinner2 = generatable_resources_on_planet.get_generate(explorer2_current_planet_id).get_current_value();
 
-    let combine_resource_spinner1 = &combinable_resources_on_planet.get_combine(explorer1_current_planet_id).get_current_value().clone();
-    let combine_resource_spinner2 = &combinable_resources_on_planet.get_combine(explorer2_current_planet_id).get_current_value().clone();
+    let combine_resource_spinner1 = combinable_resources_on_planet.get_combine(explorer1_current_planet_id).get_current_value();
+    let combine_resource_spinner2 = combinable_resources_on_planet.get_combine(explorer2_current_planet_id).get_current_value();
 
     commands
         .spawn((
@@ -73,7 +73,7 @@ pub fn spawn_manual_mode_panel(
                 })
                 .with_children(|area| {
                     spawn_galaxy_tab(area, font.clone(), font_bold.clone(), planet_spinner.get_current_value() + 1);
-                    spawn_explorer_tab(area, 1, font.clone(), font_bold.clone(),
+                    spawn_explorer_tab(area, 0, font.clone(), font_bold.clone(),
                                        explorer1_state,
                                        explorer1_alive_sprite,
                                        explorer1_dead_sprite,
@@ -83,7 +83,7 @@ pub fn spawn_manual_mode_panel(
                                        generate_resource_spinner1,
                                        combine_resource_spinner1,
                     );
-                    spawn_explorer_tab(area, 2, font.clone(), font_bold.clone(),
+                    spawn_explorer_tab(area, 1, font.clone(), font_bold.clone(),
                                        explorer2_state,
                                        explorer2_alive_sprite,
                                        explorer2_dead_sprite,
@@ -214,155 +214,6 @@ fn spawn_galaxy_tab(
 //      Explorers Tab
 // ---------------------------------------------------------------
 
-// fn spawn_explorer_tab(
-//     parent: &mut RelatedSpawnerCommands<ChildOf>,
-//     explorer_id: u32,
-//     font: Handle<Font>,
-//     fb: Handle<Font>,
-//     explorer_current_planet: usize,
-//     explorer_bag: &BagView,
-//     planet_spinner_value: usize,
-//     current_generate: BasicResourceType,
-//     current_combine: ComplexResourceType,
-// ) {
-//     let tab_kind = if explorer_id == 1 { Tab::Explorer1 } else { Tab::Explorer2 };
-//
-//     parent
-//         .spawn((
-//             Node {
-//                 position_type: PositionType::Absolute,
-//                 width: Val::Percent(100.0),
-//                 height: Val::Percent(100.0),
-//                 flex_direction: FlexDirection::Column,
-//                 padding: UiRect::axes(Val::Px(14.0), Val::Px(8.0)),
-//                 row_gap: Val::Px(6.0),
-//                 ..default()
-//             },
-//             Visibility::Hidden,
-//             TabContent { tab: tab_kind },
-//         ))
-//         .with_children(|tab| {
-//             // Row 1: Current planet
-//             tab.spawn(Node {
-//                 flex_direction: FlexDirection::Row,
-//                 align_items: AlignItems::Center,
-//                 column_gap: Val::Px(22.0),
-//                 ..default()
-//             })
-//                 .with_children(|row| {
-//                     // Pianeta corrente
-//                     row.spawn((
-//                         Text::new("Planet "),
-//                         TextFont { font: font.clone(), font_size: FS_NM, ..default() },
-//                         TextColor(TEXT_LABEL),
-//                     ));
-//                     row.spawn((
-//                         Text::new(explorer_current_planet.to_string()),
-//                         TextFont { font: fb.clone(), font_size: FS_NM, ..default() },
-//                         TextColor(TEXT_VALUE),
-//                         ExplorerCurrentPlanetMarker{ explorer_id },
-//                     ));
-//                 });
-//
-//             // Row 2: bag
-//             tab.spawn(Node {
-//                 flex_direction: FlexDirection::Row,
-//                 align_items: AlignItems::Center,
-//                 column_gap: Val::Px(10.0),
-//                 ..default()
-//             })
-//                 .with_children(|row| {
-//                     row.spawn((
-//                         Text::new("Bag "),
-//                         TextFont { font: font.clone(), font_size: FS_NM, ..default() },
-//                         TextColor(TEXT_LABEL),
-//                     ));
-//                     row.spawn((
-//                         Text::new(explorer_bag.to_string()),
-//                         TextFont { font: font.clone(), font_size: FS_NM, ..default() },
-//                         TextColor(TEXT_VALUE),
-//                         BagViewMarker{ explorer_id },
-//                     ));
-//                 });
-//
-//             // Move
-//             tab.spawn(Node {
-//                 flex_direction: FlexDirection::Row,
-//                 align_items: AlignItems::Center,
-//                 column_gap: Val::Px(10.0),
-//                 ..default()
-//             })
-//                 .with_children(|row| {
-//                     action_btn(row, font.clone(), "Move To Planet", BTN_BG, BTN_BORDER, MoveButton{ explorer_id });
-//                     small_arrow_btn(row, font.clone(), "<", PlanetSpinnerDecrementButton);
-//                     row.spawn((
-//                         Text::new(planet_spinner_value.to_string()),
-//                         TextFont { font: fb.clone(), font_size: FS_NM, ..default() },
-//                         TextColor(TEXT_VALUE),
-//                         PlanetSpinnerValue,
-//                     ));
-//                     small_arrow_btn(row, font.clone(), ">", PlanetSpinnerIncrementButton);
-//                 });
-//
-//             // Resource Generation
-//             tab.spawn(Node {
-//                 flex_direction: FlexDirection::Row,
-//                 align_items: AlignItems::Center,
-//                 column_gap: Val::Px(10.0),
-//                 ..default()
-//             })
-//                 .with_children(|row| {
-//                     action_btn(row, font.clone(), "Ask Generatable", BTN_BG, BTN_BORDER, AskGenerateButton { explorer_id });
-//
-//                     small_arrow_btn(row, font.clone(), "<", GenerateResourceSpinnerDecrementButton);
-//                     row.spawn((
-//                         Text::new(basic_resource_type_to_string(current_generate)),
-//                         TextFont { font: font.clone(), font_size: FS_NM, ..default() },
-//                         TextColor(TEXT_VALUE),
-//                         GenerateResourceSpinnerValue,
-//                     ));
-//                     small_arrow_btn(row, font.clone(), ">", GenerateResourceSpinnerIncrementButton);
-//
-//                     action_btn(row, font.clone(), "Generate", BTN_BG, BTN_BORDER, GenerateButton { explorer_id });
-//                 });
-//
-//             // Resource Combine
-//             tab.spawn(Node {
-//                 flex_direction: FlexDirection::Row,
-//                 align_items: AlignItems::Center,
-//                 column_gap: Val::Px(10.0),
-//                 ..default()
-//             })
-//                 .with_children(|row| {
-//                     action_btn(row, font.clone(), "Ask Combinable", BTN_BG, BTN_BORDER, AskCombineButton{ explorer_id });
-//
-//                     small_arrow_btn(row, font.clone(), "<", CombinableResourceSpinnerDecrementButton);
-//                     row.spawn((
-//                         Text::new(complex_resource_type_to_string(current_combine)),
-//                         TextFont { font: font.clone(), font_size: FS_NM, ..default() },
-//                         TextColor(TEXT_VALUE),
-//                         CombineResourceSpinnerValue,
-//                     ));
-//                     small_arrow_btn(row, font.clone(), ">", CombinableResourceSpinnerIncrementButton);
-//
-//                     action_btn(row, font.clone(), "Combine", BTN_BG, BTN_BORDER, CombineButton{ explorer_id });
-//                 });
-//
-//             // Start/Stop AI
-//             tab.spawn(Node {
-//                 flex_direction: FlexDirection::Row,
-//                 align_items: AlignItems::Center,
-//                 column_gap: Val::Px(10.0),
-//                 ..default()
-//             })
-//                 .with_children(|row| {
-//                     action_btn(row, font.clone(), "Start AI", BTN_BG, BTN_BORDER, StartAIButton{ explorer_id });
-//                     action_btn(row, font.clone(), "Stop AI", BTN_BG, BTN_BORDER, StopAIButton{ explorer_id });
-//                 });
-//
-//         });
-// }
-
 fn spawn_explorer_tab(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     explorer_id: u32,
@@ -374,10 +225,10 @@ fn spawn_explorer_tab(
     explorer_current_planet: usize,
     explorer_bag: &BagView,
     planet_spinner_value: usize,
-    current_generate: &BasicResourceType,
-    current_combine: &ComplexResourceType,
+    current_generate: Option<&BasicResourceType>,
+    current_combine: Option<&ComplexResourceType>,
 ) {
-    let tab_kind = if explorer_id == 1 {
+    let tab_kind = if explorer_id == 0 {
         Tab::Explorer1
     } else {
         Tab::Explorer2

@@ -13,11 +13,21 @@ impl Plugin for ManualModePlugin {
     app
         // Resources
             .init_resource::<ManualModePanel>()
+            .init_resource::<PlanetSpinner>()
             .init_resource::<GeneratableResourcesOnPlanet>()
             .init_resource::<CombinableResourcesOnPlanet>()
             // Manual Mode Panel Spawn/Despawn
             .add_systems(OnEnter(GalaxyView), spawn_manual_mode_panel)
             .add_systems(OnExit(GalaxyView), despawn_manual_mode_panel)
+            // Tab Handlers
+            .add_systems(Update, (
+                update_panel_visibility,
+                update_selected_tab,
+                update_tab_visibility,
+                update_tab_selector_colors,
+                update_orbit_for_manual_mode,
+                ).run_if(in_state(GalaxyView).and(resource_exists::<ManualModePanel>))
+            )
             // Galaxy Tab button logic
             .add_systems(Update, (
                     handle_planet_spinner_dec,
@@ -47,7 +57,7 @@ impl Plugin for ManualModePlugin {
                 update_generate_spinner_value,
                 update_combine_spinner_value,
                 update_explorers_info,
-                ).run_if(in_state(GalaxyView).and(resource_exists::<ManualModePanel>))
+                ).run_if(in_state(GalaxyView))
             )
         ;
     }
