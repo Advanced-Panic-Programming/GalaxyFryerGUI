@@ -9,7 +9,7 @@ impl Plugin for PauseMenuPlugin {
             // OnEnter systems
             .add_systems(OnEnter(PauseMenu), setup_pause_menu)
             // Update systems
-            .add_systems(Update, (animate_logo, play_button_system, exit_button_system).run_if(in_state(PauseMenu)))
+            .add_systems(Update, (animate_tittle, animate_logo, play_button_system, exit_button_system).run_if(in_state(PauseMenu)))
             // OnExit systems
             .add_systems(OnExit(PauseMenu), despawn_pause_menu);
     }

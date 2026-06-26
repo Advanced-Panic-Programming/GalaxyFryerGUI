@@ -1,5 +1,6 @@
 use bevy::ecs::relationship::RelatedSpawnerCommands;
 use bevy::prelude::*;
+use bevy::ui::Val::Px;
 use common_game::components::resource::{BasicResourceType, ComplexResourceType};
 use common_game::utils::ID;
 use galaxy_fryer::explorer::bag::BagView;
@@ -46,6 +47,11 @@ pub fn spawn_manual_mode_panel(
     let combine_resource_spinner1 = combinable_resources_on_planet.get_combine(explorer1_current_planet_id).get_current_value();
     let combine_resource_spinner2 = combinable_resources_on_planet.get_combine(explorer2_current_planet_id).get_current_value();
 
+    let visibility = match manual_mode_panel.visible {
+        true =>  Visibility::Visible,
+        false => Visibility::Hidden,
+    };
+
     commands
         .spawn((
             Node {
@@ -58,7 +64,9 @@ pub fn spawn_manual_mode_panel(
                 ..default()
             },
             BackgroundColor(PANEL_BG),
-            Visibility::Hidden,
+            BorderRadius::all(Px(PANEL_BORDER_RADIUS)),
+            BorderColor::all(PANEL_BORDER_COLOR),
+            visibility,
             ManualModePanelRoot,
         ))
         .with_children(|panel| {

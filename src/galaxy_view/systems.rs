@@ -496,8 +496,8 @@ pub fn update_explorer_data (
     if !explorer_bag_reader.is_empty() {
         for msg in explorer_bag_reader.read() {
             match msg.explorer_id {
-                0 => {explorer_data.explorer1.set_bag(msg.explorer_bag.clone())}
-                1 => {explorer_data.explorer2.set_bag(msg.explorer_bag.clone())}
+                0 => {explorer_data.explorer1.set_bag(msg.explorer_bag.clone()); println!("EXPLORER 1 {}", explorer_data.explorer1.get_bag())}
+                1 => {explorer_data.explorer2.set_bag(msg.explorer_bag.clone()); println!("EXPLORER 2 {}", explorer_data.explorer2.get_bag())}
                 _ => {}
             }
         }

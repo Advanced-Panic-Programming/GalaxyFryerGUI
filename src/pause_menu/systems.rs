@@ -1,5 +1,7 @@
 use bevy::color::palettes::css::WHITE;
+use bevy::pbr::Shadow;
 use bevy::prelude::*;
+use bevy::sprite::Text2dShadow;
 use crate::app_state_manager::messages::{PlayPressed, ExitPressed};
 use crate::app_states::AppState;
 use crate::app_states::AppState::PauseMenu;
@@ -28,7 +30,41 @@ pub fn setup_pause_menu(
         Transform::from_translation(Vec3::new(0.0, 0.0, -100.0)),
         PauseMenuUI
     ));
-    
+
+    // =========================
+    // === Tittle =======
+    // =========================
+
+    let title_font = asset_server.load(TITLE_FONT);
+
+    commands
+        .spawn(Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(TITLE_TOP_PADDING),
+            width: Val::Percent(100.0),
+
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+
+            ..default()
+        })
+        .with_child((
+            Text::new("GalaxyFryer"),
+            TextFont {
+                font: title_font,
+                font_size: TITLE_SIZE,
+                ..default()
+            },
+            TextColor(Color::WHITE),
+            TextShadow {
+                offset: Vec2::splat(8.0),
+                ..default()
+            },
+            PauseMenuUI,
+            AnimatedTitle,
+        ));
+
+
     // =========================
     // === Animated Logo =======
     // =========================
@@ -57,7 +93,7 @@ pub fn setup_pause_menu(
             }),
             ..default()
         },
-        Transform::from_translation(Vec3::new(0.0, 120.0, 10.0))
+        Transform::from_translation(Vec3::new(0.0, 10.0, 10.0))
             .with_scale(Vec3::splat(LOGO_SCALE)),
         AnimationIndices {
             first: 0,
@@ -72,8 +108,8 @@ pub fn setup_pause_menu(
     // ===============================
     // === Play/Exit Buttons =========
     // ===============================
-    
-    let font = asset_server.load(FONT);
+
+    let buttons_font = asset_server.load(BUTTONS_FONT);
 
     commands.spawn((
         Node {
@@ -94,9 +130,9 @@ pub fn setup_pause_menu(
         },
         children![
                 // Play Button
-                (PlayButton, create_button(font.clone(), "PLAY")),
+                (PlayButton, create_button(buttons_font.clone(), "PLAY")),
                 // Exit Button
-                (ExitButton, create_button(font.clone(), "EXIT")),
+                (ExitButton, create_button(buttons_font.clone(), "EXIT")),
             ]
         )],
     ));
@@ -119,10 +155,22 @@ fn create_button(font: Handle<Font>, label: &str) -> impl Bundle {
         BorderRadius::all(Val::Px(10.0)),
         children![(
             Text::new(label),
-            TextFont { font_size: FONT_SIZE, font, ..default() },
+            TextFont { font_size: FONT_SIZE, font: font.clone(), ..default() },
             TextColor(Color::WHITE),
         )],
     )
+}
+
+pub fn animate_tittle(
+    time: Res<Time>,
+    mut query: Query<&mut Node, With<AnimatedTitle>>,
+) {
+    for mut node in &mut query {
+        node.top = Val::Px(
+            TITLE_TOP_PADDING
+                + TITLE_OSCILLATION * ops::cos(time.elapsed_secs()*TITLE_SPEED)
+        );
+    }
 }
 
 pub fn animate_logo(

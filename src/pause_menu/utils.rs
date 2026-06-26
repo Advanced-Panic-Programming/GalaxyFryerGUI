@@ -2,13 +2,17 @@ pub const MENU_BACKGROUND: &str = "backgrounds/space_bg.png";
 
 pub const LOGO_SPRITE_SHEET: &str = "galaxy/blackHole400-40.png";
 
-pub const FONT: &str = "fonts/MediumPixel.otf";
+pub const TITLE_FONT: &str = "fonts/BoldPixel.ttf";
+pub const BUTTONS_FONT: &str = "fonts/MediumPixel.otf";
 
 pub const BUTTON_WIDTH: f32 = 260.0;
 pub const BUTTON_HEIGHT: f32 = 80.0;
 
 pub const FONT_SIZE: f32 = 42.0;
-
+pub const TITLE_SIZE: f32 = 110.0;
+pub const TITLE_TOP_PADDING: f32 = 50.0;
+pub const TITLE_OSCILLATION: f32 = 20.0;
+pub const TITLE_SPEED: f32 = 2.0;
 pub const BUTTON_SPACING: f32 = 40.0;
 pub const LOGO_SCALE: f32 = 1.6;
 
