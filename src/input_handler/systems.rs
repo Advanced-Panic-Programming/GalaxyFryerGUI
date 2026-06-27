@@ -89,7 +89,11 @@ pub fn game_related_inputs(
     }
     // Resume Simulation
     if keyboard_input.just_pressed(KeyCode::KeyR) {
-        let _ = gui_to_orch.0.send(ResumeSimulation);
+        if current_mode.current == Mode::Manual {
+            let _ = gui_to_orch.0.send(ResumeSimulationFromManual);
+        } else if current_mode.current == Mode::Automatic {
+            let _ = gui_to_orch.0.send(ResumeSimulationFromAutomatic);
+        }
     }
     // Cycle Explorer -> sets PlanetView
     if keyboard_input.just_pressed(KeyCode::KeyE) {

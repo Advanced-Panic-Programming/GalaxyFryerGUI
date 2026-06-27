@@ -1,11 +1,10 @@
 use bevy::prelude::*;
-use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::{EndSimulation, PauseSimulation, ResumeSimulation};
+use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::{EndSimulation, PauseSimulation, ResumeSimulationFromAutomatic, ResumeSimulationFromManual};
 use crate::app_state_manager::resources::{CurrentMode, Mode};
 use super::messages::*;
 use crate::app_states::*;
 use crate::AppState::*;
 use crate::galaxy_view::messages::{ReceivedAutomaticModeAck, ReceivedManualModeAck, ReceivedSimulationEnd};
-use crate::manual_mode::resources::ManualModePanel;
 use crate::setup_orchestrator::resources::{CurrentOrchestratorMode, OrchestratorMode, ToOrchestrator};
 
 pub fn handle_setup_simulation_completed(
@@ -39,15 +38,11 @@ pub fn handle_play_pressed(
         info!("State transition: Pause Menu -> GalaxyView");
         next_state.set(GalaxyView);
 
-        //TODO!
-        // Al momento non distinguendo il Resume simulation se viene da manual mode o da automatic mode, fa partire l'AI di pianeti ed explorer
-        // quindi l'app si avvia graficamente in manual mode, ma l'orchestrator e' in automatic mode
-
-        // if current_mode.current == Mode::Automatic {
-        //     let _ = gui_to_orchestrator.0.send(ResumeSimulation); //TODO! ResumeSimulationFromAutomatic
-        // } else if current_mode.current == Mode::Manual {
-        //     let _ = gui_to_orchestrator.0.send(ResumeSimulation); //TODO! ResumeSimulationFromManual
-        // }
+        if current_mode.current == Mode::Automatic {
+            let _ = gui_to_orchestrator.0.send(ResumeSimulationFromAutomatic);
+        } else if current_mode.current == Mode::Manual {
+            let _ = gui_to_orchestrator.0.send(ResumeSimulationFromManual);
+        }
     }
 }
 pub fn handle_pause_pressed(

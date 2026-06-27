@@ -16,8 +16,8 @@ pub const EXPLORER2_DEAD_PATH: &str = "assets/astronaut/old/astro_chicken_no_mid
 
 // Panel
 pub const PANEL_HEIGHT: f32 = 340.0;
-pub const PANEL_WIDTH: f32 = 70.0;
-pub const TAB_HEIGHT: f32 = 36.0;
+pub const PANEL_WIDTH: f32 = 60.0; // Percent
+pub const TAB_HEIGHT: f32 = 36.0; // Px
 pub const PANEL_BG: Color = Color::srgba(0.05, 0.05, 0.08, 0.80);
 pub const PANEL_BORDER_RADIUS: f32 = 12.0;
 pub const PANEL_BORDER_COLOR: Color = Color::srgba(0.7, 0.7, 0.7, 0.9);
