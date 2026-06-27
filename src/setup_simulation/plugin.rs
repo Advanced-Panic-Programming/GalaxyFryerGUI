@@ -25,6 +25,7 @@ impl Plugin for SetupSimulationPlugin {
                     init_planets_sprites_data_resource,
                     init_planets_data_resource,
                     init_selected_planet_resource,
+                    init_explorer_sprites_resource,
                 )
             )
             // Update system: sends SetupSimulationCompleted Message -> AppStateManager will change app state

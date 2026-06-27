@@ -8,7 +8,7 @@ use crate::manual_mode::resources::*;
 use crate::manual_mode::components::*;
 use crate::manual_mode::builders::*;
 use crate::manual_mode::utils::*;
-use crate::setup_simulation::resources::ExplorersData;
+use crate::setup_simulation::resources::{ExplorerSpriteData, ExplorersData};
 // ---------------------------------------------------------------
 //      Spawn / Despawn
 // ---------------------------------------------------------------
@@ -19,17 +19,18 @@ pub fn spawn_manual_mode_panel(
     manual_mode_panel: Res<ManualModePanel>,
     planet_spinner: Res<PlanetSpinner>,
     explorers_data: Res<ExplorersData>,
+    explorer_sprite_data: Res<ExplorerSpriteData>, // Guaranteed to exist bc it has been added in simulation_setup that runs before every other system
     generatable_resources_on_planet: Res<GeneratableResourcesOnPlanet>,
     combinable_resources_on_planet: Res<CombinableResourcesOnPlanet>,
 ) {
     let font = asset_server.load(FONT);
     let font_bold = asset_server.load(FONT_BOLD);
 
-    let explorer1_alive_sprite: Handle<Image> = asset_server.load(EXPLORER1_ALIVE_PATH);
-    let explorer1_dead_sprite: Handle<Image> = asset_server.load(EXPLORER1_DEAD_PATH);
+    let explorer1_alive_sprite: Handle<Image> = explorer_sprite_data.explorer1.alive_sprite.clone();
+    let explorer1_dead_sprite: Handle<Image> = explorer_sprite_data.explorer1.dead_sprite.clone();
 
-    let explorer2_alive_sprite: Handle<Image> = asset_server.load(EXPLORER2_ALIVE_PATH);
-    let explorer2_dead_sprite: Handle<Image> = asset_server.load(EXPLORER2_DEAD_PATH);
+    let explorer2_alive_sprite: Handle<Image> = explorer_sprite_data.explorer2.alive_sprite.clone();
+    let explorer2_dead_sprite: Handle<Image> = explorer_sprite_data.explorer2.dead_sprite.clone();
 
     let explorer1_state = explorers_data.explorer1.is_alive();
     let explorer2_state = explorers_data.explorer2.is_alive();
@@ -305,7 +306,7 @@ fn spawn_explorer_tab(
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Row,
-                column_gap: Val::Px(40.0),
+                column_gap: Val::Px(EXPLOER_TAB_COLUMNS_GAP),
                 padding: UiRect::axes(Val::Px(25.0), Val::Px(8.0)),
                 ..default()
             })
@@ -318,7 +319,7 @@ fn spawn_explorer_tab(
                     main_row.spawn(Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(20.0),
-                        flex_grow: 1.0,
+                        flex_grow: 3.0,
                         ..default()
                     })
                         .with_children(|left_column| {
@@ -327,7 +328,7 @@ fn spawn_explorer_tab(
                             left_column.spawn(Node {
                                 flex_direction: FlexDirection::Row,
                                 align_items: AlignItems::Center,
-                                column_gap: Val::Px(22.0),
+                                column_gap: Val::Px(10.0),
                                 ..default()
                             })
                                 .with_children(|row| {

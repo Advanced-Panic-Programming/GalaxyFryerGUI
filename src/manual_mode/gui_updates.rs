@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::manual_mode::components::{BagViewMarker, CombineResourceSpinnerValue, ExplorerCurrentPlanetMarker, ExplorerSpriteMarker, GenerateResourceSpinnerValue, ManualModePanelRoot, PlanetSpinnerValue, TabButton, TabContent};
 use crate::manual_mode::resources::{CombinableResourcesOnPlanet, GeneratableResourcesOnPlanet, ManualModePanel, PlanetSpinner};
 use crate::manual_mode::utils::*;
-use crate::setup_simulation::resources::{ExplorersData, GalaxyOrbit};
+use crate::setup_simulation::resources::{ExplorerSpriteData, ExplorersData, GalaxyOrbit};
 // This module contains the systems that update the graphics part
 
 /// Shows/hides the manual mode panel according to `ManualModePanel.visible`,
@@ -145,6 +145,7 @@ pub fn update_explorers_info(
     asset_server: Res<AssetServer>,
     explorers_data: Res<ExplorersData>,
     check_root: Query<Entity, With<ManualModePanelRoot>>,
+    explorer_sprite_data: Res<ExplorerSpriteData>, // Guaranteed to exist bc it has been added in simulation_setup that runs before every other system
     mut queries: ParamSet<(
         Query<
             (&mut Text, &ExplorerCurrentPlanetMarker),
@@ -200,16 +201,16 @@ pub fn update_explorers_info(
         match marker.explorer_id {
             0 => {
                 if explorers_data.explorer1.is_alive() {
-                    sprite.image = asset_server.load(EXPLORER1_ALIVE_PATH)
+                    sprite.image = explorer_sprite_data.explorer1.alive_sprite.clone();
                 } else {
-                    sprite.image = asset_server.load(EXPLORER1_DEAD_PATH)
+                    sprite.image = explorer_sprite_data.explorer1.dead_sprite.clone();
                 }
             }
             1 => {
                 if explorers_data.explorer2.is_alive() {
-                    sprite.image = asset_server.load(EXPLORER2_ALIVE_PATH)
+                    sprite.image = explorer_sprite_data.explorer2.alive_sprite.clone();
                 } else {
-                    sprite.image = asset_server.load(EXPLORER2_DEAD_PATH)
+                    sprite.image = explorer_sprite_data.explorer2.dead_sprite.clone();
                 }
             }
             _ => { panic!("Explorer Index out of bounds!") }

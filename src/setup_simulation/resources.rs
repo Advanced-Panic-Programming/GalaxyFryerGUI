@@ -142,8 +142,6 @@ pub struct Explorer {
     alive: bool,
     current_planet_index: usize,
     bag: BagView,
-    // alive_sprite: Handle<Image>,
-    // dead_sprite: Handle<Image>
 }
 
 impl Explorer {
@@ -155,17 +153,26 @@ impl Explorer {
             bag,
         }
     }
-    
+
     // Getters
     pub fn is_alive(&self) -> bool { self.alive }
     pub fn get_current_planet_index(&self) -> usize { self.current_planet_index }
     pub fn get_bag(&self) -> &BagView { &self.bag }
-    
+
     // Setters
     pub fn kill(&mut self) {
         self.alive = false;
     }
     pub fn set_current_planet_index(&mut self, index: usize) { self.current_planet_index = index; }
     pub fn set_bag(&mut self, bag: BagView) { self.bag = bag; }
-    
+}
+
+#[derive(Resource)]
+pub struct ExplorerSpriteData {
+    pub explorer1: ExplorerSpriteInfo,
+    pub explorer2: ExplorerSpriteInfo,
+}
+pub struct ExplorerSpriteInfo {
+    pub alive_sprite: Handle<Image>,
+    pub dead_sprite: Handle<Image>,
 }

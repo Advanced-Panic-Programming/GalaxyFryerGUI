@@ -134,6 +134,30 @@ pub fn init_selected_planet_resource(
     selected_planet.clear();
 }
 
+// ==============================
+// === Explorer Resource Init ===
+// ==============================
+
+pub fn init_explorer_sprites_resource(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let explorer1 = ExplorerSpriteInfo {
+        alive_sprite: asset_server.load(EXPLORER1_ALIVE_PATH),
+        dead_sprite: asset_server.load(EXPLORER1_DEAD_PATH),
+    };
+
+    let explorer2 = ExplorerSpriteInfo {
+        alive_sprite: asset_server.load(EXPLORER2_ALIVE_PATH),
+        dead_sprite: asset_server.load(EXPLORER2_DEAD_PATH),
+    };
+
+    commands.insert_resource(ExplorerSpriteData {
+        explorer1,
+        explorer2,
+    }); // HERE the resource is added to the system
+}
+
 // ======================
 // === Update Systems ===
 // ======================
