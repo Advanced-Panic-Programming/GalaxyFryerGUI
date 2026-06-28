@@ -1,30 +1,56 @@
-use bevy::prelude::Component;
+use bevy::prelude::*;
 use common_game::utils::ID;
 
+// ── Despawn anchor ────────────────────────────────────────────────────────────
+
+/// Marks every entity owned by PlanetView.
+/// A single query on this component is enough to despawn the whole view.
 #[derive(Component)]
 pub struct SpawnedByPlanetView;
 
+// ── Corner planet (top-right animated sprite) ─────────────────────────────────
+
+/// The animated planet sprite shown in the corner of the screen.
 #[derive(Component)]
 pub struct CornerPlanet {
     pub planet_id: ID,
 }
 
+// ── Terrain / background ──────────────────────────────────────────────────────
+
+/// The full-screen terrain background sprite.
+/// Carries no extra data — updated by swapping the image handle directly.
+#[derive(Component)]
+pub struct TerrainBackground;
+
+// ── Rocket ────────────────────────────────────────────────────────────────────
+
+/// The rocket sprite. `planet_id` lets update systems find it without ambiguity.
 #[derive(Component)]
 pub struct Rocket {
     pub planet_id: ID,
 }
 
-#[derive(Component)]
-pub struct Explorer {
-    pub explorer_id: ID,
-}
+// ── Energy cells ──────────────────────────────────────────────────────────────
 
+/// One energy-cell sprite. `cell_index` identifies its position in the row so
+/// update systems can patch individual cells without rebuilding the whole row.
 #[derive(Component)]
-pub struct ExplorerBag {
-    pub explorer_id: ID,
-}
-
-#[derive(Component)]
-pub struct EnergyCells {
+pub struct EnergyCell {
     pub planet_id: ID,
+    pub cell_index: usize,
+}
+
+// ── Explorers ─────────────────────────────────────────────────────────────────
+
+/// The explorer body sprite.
+#[derive(Component)]
+pub struct ExplorerSprite {
+    pub explorer_id: ID,
+}
+
+/// The explorer's bag label (Text2d).
+#[derive(Component)]
+pub struct ExplorerBagLabel {
+    pub explorer_id: ID,
 }

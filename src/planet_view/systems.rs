@@ -1,76 +1,83 @@
+//! Systems for PlanetView.
+//!
+//! Three clearly separated categories:
+//!
+//! **OnEnter** — full cold spawn. Always run after `cleanup`.
+//!   • `spawn_corner_planet`
+//!   • `spawn_planet_view`
+//!
+//! **Update** — targeted patch systems. Each reacts to exactly one resource
+//!   change and touches the minimal set of entities needed.
+//!   • `on_planet_changed`   — SelectedPlanet changed → full respawn
+//!   • `update_terrain`      — PlanetsData changed → swap terrain + rocket image
+//!   • `update_energy_cells` — PlanetsData changed → swap individual cell images
+//!   • `update_explorers`    — ExplorersData changed → add/remove/update explorer entities
+//!   • `animate_corner_planet`
+//!
+//! **OnExit** — `cleanup`.
+
+use bevy::prelude::*;
+use common_game::utils::ID;
+
 use crate::galaxy_view::components::AnimationConfig;
 use crate::planet_view::builders::*;
-use crate::planet_view::components::{CornerPlanet, SpawnedByPlanetView};
+use crate::planet_view::components::*;
 use crate::planet_view::utils::*;
 use crate::setup_simulation::resources::{
     EnergyCellsSpritesData, ExplorerSpriteData, ExplorersData, PlanetTerrainSpriteData,
     PlanetsData, PlanetsSpritesData, RocketSpritesData, SelectedPlanet,
 };
-use bevy::prelude::*;
-use common_game::utils::ID;
 
-// =====================
-// === Setup Systems ===
-// =====================
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-/// Spawns the animated corner-planet sprite in the top-right of the screen.
-///
-/// The planet sprite sheet is a 1-row atlas with 144 frames of 72×72 px each.
-/// PLANET_X / PLANET_Y / PLANET_INITIAL_SPLAT are defined in utils.rs.
-///
-/// Must run after `cleanup` so no stale CornerPlanet entity lingers.
-pub fn spawn_corner_planet(
+/// Despawns every entity tagged `SpawnedByPlanetView`, including their children.
+fn despawn_view(commands: &mut Commands, query: &Query<Entity, With<SpawnedByPlanetView>>) {
+    for entity in query.iter() {
+        // commands.entity(entity).despawn_related::<ChildOf>(); // Does not work!
+        commands.entity(entity).despawn();
+    }
+}
+
+/// Returns the planet index currently stored in `SelectedPlanet`, logging a
+/// warning and returning `None` if no planet is selected.
+fn require_selected(selected: &SelectedPlanet, caller: &str) -> Option<usize> {
+    let index = selected.get();
+    if index.is_none() {
+        warn!("{caller}: SelectedPlanet has no value — skipping");
+    }
+    index
+}
+
+// ── OnEnter ───────────────────────────────────────────────────────────────────
+
+/// Spawns the animated corner-planet sprite.
+/// Must run after `cleanup` so no stale entity lingers from a previous visit.
+pub fn spawn_corner_planet_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
     planets_sprites_data: Res<PlanetsSpritesData>,
     selected_planet: Res<SelectedPlanet>,
 ) {
-    let Some(index) = selected_planet.get() else {
-        // No planet selected — nothing to show in the corner.
-        warn!("spawn_corner_planet: SelectedPlanet has no value, skipping");
+    let Some(index) = require_selected(&selected_planet, "spawn_corner_planet") else {
         return;
     };
 
-    let planet_to_show = &planets_sprites_data.planets[index];
-
-    let sprite_path = if planet_to_show.alive {
-        &planet_to_show.alive_sprite_path
-    } else {
-        &planet_to_show.destroyed_sprite_path
-    };
-
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(72), 144, 1, None, None);
-    let texture_atlas_layout = layouts.add(layout);
-
-    commands.spawn((
-        Sprite {
-            image: asset_server.load(sprite_path),
-            texture_atlas: Some(TextureAtlas {
-                layout: texture_atlas_layout,
-                index: 0,
-            }),
-            ..default()
-        },
-        Transform::from_translation(Vec3::new(PLANET_X, PLANET_Y, -50.0))
-            .with_scale(Vec3::splat(PLANET_INITIAL_SPLAT)),
-        AnimationConfig::new(0, 143, ANIMATION_FPS),
-        SpawnedByPlanetView,
-        CornerPlanet {
-            planet_id: index as ID,
-        },
-    ));
+    spawn_corner_planet(
+        &mut commands,
+        &asset_server,
+        &mut layouts,
+        &planets_sprites_data.planets[index],
+        index as ID,
+    );
 }
 
-/// Spawns the full planet view: terrain, rocket, energy cells and any explorers present.
-///
-/// The root entity carries only `SpawnedByPlanetView` (used as a despawn anchor) plus the
-/// visibility/transform bundle so that Bevy propagates Visibility down to all children.
-/// Without `Visibility` + `InheritedVisibility` on the root, child sprites are invisible.
-pub fn spawn_planet_view_ui(
-    selected: Res<SelectedPlanet>,
+/// Spawns the full planet view: terrain, rocket, cells, explorers.
+/// Must run after `cleanup`.
+pub fn spawn_planet_view_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    selected: Res<SelectedPlanet>,
     planets_data: Res<PlanetsData>,
     planet_terrain_sprite_data: Res<PlanetTerrainSpriteData>,
     explorers_data: Res<ExplorersData>,
@@ -78,185 +85,258 @@ pub fn spawn_planet_view_ui(
     rocket_sprites_data: Res<RocketSpritesData>,
     energy_cells_sprites_data: Res<EnergyCellsSpritesData>,
 ) {
-    let Some(planet_index) = selected.get() else {
-        warn!("spawn_planet_view_ui: SelectedPlanet has no value, skipping");
+    let Some(planet_index) = require_selected(&selected, "spawn_planet_view") else {
         return;
     };
 
-    let font = asset_server.load(EXPLORERS_BAG_FONT_PATH);
-
-    // Which explorers (if any) are currently on this planet?
-    let explorer1_bag = (explorers_data.explorer1.get_current_planet_index() == planet_index)
-        .then(|| explorers_data.explorer1.get_bag());
-    let explorer2_bag = (explorers_data.explorer2.get_current_planet_index() == planet_index)
-        .then(|| explorers_data.explorer2.get_bag());
-
-    // Root entity — invisible spatial anchor used only for grouped despawning.
-    //
-    // Bevy requires a Visibility component on every ancestor in a hierarchy for
-    // InheritedVisibility to propagate correctly to children. Without it, all
-    // child sprites render as invisible even though their own Visibility is default.
-    commands
-        .spawn((
-            Transform::default(),
-            Visibility::default(),
-            // Bevy 0.15+ auto-inserts InheritedVisibility and ViewVisibility as
-            // required components of Visibility, so we don't need to add them manually.
-            SpawnedByPlanetView,
-        ))
-        .with_children(|child| {
-            spawn_terrain(
-                child,
-                &planets_data.planets[planet_index],
-                &planet_terrain_sprite_data.terrain,
-                &rocket_sprites_data,
-                &energy_cells_sprites_data,
-            );
-
-            spawn_explorers(
-                child,
-                &explorers_data,
-                &explorer_sprite_data,
-                explorer1_bag,
-                explorer2_bag,
-                font,
-            );
-        });
+    spawn_planet_view(
+        &mut commands,
+        &planets_data.planets[planet_index],
+        &planet_terrain_sprite_data.terrain,
+        &rocket_sprites_data,
+        &energy_cells_sprites_data,
+        &explorers_data,
+        &explorer_sprite_data,
+        asset_server.load(EXPLORERS_BAG_FONT_PATH),
+        planet_index,
+    );
 }
 
-// ======================
-// === Update Systems ===
-// ======================
+// ── Update: planet changed (full respawn) ─────────────────────────────────────
 
-/// Advances the corner-planet sprite-sheet animation every frame.
-pub fn animate_corner_planet(
-    time: Res<Time>,
-    mut query: Query<(&mut AnimationConfig, &mut Sprite), With<CornerPlanet>>,
-) {
-    match query.single_mut() {
-        Ok((mut config, mut sprite)) => {
-            config.frame_timer.tick(time.delta());
-
-            if config.frame_timer.just_finished() {
-                if let Some(atlas) = &mut sprite.texture_atlas {
-                    if atlas.index >= config.last_sprite_index {
-                        atlas.index = config.first_sprite_index;
-                    } else {
-                        atlas.index += 1;
-                    }
-                }
-            }
-        }
-        Err(e) => warn!("animate_corner_planet: {e}"),
-    }
-}
-
-/// Re-spawns the entire planet view whenever `SelectedPlanet` changes while already in
-/// PlanetView state. Lives in `Update` so its `is_changed` guard is evaluated every frame
-/// (unlike `OnEnter` where Bevy silently ignores run conditions).
-pub fn respawn_on_planet_change(
-    selected: Res<SelectedPlanet>,
+/// When the user selects a different planet, tears down the whole view and
+/// rebuilds it from scratch. This is the only case that warrants a full respawn:
+/// every element on screen belongs to a different planet.
+pub fn on_planet_changed(
+    mut commands: Commands,
     asset_server: Res<AssetServer>,
+    mut layouts: ResMut<Assets<TextureAtlasLayout>>,
+    selected: Res<SelectedPlanet>,
     planets_data: Res<PlanetsData>,
+    planets_sprites_data: Res<PlanetsSpritesData>,
     planet_terrain_sprite_data: Res<PlanetTerrainSpriteData>,
     explorers_data: Res<ExplorersData>,
     explorer_sprite_data: Res<ExplorerSpriteData>,
     rocket_sprites_data: Res<RocketSpritesData>,
     energy_cells_sprites_data: Res<EnergyCellsSpritesData>,
     existing: Query<Entity, With<SpawnedByPlanetView>>,
-    mut commands: Commands,
-    mut layouts: ResMut<Assets<TextureAtlasLayout>>,
-    planets_sprites_data: Res<PlanetsSpritesData>,
 ) {
     if !selected.is_changed() {
         return;
     }
 
-    // Despawn the entire previous hierarchy before rebuilding.
-    for entity in existing.iter() {
-        commands.entity(entity).despawn();
-    }
-
-    // Re-run both setup systems inline by duplicating the spawn logic.
-    // (Calling the system functions directly is not possible in Bevy's system model;
-    //  the cleanest alternative without a full refactor is to forward to the same builders.)
-    let Some(planet_index) = selected.get() else {
+    let Some(planet_index) = require_selected(&selected, "on_planet_changed") else {
         return;
     };
 
-    // Corner planet
-    let planet_to_show = &planets_sprites_data.planets[planet_index];
-    let sprite_path = if planet_to_show.alive {
-        &planet_to_show.alive_sprite_path
-    } else {
-        &planet_to_show.destroyed_sprite_path
+    despawn_view(&mut commands, &existing);
+
+    spawn_corner_planet(
+        &mut commands,
+        &asset_server,
+        &mut layouts,
+        &planets_sprites_data.planets[planet_index],
+        planet_index as ID,
+    );
+
+    spawn_planet_view(
+        &mut commands,
+        &planets_data.planets[planet_index],
+        &planet_terrain_sprite_data.terrain,
+        &rocket_sprites_data,
+        &energy_cells_sprites_data,
+        &explorers_data,
+        &explorer_sprite_data,
+        asset_server.load(EXPLORERS_BAG_FONT_PATH),
+        planet_index,
+    );
+}
+
+// ── Update: planet data changed (same planet, patch sprites) ──────────────────
+
+/// Swaps the terrain background and rocket images when `PlanetsData` changes
+/// (planet destroyed, rocket built/used).
+/// Touches only the two entities that may need a new image — no respawn.
+pub fn update_terrain_and_rocket(
+    selected: Res<SelectedPlanet>,
+    planets_data: Res<PlanetsData>,
+    planet_terrain_sprite_data: Res<PlanetTerrainSpriteData>,
+    rocket_sprites_data: Res<RocketSpritesData>,
+    mut terrain_query: Query<&mut Sprite, With<TerrainBackground>>,
+    mut rocket_query: Query<&mut Sprite, (With<Rocket>, Without<TerrainBackground>)>,
+) {
+    if !planets_data.is_changed() {
+        return;
+    }
+
+    let Some(planet_index) = require_selected(&selected, "update_terrain_and_rocket") else {
+        return;
     };
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(72), 144, 1, None, None);
-    let atlas_layout = layouts.add(layout);
 
-    commands.spawn((
-        Sprite {
-            image: asset_server.load(sprite_path),
-            texture_atlas: Some(TextureAtlas {
-                layout: atlas_layout,
-                index: 0,
-            }),
-            ..default()
-        },
-        Transform::from_translation(Vec3::new(PLANET_X, PLANET_Y, -50.0))
-            .with_scale(Vec3::splat(PLANET_INITIAL_SPLAT)),
-        AnimationConfig::new(0, 143, ANIMATION_FPS),
-        SpawnedByPlanetView,
-        CornerPlanet {
-            planet_id: planet_index as ID,
-        },
-    ));
+    let planet_info = &planets_data.planets[planet_index];
 
-    // Main view
-    let font = asset_server.load(EXPLORERS_BAG_FONT_PATH);
-    let explorer1_bag = (explorers_data.explorer1.get_current_planet_index() == planet_index)
-        .then(|| explorers_data.explorer1.get_bag());
-    let explorer2_bag = (explorers_data.explorer2.get_current_planet_index() == planet_index)
-        .then(|| explorers_data.explorer2.get_bag());
+    // Terrain background
+    for (mut sprite) in terrain_query.iter_mut() {
+        sprite.image = terrain_image(planet_info, &planet_terrain_sprite_data.terrain);
+    }
 
-    commands
-        .spawn((
-            Transform::default(),
-            Visibility::default(),
-            SpawnedByPlanetView,
-        ))
-        .with_children(|child| {
-            spawn_terrain(
-                child,
-                &planets_data.planets[planet_index],
-                &planet_terrain_sprite_data.terrain,
-                &rocket_sprites_data,
-                &energy_cells_sprites_data,
-            );
-            spawn_explorers(
-                child,
-                &explorers_data,
-                &explorer_sprite_data,
-                explorer1_bag,
-                explorer2_bag,
-                font,
-            );
-        });
+    // Rocket (may not exist on all planets)
+    if planet_info.can_have_rocket() {
+        for (mut sprite) in rocket_query.iter_mut() {
+            sprite.image = rocket_image(planet_info, &rocket_sprites_data);
+        }
+    }
 }
 
-pub fn update_current_planet() {
-    // TODO!
+/// Updates individual energy-cell sprites when `PlanetsData` changes.
+/// Each cell is patched independently via its `cell_index` component — no respawn.
+pub fn update_energy_cells(
+    selected: Res<SelectedPlanet>,
+    planets_data: Res<PlanetsData>,
+    cell_sprites: Res<EnergyCellsSpritesData>,
+    mut cell_query: Query<(&EnergyCell, &mut Sprite)>,
+) {
+    if !planets_data.is_changed() {
+        return;
+    }
+
+    let Some(planet_index) = require_selected(&selected, "update_energy_cells") else {
+        return;
+    };
+
+    let energy_cells = planets_data.planets[planet_index].get_energy_cells();
+
+    for (cell, mut sprite) in cell_query.iter_mut() {
+        if let Some(&charged) = energy_cells.get(cell.cell_index) {
+            sprite.image = cell_image(charged, &cell_sprites);
+        }
+    }
 }
 
-// ======================
-// === OnExit Systems ===
-// ======================
+// ── Update: explorer data changed ─────────────────────────────────────────────
 
-/// Despawns all entities tagged `SpawnedByPlanetView`, including their full child hierarchy.
-/// `despawn_related::<ChildOf>` removes all children recursively before `despawn` removes
-/// the root — leaving no orphaned entities in the world.
-pub fn cleanup(mut commands: Commands, query: Query<Entity, With<SpawnedByPlanetView>>) {
+/// Reacts to changes in `ExplorersData`:
+/// - Explorer moved away from this planet → despawn its sprite + bag label.
+/// - Explorer moved to this planet → spawn its sprite + bag label.
+/// - Explorer died (same planet) → swap the sprite image.
+/// - Bag contents changed (same planet) → update the label text.
+pub fn update_explorers(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    selected: Res<SelectedPlanet>,
+    explorers_data: Res<ExplorersData>,
+    explorer_sprite_data: Res<ExplorerSpriteData>,
+    // Separate queries to avoid mutable aliasing
+    mut sprite_query: Query<(Entity, &ExplorerSprite, &mut Sprite)>,
+    mut label_query: Query<(Entity, &ExplorerBagLabel, &mut Text2d)>,
+    root_query: Query<Entity, (With<SpawnedByPlanetView>, Without<CornerPlanet>)>,
+) {
+    if !explorers_data.is_changed() {
+        return;
+    }
+
+    let Some(planet_index) = require_selected(&selected, "update_explorers") else {
+        return;
+    };
+
+    let explorer_configs = [
+        (0 as ID, &explorers_data.explorer1, &explorer_sprite_data.explorer1, EXPLORER1_POS),
+        (1 as ID, &explorers_data.explorer2, &explorer_sprite_data.explorer2, EXPLORER2_POS),
+    ];
+
+    for (explorer_id, explorer, sprite_info, position) in explorer_configs {
+        let on_planet = explorer.get_current_planet_index() == planet_index;
+
+        // Find existing sprite and label entities for this explorer (if any).
+        let existing_sprite = sprite_query
+            .iter()
+            .find(|(_, s, _)| s.explorer_id == explorer_id)
+            .map(|(e, _, _)| e);
+
+        let existing_label = label_query
+            .iter()
+            .find(|(_, l, _)| l.explorer_id == explorer_id)
+            .map(|(e, _, _)| e);
+
+        match (on_planet, existing_sprite, existing_label) {
+            // Explorer is here and was already here → patch in-place
+            (true, Some(sprite_entity), Some(label_entity)) => {
+                // Update sprite image in case the explorer just died
+                if let Ok((_, _, mut sprite)) = sprite_query.get_mut(sprite_entity) {
+                    sprite.image = explorer_image(explorer.is_alive(), sprite_info);
+                }
+                // Update bag label text
+                if let Ok((_, _, mut text)) = label_query.get_mut(label_entity) {
+                    text.0 = format!("{}", explorer.get_bag());
+                }
+            }
+
+            // Explorer arrived on this planet → spawn
+            (true, None, _) => {
+                // Attach to the view root so the entity is despawned with the view
+                if let Ok(root) = root_query.single() {
+                    commands.entity(root).with_children(|parent| {
+                        spawn_single_explorer_pub(
+                            parent,
+                            explorer_id,
+                            explorer.is_alive(),
+                            explorer.get_bag(),
+                            sprite_info,
+                            position,
+                            asset_server.load(EXPLORERS_BAG_FONT_PATH),
+                        );
+                    });
+                }
+            }
+
+            // Explorer left this planet → despawn
+            (false, Some(sprite_entity), Some(label_entity)) => {
+                commands.entity(sprite_entity).despawn();
+                commands.entity(label_entity).despawn();
+            }
+
+            // Remaining combinations (e.g. label exists but sprite doesn't) are
+            // inconsistent state — ignore and let the next full respawn fix them.
+            _ => {}
+        }
+    }
+}
+
+// ── Update: corner planet animation ───────────────────────────────────────────
+
+/// Advances the corner-planet sprite-sheet animation by one frame when the
+/// per-frame timer fires.
+pub fn animate_corner_planet(
+    time: Res<Time>,
+    mut query: Query<(&mut AnimationConfig, &mut Sprite), With<CornerPlanet>>,
+) {
+    let Ok((mut config, mut sprite)) = query.single_mut() else {
+        return;
+    };
+
+    config.frame_timer.tick(time.delta());
+
+    if config.frame_timer.just_finished() {
+        if let Some(atlas) = &mut sprite.texture_atlas {
+            atlas.index = if atlas.index >= config.last_sprite_index {
+                config.first_sprite_index
+            } else {
+                atlas.index + 1
+            };
+        }
+    }
+}
+
+// ── OnExit ────────────────────────────────────────────────────────────────────
+
+/// Removes every entity owned by the planet view, including their full child
+/// hierarchy. Runs on state exit and before every full respawn.
+pub fn cleanup(
+    mut commands: Commands,
+    query: Query<Entity, With<SpawnedByPlanetView>>,
+) {
     for entity in query.iter() {
+        // commands.entity(entity).despawn_related::<ChildOf>(); // Does not work
         commands.entity(entity).despawn();
     }
 }
