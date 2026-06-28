@@ -1,6 +1,7 @@
 use bevy::prelude::*;
+use crate::app_states::AppState::{GalaxyView, PlanetView};
 use crate::cutscene::messages::Cutscene;
-use crate::cutscene::resources::ActiveCutscene;
+use crate::cutscene::resources::{ActiveCutscene, CutsceneTimer};
 use crate::cutscene::systems::*;
 
 pub struct CutscenePlugin;
@@ -20,10 +21,25 @@ impl Plugin for CutscenePlugin {
                     )
                 )
             )
-            // Systems
-            .add_systems(Update, (
-                handle_cutscene,
-                update_cutscene,
-            ));
+            // Systems (we need chain() because the order of execution matters)
+            // 1. Receive message → set ActiveCutscene
+            // 2. Spawn visuals once (guarded by ActiveCutscene::spawned)
+            // 3. Animate every frame
+            // 4. Tick timer, despawn when finished
+            .add_systems(
+                Update,
+                (
+                    handle_cutscene,
+                    spawn_cutscene_visuals,
+                    animate_cutscene,
+                    update_cutscene,
+                )
+                    .chain()
+                    .run_if(in_state(GalaxyView).or(in_state(PlanetView))),
+            )
+            // To clean the screen if the AppState changes
+            .add_systems(OnExit(GalaxyView), despawn_cutscene)
+            .add_systems(OnExit(PlanetView), despawn_cutscene)
+        ;
     }
 }

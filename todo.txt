@@ -17,8 +17,6 @@ TODO:
 - Quando explorer muore, metti una freccia grigia/con teschio
 !!! Quando vado in PlanetState, manda richiesta all' orchestrator per aggiornare lo stato del pianeta
 ??? Aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all' orchestrator per aggiornare le risorse ???
-- Aggiungere risorsa per sprite explorer
-- Modificare stile Manual Mode Panel
 - PlanetView Mostrare anche la bag dell'esploratore
 
 Esc -> manda stop simulation che triggera stop planet AI
