@@ -1,7 +1,8 @@
 use bevy::prelude::*;
+use crate::log::resources::LogMessage;
 use common_game::utils::ID;
-use galaxy_fryer::app::orchestrator::OrchestratorToGUI::*;
-use crate::setup_orchestrator::resources::{FromOrchestrator, ToOrchestrator};
+use galaxy_fryer::app::gui_protocol::OrchestratorToGUI::*;
+use crate::setup_orchestrator::resources::{FromOrchestrator, OrchestratorMode, ToOrchestrator};
 use crate::galaxy_view::messages::*;
 
 /// This function manages the orchestrator messages and generates the corresponding events 
@@ -22,11 +23,23 @@ pub fn receive_from_orchestrator(
     mut explorer_bag_writer: MessageWriter<ReceivedExplorerBag>,
     mut explorer_kill_writer: MessageWriter<ReceivedKilledExplorer>,
     // Simulation
-    mut simulation_end_writer: MessageWriter<ReceivedSimulationEnd>
+    mut manual_mode_writer: MessageWriter<ReceivedManualModeAck>,
+    mut automatic_mode_writer: MessageWriter<ReceivedAutomaticModeAck>,
+    mut simulation_end_writer: MessageWriter<ReceivedSimulationEnd>,
+    // Log
+    mut log: MessageWriter<LogMessage>, // Not all events are registered in the log //TODO! It's OK? read protocol
 ){
     while let Ok(msg) = receiver.0.try_recv() {
         match msg {
             DefaultMessage => {}
+            ManualModeAck => {
+                manual_mode_writer.write(ReceivedManualModeAck);
+                log.write(LogMessage::manual_mode_ack());
+            }
+            AutomaticModeAck => {
+                automatic_mode_writer.write(ReceivedAutomaticModeAck);
+                log.write(LogMessage::automatic_mode_ack());
+            }
             SendPlanetState{p_id, planet_state} => {
                 planet_state_writer.write(ReceivedPlanetState{
                     planet_id: p_id,
@@ -38,12 +51,16 @@ pub fn receive_from_orchestrator(
                 planet_destroyed_writer.write(ReceivedPlanetDestroyed{planet_id: p_id});
                 // Activate cutscene
                 planet_destroyed_cutscene_writer.write(PlanetDestroyedCutscene{planet_id: p_id});
+                //Log
+                log.write(LogMessage::planet_destroyed(p_id));
             }
             SendAsteroidDestroyed{p_id} => {
                 // Generate in-game event
                 asteroid_destroyed_writer.write(ReceivedAsteroidDestroyed{planet_id: p_id});
                 // Activate cutscene
                 asteroid_destroyed_cutscene_writer.write(AsteroidDestroyedCutscene{planet_id: p_id});
+                // Log
+                log.write(LogMessage::asteroid_destroyed(p_id));
             }
             SendPlanetGenerate{planet_id, generate} => {
                 planet_generate_writer.write(ReceivedPlanetGenerate{
@@ -68,6 +85,7 @@ pub fn receive_from_orchestrator(
                     explorer_id,
                     planet_id,
                 });
+                log.write(LogMessage::explorer_moved(explorer_id, planet_id));
             }
             SendExplorerBag{explorer_id, bag} => {
                 explorer_bag_writer.write(ReceivedExplorerBag{ 
@@ -77,9 +95,11 @@ pub fn receive_from_orchestrator(
             }
             SendKilledExplorer {explorer_id} => {
                 explorer_kill_writer.write(ReceivedKilledExplorer{explorer_id});
+                log.write(LogMessage::explorer_killed(explorer_id));
             }
             SendSimulationEnd => {
                 simulation_end_writer.write(ReceivedSimulationEnd);
+                log.write(LogMessage::simulation_end());
             }
         }
     }

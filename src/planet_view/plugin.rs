@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use super::ui::plugin::PlanetViewUiPlugin;
 use crate::app_states::AppState::PlanetView;
 use crate::planet_view::systems::*;
 
@@ -8,8 +7,6 @@ pub struct PlanetViewPlugin;
 impl Plugin for PlanetViewPlugin {
     fn build(&self, app: &mut App) {
         app
-        // Plugins
-            .add_plugins(PlanetViewUiPlugin)
         // OnEnter systems
         .add_systems(OnEnter(PlanetView), (
             refresh_planet_view, // Needed for: PlanetView -> Esc -> Esc to redraw

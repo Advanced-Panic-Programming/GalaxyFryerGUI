@@ -5,7 +5,6 @@ edition = "2024"
 
 [dependencies]
 bevy = "0.17.2"
-rand = "0.9.2"
 galaxy_fryer = {git="ssh://git@github.com/Advanced-Panic-Programming/GalaxyFryer.git"}
 crossbeam-channel = "0.5.15"
 common-game = { git = "https://github.com/unitn-ap-2025/common", branch = "main" }

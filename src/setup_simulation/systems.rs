@@ -1,5 +1,7 @@
+use std::collections::HashSet;
 use bevy::prelude::*;
 use bevy::window::WindowResized;
+use galaxy_fryer::explorer::bag::BagView;
 use crate::app_states::AppState;
 use crate::app_states::AppState::{GalaxyView, PlanetView, SetupOrchestrator};
 use crate::setup_simulation::utils::*;
@@ -51,19 +53,9 @@ fn compute_orbit_from_size(width: f32, _height: f32) -> GalaxyOrbit {
     }
 }
 
-pub fn init_planets_resources(
-    mut planets_data: ResMut<PlanetsData>,
+pub fn init_planets_sprites_data_resource(
+    mut planets_data: ResMut<PlanetsSpritesData>,
 ) {
-    let planets_names = vec![
-        "Mercury",
-        "Venus",
-        "Earth",
-        "Mars",
-        "Jupiter",
-        "Saturn",
-        "Uranus",
-    ];
-
     let planets_sprites = vec![
         "planets/planet1.png",
         "planets/planet2.png",
@@ -90,8 +82,7 @@ pub fn init_planets_resources(
 
     for (i, &angle) in angles.iter().enumerate() {
         {
-            planets_data.planets.push(PlanetInfo {
-                name: planets_names[i].to_string(),
+            planets_data.planets.push(PlanetSpriteInfo {
                 index: i,
                 alive: true,
                 angle,
@@ -104,17 +95,67 @@ pub fn init_planets_resources(
     }
 }
 
-pub fn init_explorers_resource(
-    mut explorers_data: ResMut<ExplorersData>,
+/// Initializes the actual planets' data. Hard coded as in the orchestrator
+pub fn init_planets_data_resource(
+    mut planets_data: ResMut<PlanetsData>,
 ) {
-    explorers_data.explorer1 = Explorer::new(0);
-    explorers_data.explorer2 = Explorer::new(4);
+    // Planet 1 - Rustrelli - D
+    let rustrelli = PlanetInfo::new(0, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
+    planets_data.planets.push(rustrelli);
+    
+    // Planet 2 - Houston we have a borrow
+    let huston_we_have_a_borrow = PlanetInfo::new(1, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    planets_data.planets.push(huston_we_have_a_borrow);
+    
+    // Planet 3 - Enterprise - C
+    let entrerprise = PlanetInfo::new(2, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    planets_data.planets.push(entrerprise);
+    
+    // Planet 4 - One-Million-Crabs - D
+    let one_million_crabs = PlanetInfo::new(3, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
+    planets_data.planets.push(one_million_crabs);
+    
+    // Planet 5 - Rusty Crab - C
+    let rusty_crab = PlanetInfo::new(4, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    planets_data.planets.push(rusty_crab);
+    
+    // Planet 6 - Orbitron - D
+    let orbitron = PlanetInfo::new(5, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
+    planets_data.planets.push(orbitron);
+    
+    // Planet 7 - Trip - A
+    let trip = PlanetInfo::new(6, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    planets_data.planets.push(trip);
 }
 
 pub fn init_selected_planet_resource(
     mut selected_planet: ResMut<SelectedPlanet>,
 ) {
     selected_planet.clear();
+}
+
+// ==============================
+// === Explorer Resource Init ===
+// ==============================
+
+pub fn init_explorer_sprites_resource(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let explorer1 = ExplorerSpriteInfo {
+        alive_sprite: asset_server.load(EXPLORER1_ALIVE_PATH),
+        dead_sprite: asset_server.load(EXPLORER1_DEAD_PATH),
+    };
+
+    let explorer2 = ExplorerSpriteInfo {
+        alive_sprite: asset_server.load(EXPLORER2_ALIVE_PATH),
+        dead_sprite: asset_server.load(EXPLORER2_DEAD_PATH),
+    };
+
+    commands.insert_resource(ExplorerSpriteData {
+        explorer1,
+        explorer2,
+    }); // HERE the resource is added to the system
 }
 
 // ======================
@@ -136,6 +177,7 @@ pub fn update_orbit_on_window_resized(
     }
 }
 
+// SetupSimulationEnd
 pub fn finish_simulation_setup(
     mut writer: MessageWriter<SetupSimulationCompleted>,
 ) {

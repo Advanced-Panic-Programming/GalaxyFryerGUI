@@ -1,5 +1,7 @@
 use bevy::color::palettes::css::WHITE;
+use bevy::pbr::Shadow;
 use bevy::prelude::*;
+use bevy::sprite::Text2dShadow;
 use crate::app_state_manager::messages::{PlayPressed, ExitPressed};
 use crate::app_states::AppState;
 use crate::app_states::AppState::PauseMenu;
@@ -7,6 +9,7 @@ use crate::galaxy_view::components::AnimationConfig;
 use crate::galaxy_view::utils::{ANIMATION_FPS, PLANET_INITIAL_SPLAT};
 use crate::pause_menu::components::*;
 use crate::pause_menu::utils::*;
+use crate::setup_orchestrator::resources::ToOrchestrator;
 
 pub fn setup_pause_menu(
     mut commands: Commands,
@@ -28,7 +31,41 @@ pub fn setup_pause_menu(
         Transform::from_translation(Vec3::new(0.0, 0.0, -100.0)),
         PauseMenuUI
     ));
-    
+
+    // =========================
+    // === Tittle =======
+    // =========================
+
+    let title_font = asset_server.load(TITLE_FONT);
+
+    commands
+        .spawn(Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(TITLE_TOP_PADDING),
+            width: Val::Percent(100.0),
+
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+
+            ..default()
+        })
+        .with_child((
+            Text::new("GalaxyFryer"),
+            TextFont {
+                font: title_font,
+                font_size: TITLE_SIZE,
+                ..default()
+            },
+            TextColor(Color::WHITE),
+            TextShadow {
+                offset: Vec2::splat(8.0),
+                ..default()
+            },
+            PauseMenuUI,
+            AnimatedTitle,
+        ));
+
+
     // =========================
     // === Animated Logo =======
     // =========================
@@ -57,7 +94,7 @@ pub fn setup_pause_menu(
             }),
             ..default()
         },
-        Transform::from_translation(Vec3::new(0.0, 120.0, 10.0))
+        Transform::from_translation(Vec3::new(0.0, 10.0, 10.0))
             .with_scale(Vec3::splat(LOGO_SCALE)),
         AnimationIndices {
             first: 0,
@@ -73,124 +110,68 @@ pub fn setup_pause_menu(
     // === Play/Exit Buttons =========
     // ===============================
 
-    let font = asset_server.load("fonts/FiraSans-Bold.ttf");
+    let buttons_font = asset_server.load(BUTTONS_FONT);
 
-    // First we create a Node that will contain the two buttons so that we can align them properly
     commands.spawn((
-        DespawnOnExit(PauseMenu),
         Node {
             width: percent(100),
             height: percent(100),
-            align_items: AlignItems::Center,
+            align_items: AlignItems::FlexEnd,
             justify_content: JustifyContent::Center,
+            padding: UiRect::bottom(Val::Px(48.0)),
             ..default()
         },
         PauseMenuUI,
         children![(
-                Node {
-                    flex_direction: FlexDirection::Row,
-                    align_items: AlignItems::Center,
-                    ..default()
-                },
-                children![
-                    // Play Button
-                    (
-                        PauseMenuUI,
-                        Button,
-                        PlayButton,
-                        Node {
-                            width: Val::Percent(100.0),
-                            height: Val::Percent(100.0),
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
-                            ..default()
-                        },
-                        BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
-                        children![
-                            (
-                                Text::new("PLAY"),
-                                TextFont {
-                                    font_size: 42.0,
-                                    font: font.clone(),
-                                    ..default()
-                                },
-                                TextColor(Color::WHITE),
-                            ),
-                        ]
-                    ),
-                    // Exit Button
-                    (
-                        PauseMenuUI,
-                        Button,
-                        ExitButton,
-                        Node {
-                            width: Val::Percent(100.0),
-                            height: Val::Percent(100.0),
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
-                            ..default()
-                        },
-                        BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
-                        children![
-                            (
-                                Text::new("EXIT"),
-                                TextFont {
-                                    font_size: 42.0,
-                                    font: font.clone(),
-                                    ..default()
-                                },
-                                TextColor(Color::WHITE),
-                            ),
-                        ]
-                    ),
-                ]
-            )],
+        Node {
+            flex_direction: FlexDirection::Row,
+            align_items: AlignItems::Center,
+            column_gap: Val::Px(BUTTON_SPACING), // Buttons spacing
+            ..default()
+        },
+        children![
+                // Play Button
+                (PlayButton, create_button(buttons_font.clone(), "PLAY")),
+                // Exit Button
+                (ExitButton, create_button(buttons_font.clone(), "EXIT")),
+            ]
+        )],
     ));
 
-    // Old Play button backup
-    // commands
-    //     .spawn((
-    //         PauseMenuUI,
-    //         Node {
-    //             width: Val::Percent(100.0),
-    //             height: Val::Percent(100.0),
-    //             justify_content: JustifyContent::Center,
-    //             align_items: AlignItems::Center,
-    //             position_type: PositionType::Absolute,
-    //             ..default()
-    //         },
-    //     ))
-    //     .with_children(|parent| {
-    //         parent
-    //             .spawn((
-    //                 PauseMenuUI,
-    //                 PlayButton,
-    //                 Button,
-    //                 Node {
-    //                     width: Val::Px(PLAY_BUTTON_WIDTH),
-    //                     height: Val::Px(PLAY_BUTTON_HEIGHT),
-    //
-    //                     // Push button LOWER than center
-    //                     margin: UiRect::top(Val::Px(320.0)),
-    //
-    //                     justify_content: JustifyContent::Center,
-    //                     align_items: AlignItems::Center,
-    //                     ..default()
-    //                 },
-    //                 BorderRadius::all(Val::Px(18.0)),
-    //                 BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
-    //             ))
-    //             .with_children(|parent| {
-    //                 parent.spawn((
-    //                     Text::new("PLAY"),
-    //                     TextFont {
-    //                         font_size: 42.0,
-    //                         ..default()
-    //                     },
-    //                     TextColor(Color::WHITE),
-    //                 ));
-    //             });
-    //     });
+}
+
+fn create_button(font: Handle<Font>, label: &str) -> impl Bundle {
+    (
+        Button,
+        Node {
+            width: Val::Px(BUTTON_WIDTH),
+            height: Val::Px(BUTTON_HEIGHT),
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+            border: UiRect::all(Val::Px(3.0)),
+            ..default()
+        },
+        BackgroundColor(Color::srgb(0.12, 0.12, 0.12)),
+        BorderColor::all(Color::srgb(0.05, 0.05, 0.05)),
+        BorderRadius::all(Val::Px(10.0)),
+        children![(
+            Text::new(label),
+            TextFont { font_size: FONT_SIZE, font: font.clone(), ..default() },
+            TextColor(Color::WHITE),
+        )],
+    )
+}
+
+pub fn animate_tittle(
+    time: Res<Time>,
+    mut query: Query<&mut Node, With<AnimatedTitle>>,
+) {
+    for mut node in &mut query {
+        node.top = Val::Px(
+            TITLE_TOP_PADDING
+                + TITLE_OSCILLATION * ops::cos(time.elapsed_secs()*TITLE_SPEED)
+        );
+    }
 }
 
 pub fn animate_logo(

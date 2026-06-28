@@ -12,12 +12,15 @@ mod cutscene;
 mod pause_menu;
 mod communication;
 mod simulation_end;
+mod log;
+mod manual_mode;
 
 use bevy::prelude::*;
 use bevy::window::{WindowMode, WindowResolution};
 use crate::galaxy_view::plugin::GalaxyViewPlugin;
 use crate::input_handler::plugin::InputHandlerPlugin;
 use crate::setup_simulation::plugin::SetupSimulationPlugin;
+use crate::resources_manager::plugin::ResourceManagerPlugin;
 use crate::planet_view::plugin::PlanetViewPlugin;
 use crate::setup_orchestrator::plugin::SetupOrchestratorPlugin;
 use crate::pause_menu::plugin::PauseMenuPlugin;
@@ -25,6 +28,9 @@ use crate::app_state_manager::plugin::AppStateManagerPlugin;
 use crate::app_states::AppState;
 use crate::communication::plugin::CommunicationPlugin;
 use crate::cutscene::plugin::CutscenePlugin;
+use crate::legend::plugin::LegendPlugin;
+use crate::log::plugin::LogPlugin;
+use crate::manual_mode::plugin::ManualModePlugin;
 use crate::simulation_end::plugin::SimulationEndPlugin;
 
 fn main() {
@@ -48,7 +54,11 @@ fn main() {
         .add_plugins(AppStateManagerPlugin)
         .add_plugins(SetupSimulationPlugin)
         .add_plugins(SetupOrchestratorPlugin)
+        .add_plugins(ResourceManagerPlugin)
         .add_plugins(PauseMenuPlugin)
+        .add_plugins(LegendPlugin)
+        .add_plugins(LogPlugin)
+        .add_plugins(ManualModePlugin)
         .add_plugins(InputHandlerPlugin)
         .add_plugins(GalaxyViewPlugin)
         .add_plugins(PlanetViewPlugin)

@@ -1,18 +1,24 @@
-- input_handler/systems:
-    Siccome la risorsa ToOrchestrator non è ancora stata inizializzata (pk manca Default sulla struct in orchestrator.rs) sono stati commentati tutti i suoi utilizzi nel file
-
-- Attualmente non esiste un menu di pausa, quindi lo stato pause menu (da cui inizia la simulazione e aspetta per un play input) manda subito il messaggio di play.
-Così facendo possiamo testare le altre funzionalità finche non lo implementiamo.
-Quando lo implementi, fai in modo che i pulsanti inviino un messaggio PlayPressed, ... e ci pensa l'app_state_manager a eseguire le transizioni di stato.
-
-
-- Inoltre bisogna mettere un default per i canali di comunicazione pk altrimenti bevy non li fa inizializzare come risorse.
-
-- Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?Creare un nuovo modulo galaxy_update?)
-
-- Aggiungere messaggi GuiTOOrchestrator:
-    PauseSimulation
-
 !!! IMPORTANTE !!!
-I sistemi che utilizzano le risorse non inizializzate a valori di default DEVONO avere questo run_if: .run_if(resource_exists::<"nome_risorsa">)
-Le uniche risorse non inizializzate a defualt per ora sono ToOrchestrator e FromOrchestrator
+I sistemi che utilizzano le risorse non inizializzate a valori di default DEVONO avere questo run_if:.run_if(resource_exists::<"nome_risorsa">)
+Le uniche risorse non inizializzate a default per ora sono ToOrchestrator e FromOrchestrator
+
+BUG NOTI:
+- 2026-06-26T10:24:56.018073Z  WARN bevy_ecs::error::handler: Encountered an error in command `<bevy_ecs::system::commands::entity_command::despawn::{{closure}} as bevy_ecs::error::command_handling::CommandWithEntity<core::result::Result<(), bevy_ecs::world::error::EntityMutableFetchError>>>::with_entity::{{closure}}`: The entity with ID 227v2 does not exist (enable `track_location` feature for more details)
+    Questo errore appare solo come WARN -> Bevy non manda un panic e continua a girare ma cmq va risolto
+- A volte la move degli esploratori genera 2 messaggi del log invece che 1 solo (sospetto sia colpa dell'orchestrator)
+- OGNI SISTEMA CHE USA run_if(resource_changed) STA CREANDO UNA RACE CONDITION !!!! MODIFICALI COME FATTO CON UPDATE SYSTEM DEL MODULO LEGEND
+
+TODO:
+- Sistemare dimensione bottoni tab explorer nel pannello manual mode (il testo va a capo) e la riga del pianeta è più a sinistra del resto
+- Aggiungere log per azioni non possibili (move to planet fallita) e per start e stop explorer AI
+- Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?Creare un nuovo modulo galaxy_update?)
+- Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva bottone (cambia colore)
+- remove cycle explorer? Currently not working
+- Quando explorer muore, metti una freccia grigia/con teschio
+!!! Quando vado in PlanetState, manda richiesta all' orchestrator per aggiornare lo stato del pianeta
+??? Aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all' orchestrator per aggiornare le risorse ???
+- PlanetView Mostrare anche la bag dell'esploratore
+- Nella cutscene Destroyed Asteroid, fare che l'asteroide arriva da sinistra e va verso il razzo che arriva da destra (ora l'asteroide è fermo al centro)
+
+Esc -> manda stop simulation che triggera stop planet AI
+Play -> Deve mandare Resume Simulation che fa ripartire i pianeti

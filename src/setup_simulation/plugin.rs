@@ -11,19 +11,21 @@ impl Plugin for SetupSimulationPlugin {
     fn build(&self, app: &mut App) {
         app
             // ===== Resources =====
+            .insert_resource(PlanetsSpritesData { planets: Vec::new() })
             .insert_resource(PlanetsData { planets: Vec::new() })
             .insert_resource(Galaxy::default())
             .insert_resource(GalaxyOrbit::default())
-            .insert_resource(ExplorersData::default())
+            .insert_resource(ExplorersData::new())
             .insert_resource(SelectedPlanet::default())
             // ===== OnEnter Setup =====
             .add_systems(OnEnter(SetupSimulation), (
                     spawn_camera,
                     spawn_background,
                     init_galaxy_orbit,
-                    init_planets_resources,
-                    init_explorers_resource,
+                    init_planets_sprites_data_resource,
+                    init_planets_data_resource,
                     init_selected_planet_resource,
+                    init_explorer_sprites_resource,
                 )
             )
             // Update system: sends SetupSimulationCompleted Message -> AppStateManager will change app state

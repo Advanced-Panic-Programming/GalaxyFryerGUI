@@ -1,7 +1,9 @@
 use bevy::prelude::*;
-use galaxy_fryer::app::orchestrator::GUIToOrchestrator::*;
+use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::*;
 use crate::app_state_manager::messages::*;
+use crate::app_state_manager::resources::{CurrentMode, Mode};
 use crate::app_states::AppState;
+use crate::manual_mode::resources::ManualModePanel;
 use crate::setup_simulation::resources::{Explorer, ExplorersData, SelectedPlanet};
 use crate::setup_orchestrator::resources::*;
 
@@ -59,19 +61,27 @@ pub fn game_related_inputs(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     gui_to_orch: ResMut<ToOrchestrator>,
     mut explorer_data: ResMut<ExplorersData>,
-    mut manual_mode_writer: MessageWriter<ActiveManualMode>,
-    mut automatic_mode_writer: MessageWriter<ActiveAutomaticMode>,
     mut planet_view_writer: MessageWriter<PlanetViewPressed>, 
+    mut selected_planet: ResMut<SelectedPlanet>,
+    mut manual_mode_panel: ResMut<ManualModePanel>,
+    mut current_mode: ResMut<CurrentMode>,
 ) {
-    // Handle Manual Mode
-    if keyboard_input.just_pressed(KeyCode::KeyM) && *current_state.get() != AppState::PauseMenu {
+    // Set Manual Mode
+    if keyboard_input.just_pressed(KeyCode::KeyM) && *current_state.get() != AppState::PauseMenu && current_mode.current == Mode::Automatic {
         let _ = gui_to_orch.0.send(ManualMode); // sends ManualMode message to orchestrator
-        manual_mode_writer.write(ActiveManualMode);
+        // Set Manual Mode Panel to visible
+        manual_mode_panel.visible = true;
+        // Update Resource
+        current_mode.current = Mode::Manual;
+
     }
-    // Handle Automatic Mode
-    if keyboard_input.just_pressed(KeyCode::KeyA) && *current_state.get() != AppState::PauseMenu {
+    // Set Automatic Mode
+    if keyboard_input.just_pressed(KeyCode::KeyA) && *current_state.get() != AppState::PauseMenu && current_mode.current == Mode::Manual {
         let _ = gui_to_orch.0.send(AutomaticMode); // sends ManualMode message to orchestrator
-        automatic_mode_writer.write(ActiveAutomaticMode);
+        // Set Manual Mode Panel to not visible
+        manual_mode_panel.visible = false;
+        // Update Resource
+        current_mode.current = Mode::Automatic;
     }
     // Pause Simulation
     if keyboard_input.just_pressed(KeyCode::KeyP) {
@@ -79,13 +89,32 @@ pub fn game_related_inputs(
     }
     // Resume Simulation
     if keyboard_input.just_pressed(KeyCode::KeyR) {
-        let _ = gui_to_orch.0.send(ResumeSimulation);
+        if current_mode.current == Mode::Manual {
+            let _ = gui_to_orch.0.send(ResumeSimulationFromManual);
+        } else if current_mode.current == Mode::Automatic {
+            let _ = gui_to_orch.0.send(ResumeSimulationFromAutomatic);
+        }
     }
     // Cycle Explorer -> sets PlanetView
     if keyboard_input.just_pressed(KeyCode::KeyE) {
         if *current_state.get() != AppState::PauseMenu {
-            explorer_data.switch();
+            explorer_data.switch_last_cycle();
             planet_view_writer.write(PlanetViewPressed);
+            if explorer_data.get_last_cycle() {
+                match selected_planet.set(explorer_data.explorer1.get_current_planet_index()) {
+                    Ok(_) => {}
+                    Err(_) => {
+                        panic!("Out of bounds planet index");
+                    }
+                }
+            } else {
+                match selected_planet.set(explorer_data.explorer2.get_current_planet_index()) {
+                    Ok(_) => {}
+                    Err(_) => {
+                        panic!("Out of bounds planet index");
+                    }
+                }
+            }
         }
     }
 }
