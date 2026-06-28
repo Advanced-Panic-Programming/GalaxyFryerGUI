@@ -18,6 +18,7 @@ TODO:
 !!! Quando vado in PlanetState, manda richiesta all' orchestrator per aggiornare lo stato del pianeta
 ??? Aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all' orchestrator per aggiornare le risorse ???
 - PlanetView Mostrare anche la bag dell'esploratore
+- Nella cutscene Destroyed Asteroid, fare che l'asteroide arriva da sinistra e va verso il razzo che arriva da destra (ora l'asteroide è fermo al centro)
 
 Esc -> manda stop simulation che triggera stop planet AI
 Play -> Deve mandare Resume Simulation che fa ripartire i pianeti

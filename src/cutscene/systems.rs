@@ -185,7 +185,7 @@ pub fn spawn_cutscene_visuals(
                     }),
                     ..default()
                 },
-                Transform::from_xyz(0.0, 30.0, 103.0).with_scale(Vec3::splat(3.0)),
+                Transform::from_xyz(0.0, 30.0, 103.0).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
             ));
 
             // Atlas for the destruction animation
