@@ -33,7 +33,7 @@ pub struct PlanetSpriteInfo {
     pub angle: f32,
     pub speed: f32,
     pub timer: Timer,
-    pub sprite_path: String,
+    pub alive_sprite_path: String,
     pub destroyed_sprite_path: String,
 }
 
@@ -94,8 +94,13 @@ impl PlanetInfo {
     // Getters
     pub fn get_id(&self) -> ID { self.id }
     pub fn get_alive(&self) -> bool { self.alive }
+    /// Return a reference to the bool array of the energy cells
+    pub fn get_energy_cells(&self) -> &[bool] { &self.energy_cells }
+    /// Returns the number of charged energy cells
     pub fn get_charged_energy_cells_count(&self) -> usize { self.charged_cells_count }
+    /// Can the planet have a rocket at all?
     pub fn can_have_rocket(&self) -> bool { self.can_have_rocket }
+    /// The planet has a built rocket (true) or not (false)
     pub fn get_rocket(&self) -> bool { self.has_rocket }
     pub fn get_generate(&self) -> &HashSet<BasicResourceType> { &self.generate }
     pub fn get_combine(&self) -> &HashSet<ComplexResourceType> { &self.combine }
@@ -109,6 +114,16 @@ impl PlanetInfo {
     pub fn set_has_rocket(&mut self, rocket: bool) { self.has_rocket = rocket; }
     pub fn set_generate(&mut self, generate: HashSet<BasicResourceType>) { self.generate = generate; }
     pub fn set_combine(&mut self, combine: HashSet<ComplexResourceType>) { self.combine = combine; }
+}
+
+#[derive(Resource)]
+pub struct PlanetTerrainSpriteData {
+    pub terrain: PlanetTerrainSpriteInfo,
+}
+
+pub struct  PlanetTerrainSpriteInfo {
+    pub(crate) alive: Handle<Image>,
+    pub(crate) destroyed: Handle<Image>,
 }
 
 // Explorers
@@ -175,4 +190,24 @@ pub struct ExplorerSpriteData {
 pub struct ExplorerSpriteInfo {
     pub alive_sprite: Handle<Image>,
     pub dead_sprite: Handle<Image>,
+}
+
+#[derive(Resource)]
+pub struct RocketSpritesData {
+    pub rocket: RocketSpriteInfo,
+}
+
+pub struct RocketSpriteInfo {
+    pub empty_rocket_base: Handle<Image>,
+    pub full_built_rocket: Handle<Image>,
+}
+
+#[derive(Resource)]
+pub struct EnergyCellsSpritesData {
+    pub energy_cell: EnergyCellsSpriteInfo,
+}
+
+pub struct EnergyCellsSpriteInfo {
+    pub empty: Handle<Image>,
+    pub charged: Handle<Image>,
 }

@@ -22,7 +22,7 @@ pub fn spawn_background(mut commands: Commands, asset_server: Res<AssetServer>) 
         custom_size: Some(Vec2::new(1920.0, 1080.0)),
         ..default()
     },
-                    Transform::from_translation(Vec3::new(0.0, 0.0, -100.0)),
+    Transform::from_translation(Vec3::new(0.0, 0.0, -100.0)),
     ));
 }
 
@@ -88,7 +88,7 @@ pub fn init_planets_sprites_data_resource(
                 angle,
                 speed: 0.5,
                 timer: Timer::from_seconds(1.0, TimerMode::Repeating),
-                sprite_path: planets_sprites[i].to_string(),
+                alive_sprite_path: planets_sprites[i].to_string(),
                 destroyed_sprite_path: destroyed_planets_sprites[i].to_string(),
             })
         }
@@ -134,6 +134,20 @@ pub fn init_selected_planet_resource(
     selected_planet.clear();
 }
 
+pub fn init_planet_terrain_sprites_resource(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let terrain = PlanetTerrainSpriteInfo {
+        alive: asset_server.load(ALIVE_PLANET_TERRAIN_SPRITE_PATH),
+        destroyed: asset_server.load(DESTROYED_PLANET_TERRAIN_SPRITE_PATH) 
+    };
+    
+    commands.insert_resource(PlanetTerrainSpriteData {
+        terrain,
+    })
+}
+
 // ==============================
 // === Explorer Resource Init ===
 // ==============================
@@ -156,6 +170,32 @@ pub fn init_explorer_sprites_resource(
         explorer1,
         explorer2,
     }); // HERE the resource is added to the system
+}
+
+pub fn init_rocket_sprites_resource(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let rocket = RocketSpriteInfo {
+        full_built_rocket: asset_server.load(FULL_BUILT_ROCKET_SPRITE_PATH),
+        empty_rocket_base: asset_server.load(EMPTY_BASE_ROCKET_SPRITE_PATH),
+    };
+    commands.insert_resource(RocketSpritesData {
+        rocket,
+    })
+}
+
+pub fn init_energy_cell_sprites_resource(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let energy_cell = EnergyCellsSpriteInfo {
+        empty: asset_server.load(EMPTY_ENERGY_CELL_SPRITE_PATH),
+        charged: asset_server.load(CHARGED_ENERGY_CELL_SPRITE_PATH),
+    };
+    commands.insert_resource(EnergyCellsSpritesData {
+        energy_cell,
+    })
 }
 
 // ======================

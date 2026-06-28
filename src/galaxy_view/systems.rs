@@ -27,7 +27,7 @@ pub fn spawn_planets(
     for planet in planet_data.planets.iter() {
 
         let sprite_path = if planet.alive {
-            &planet.sprite_path
+            &planet.alive_sprite_path
         } else {
             &planet.destroyed_sprite_path
         };
@@ -112,7 +112,7 @@ pub fn update_planets_sprites(
         let current_handle = &sprite.image;
 
         let expected = if should_be_alive {
-            &curr_planet.sprite_path
+            &curr_planet.alive_sprite_path
         } else {
             &curr_planet.destroyed_sprite_path
         };
