@@ -179,6 +179,7 @@ pub fn init_rocket_sprites_resource(
     let rocket = RocketSpriteInfo {
         full_built_rocket: asset_server.load(FULL_BUILT_ROCKET_SPRITE_PATH),
         empty_rocket_base: asset_server.load(EMPTY_BASE_ROCKET_SPRITE_PATH),
+        flying_rocket: asset_server.load(FLYING_ROCKET_SPIRTE_PATH),
     };
     commands.insert_resource(RocketSpritesData {
         rocket,

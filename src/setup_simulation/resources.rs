@@ -200,6 +200,7 @@ pub struct RocketSpritesData {
 pub struct RocketSpriteInfo {
     pub empty_rocket_base: Handle<Image>,
     pub full_built_rocket: Handle<Image>,
+    pub flying_rocket: Handle<Image>,
 }
 
 #[derive(Resource)]

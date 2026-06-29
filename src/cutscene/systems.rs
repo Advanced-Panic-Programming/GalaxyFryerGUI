@@ -4,6 +4,7 @@ use crate::cutscene::CutSceneType;
 use crate::cutscene::resources::*;
 use crate::cutscene::utils::*;
 use crate::galaxy_view::messages::*;
+use crate::setup_simulation::resources::RocketSpritesData;
 
 /// Receives `PlanetDestroyedCutscene` / `AsteroidDestroyedCutscene` messages and
 /// stores the cutscene type in `ActiveCutscene`. Ignores new messages while one is playing.
@@ -31,6 +32,7 @@ pub fn spawn_cutscene_visuals(
     mut active: ResMut<ActiveCutscene>,
     asset_server: Res<AssetServer>,
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
+    rocket_sprites_data: Res<RocketSpritesData>,
 ) {
     // Only run once per cutscene.
     if active.current.is_none() || active.spawned {
@@ -217,7 +219,7 @@ pub fn spawn_cutscene_visuals(
                 CutsceneEntity,
                 CutsceneAnim::IncomingRocketSprite,
                 Sprite {
-                    image: asset_server.load(ROCKET_SPRITE_PATH),
+                    image: rocket_sprites_data.rocket.flying_rocket.clone(),
                     color: Color::srgba(1.0, 1.0, 1.0, 0.0),
                     ..default()
                 },

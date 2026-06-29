@@ -10,7 +10,7 @@ BUG NOTI:
 
 TODO:
 - aggiungere SFX
-- modifica risorsa planet Spirtes in modo che inizializzi solo una volta gli Handle<Image>
+- modifica risorsa planet Spirtes in modo che inizializzi solo una volta gli Handle<Image> e assicurati che tutti i sistemi usino quelle risorse!!!
 - Sistemare dimensione bottoni tab explorer nel pannello manual mode (il testo va a capo) e la riga del pianeta è più a sinistra del resto
 - Aggiungere log per azioni non possibili (move to planet fallita) e per start e stop explorer AI
 - Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?Creare un nuovo modulo galaxy_update?)
