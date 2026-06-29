@@ -30,9 +30,9 @@ pub const ROCKET_POS: Vec3 = Vec3::new(-680.0, -350.0, Z_ROCKET);
 
 // Energy cells
 
-/// Native sprite: 300×300 px. Display at 50×50 px.
-pub const CELL_SIZE: Vec2 = Vec2::new(50.0, 50.0);
-pub const CELLS_START_X: f32 = -500.0;
+/// Native sprite: 300×300 px. Display at 70×70 px.
+pub const CELL_SIZE: Vec2 = Vec2::new(70.0, 70.0);
+pub const CELLS_START_X: f32 = -420.0;
 /// Cell centre-to-centre distance (display width + 10 px gap).
 pub const CELLS_SPACING: f32 = 60.0;
 pub const CELLS_Y: f32 = -350.0;
@@ -49,7 +49,7 @@ pub const EXPLORERS_BAG_FONT_PATH: &str = "fonts/FiraMono-Medium.ttf";
 
 /// Native sprite: 288×288 px. Display at 160×160 px.
 pub const EXPLORER_SIZE: Vec2 = Vec2::new(160.0, 160.0);
-pub const EXPLORER1_POS: Vec3 = Vec3::new(-350.0, -320.0, Z_EXPLORER);
+pub const EXPLORER1_POS: Vec3 = Vec3::new(0.0, -320.0, Z_EXPLORER);
 pub const EXPLORER2_POS: Vec3 = Vec3::new(350.0, -320.0, Z_EXPLORER);
 
 /// Vertical offset from sprite centre to bag-label centre (pixels).

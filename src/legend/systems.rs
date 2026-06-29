@@ -195,7 +195,7 @@ pub fn cleanup_legend(
     mut query: Query<Entity, With<LegendUI>>,
 ) {
     for element in query.iter_mut() {
-        commands.entity(element).despawn(); //_related::<ChildOf>
+        commands.entity(element).despawn();
     }
 }
 

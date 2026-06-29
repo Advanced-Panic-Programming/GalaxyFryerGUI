@@ -22,6 +22,7 @@ impl Plugin for PlanetViewPlugin {
             .add_systems(
                 OnEnter(PlanetView),
                 (
+                    ask_planet_state,
                     cleanup,
                     spawn_corner_planet_system,
                     spawn_planet_view_system,
@@ -35,6 +36,7 @@ impl Plugin for PlanetViewPlugin {
                     // Full respawn when the selected planet changes.
                     // Must run before patch systems so they don't try to query
                     // entities that were just despawned.
+                    ask_planet_state,
                     on_planet_changed,
                     // Patch systems — react to data changes on the current planet.
                     // These are no-ops when their respective resource is unchanged.

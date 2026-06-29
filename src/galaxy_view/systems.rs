@@ -534,7 +534,7 @@ pub fn update_explorer_data (
 
 pub fn cleanup(
     mut commands: Commands,
-    query: Query<Entity, With<SpawnedByGalaxyView>>,
+    query: Query<Entity, (With<SpawnedByGalaxyView>, Without<ChildOf>)>,
 ) {
     for entity in query.iter() {
         commands.entity(entity).despawn();

@@ -18,11 +18,12 @@
 
 use bevy::prelude::*;
 use common_game::utils::ID;
-
+use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::AskPlanetState;
 use crate::galaxy_view::components::AnimationConfig;
 use crate::planet_view::builders::*;
 use crate::planet_view::components::*;
 use crate::planet_view::utils::*;
+use crate::setup_orchestrator::resources::ToOrchestrator;
 use crate::setup_simulation::resources::{
     EnergyCellsSpritesData, ExplorerSpriteData, ExplorersData, PlanetTerrainSpriteData,
     PlanetsData, PlanetsSpritesData, RocketSpritesData, SelectedPlanet,
@@ -31,9 +32,8 @@ use crate::setup_simulation::resources::{
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /// Despawns every entity tagged `SpawnedByPlanetView`, including their children.
-fn despawn_view(commands: &mut Commands, query: &Query<Entity, With<SpawnedByPlanetView>>) {
+fn despawn_view(commands: &mut Commands, query: &Query<Entity, (With<SpawnedByPlanetView>, Without<ChildOf>)>) {
     for entity in query.iter() {
-        // commands.entity(entity).despawn_related::<ChildOf>(); // Does not work!
         commands.entity(entity).despawn();
     }
 }
@@ -119,7 +119,7 @@ pub fn on_planet_changed(
     explorer_sprite_data: Res<ExplorerSpriteData>,
     rocket_sprites_data: Res<RocketSpritesData>,
     energy_cells_sprites_data: Res<EnergyCellsSpritesData>,
-    existing: Query<Entity, With<SpawnedByPlanetView>>,
+    existing: Query<Entity, (With<SpawnedByPlanetView>, Without<ChildOf>)>,
 ) {
     if !selected.is_changed() {
         return;
@@ -327,6 +327,16 @@ pub fn animate_corner_planet(
     }
 }
 
+// Update Planet State
+pub fn ask_planet_state(
+    sender: Res<ToOrchestrator>,
+    selected_planet: Res<SelectedPlanet>,
+) {
+    if let Some(planet_id ) = selected_planet.get() {
+        let _ = sender.0.send(AskPlanetState { planet_id: planet_id as ID });
+    }
+}
+
 // ── OnExit ────────────────────────────────────────────────────────────────────
 
 /// Removes every entity owned by the planet view, including their full child
@@ -336,7 +346,6 @@ pub fn cleanup(
     query: Query<Entity, With<SpawnedByPlanetView>>,
 ) {
     for entity in query.iter() {
-        // commands.entity(entity).despawn_related::<ChildOf>(); // Does not work
         commands.entity(entity).despawn();
     }
 }
