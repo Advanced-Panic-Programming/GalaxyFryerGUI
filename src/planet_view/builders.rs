@@ -36,8 +36,8 @@ pub fn spawn_corner_planet(
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(72), 144, 1, None, None);
     let atlas_handle = layouts.add(layout);
 
-    let planet_x = (CORNER_PLANET_X * window.width())/1920.0;
-    let planet_y = (CORNER_PLANET_Y * window.height())/1080.0;
+    let width = window.width();
+    let height = window.height();
     
     commands.spawn((
         Sprite {
@@ -48,7 +48,10 @@ pub fn spawn_corner_planet(
             }),
             ..default()
         },
-        Transform::from_translation(Vec3::new(planet_x, planet_y, CORNER_PLANET_Z))
+        Transform::from_translation(Vec3::new(
+            adapt_to_width(width, CORNER_PLANET_X), 
+            adapt_to_height(height, CORNER_PLANET_Y), 
+            adapt_scale_to_current_screen(width*height, CORNER_PLANET_SCALE)))
             .with_scale(Vec3::splat(CORNER_PLANET_SCALE)),
         AnimationConfig::new(0, 143, ANIMATION_FPS),
         SpawnedByPlanetView,

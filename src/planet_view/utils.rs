@@ -65,3 +65,21 @@ pub fn bag_label_pos(explorer_pos: Vec3) -> Vec3 {
         Z_BAG_LABEL,
     )
 }
+
+const WIDTH: f32 = 1920.0;
+const HEIGHT: f32 = 1080.0;
+
+/// Uses WIDTH = 1920
+pub fn adapt_to_width(window_width: f32, original_x: f32) -> f32 {
+    (window_width * original_x) / WIDTH
+}
+
+/// Uses HEIGHT = 1080
+pub fn adapt_to_height(window_height: f32, original_y: f32) -> f32 {
+    (window_height * original_y) / HEIGHT
+}
+
+/// window_area is window.width() * window.height()
+pub fn adapt_scale_to_current_screen(window_area: f32, original_scale: f32) -> f32 {
+    (window_area * original_scale) / (WIDTH * HEIGHT)
+}

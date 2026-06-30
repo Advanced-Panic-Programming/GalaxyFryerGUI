@@ -8,3 +8,5 @@ TODO:
 - Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva bottone (cambia colore)
 - Quando explorer muore, metti una freccia grigia/con teschio
 ??? Aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all' orchestrator per aggiornare le risorse ???
+
+use adapt_to_width, ... in tutti i sistemi che fanno display !!!! Usa risorsa per dimensione finestra in modo da non doverla ricalcolare sempre!!!!!
