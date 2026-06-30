@@ -41,9 +41,7 @@ impl Plugin for GalaxyViewPlugin {
                 update_explorer_arrow_binding,
                 update_explorer_arrow_offsets,
                 despawn_dead_explorer_arrows,
-            )
-                // .run_if(resource_changed::<ExplorersData>)
-                .run_if(in_state(GalaxyView))
+            ).run_if(in_state(GalaxyView))
             )
             // Update Systems (always)
             .add_systems(Update, (

@@ -54,21 +54,23 @@ fn require_selected(selected: &SelectedPlanet, caller: &str) -> Option<usize> {
 /// Must run after `cleanup` so no stale entity lingers from a previous visit.
 pub fn spawn_corner_planet_system(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
     planets_sprites_data: Res<PlanetsSpritesData>,
     selected_planet: Res<SelectedPlanet>,
+    windows: Query<&Window>,
 ) {
     let Some(index) = require_selected(&selected_planet, "spawn_corner_planet") else {
         return;
     };
 
+    let window = windows.single().unwrap();
+
     spawn_corner_planet(
         &mut commands,
-        &asset_server,
         &mut layouts,
         &planets_sprites_data.planets[index],
         index as ID,
+        window,
     );
 }
 
@@ -120,6 +122,7 @@ pub fn on_planet_changed(
     rocket_sprites_data: Res<RocketSpritesData>,
     energy_cells_sprites_data: Res<EnergyCellsSpritesData>,
     existing: Query<Entity, (With<SpawnedByPlanetView>, Without<ChildOf>)>,
+    windows: Query<&Window>,
 ) {
     if !selected.is_changed() {
         return;
@@ -131,12 +134,14 @@ pub fn on_planet_changed(
 
     despawn_view(&mut commands, &existing);
 
+    let window = windows.single().unwrap();
+
     spawn_corner_planet(
         &mut commands,
-        &asset_server,
         &mut layouts,
         &planets_sprites_data.planets[planet_index],
         planet_index as ID,
+        window,
     );
 
     spawn_planet_view(

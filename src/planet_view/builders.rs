@@ -22,10 +22,10 @@ use crate::setup_simulation::resources::{
 /// The atlas is a single row of 144 frames, each 72×72 px.
 pub fn spawn_corner_planet(
     commands: &mut Commands,
-    asset_server: &AssetServer,
     layouts: &mut Assets<TextureAtlasLayout>,
     planet_sprite: &PlanetSpriteInfo,
     planet_id: ID,
+    window: &Window,
 ) {
     let planet = if planet_sprite.alive {
         &planet_sprite.alive_sprite
@@ -36,6 +36,9 @@ pub fn spawn_corner_planet(
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(72), 144, 1, None, None);
     let atlas_handle = layouts.add(layout);
 
+    let planet_x = (CORNER_PLANET_X * window.width())/1920.0;
+    let planet_y = (CORNER_PLANET_Y * window.height())/1080.0;
+    
     commands.spawn((
         Sprite {
             image: planet.clone(),
@@ -45,7 +48,7 @@ pub fn spawn_corner_planet(
             }),
             ..default()
         },
-        Transform::from_translation(Vec3::new(CORNER_PLANET_X, CORNER_PLANET_Y, CORNER_PLANET_Z))
+        Transform::from_translation(Vec3::new(planet_x, planet_y, CORNER_PLANET_Z))
             .with_scale(Vec3::splat(CORNER_PLANET_SCALE)),
         AnimationConfig::new(0, 143, ANIMATION_FPS),
         SpawnedByPlanetView,

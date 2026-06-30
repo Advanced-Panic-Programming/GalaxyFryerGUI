@@ -26,8 +26,7 @@ impl Plugin for PlanetViewPlugin {
                     cleanup,
                     spawn_corner_planet_system,
                     spawn_planet_view_system,
-                )
-                    .chain(),
+                ).chain(),
             )
             // ── Update ────────────────────────────────────────────────────────
             .add_systems(

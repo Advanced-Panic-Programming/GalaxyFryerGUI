@@ -62,6 +62,10 @@ pub(super) fn action_btn(
                 Text::new(label),
                 TextFont { font, font_size: FS_NM, ..default() },
                 TextColor(Color::WHITE),
+                TextLayout {
+                    linebreak: LineBreak::NoWrap,
+                    ..default()
+                }
             ));
         });
 }
