@@ -328,12 +328,29 @@ pub fn animate_corner_planet(
 }
 
 // Update Planet State
-pub fn ask_planet_state(
+pub fn immediately_ask_planet_state(
     sender: Res<ToOrchestrator>,
     selected_planet: Res<SelectedPlanet>,
 ) {
     if let Some(planet_id ) = selected_planet.get() {
         let _ = sender.0.send(AskPlanetState { planet_id: planet_id as ID });
+    }
+}
+
+pub fn periodically_ask_planet_state(
+    time: Res<Time>,
+    mut timer: Local<Option<Timer>>,
+    sender: Res<ToOrchestrator>,
+    selected_planet: Res<SelectedPlanet>,
+) {
+    let timer = timer.get_or_insert_with(|| {
+        Timer::from_seconds(0.5, TimerMode::Repeating)
+    });
+
+    if timer.tick(time.delta()).just_finished() {
+        if let Some(planet_id ) = selected_planet.get() {
+            let _ = sender.0.send(AskPlanetState { planet_id: planet_id as ID });
+        }
     }
 }
 

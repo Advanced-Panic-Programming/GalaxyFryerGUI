@@ -12,7 +12,7 @@ impl Plugin for InputHandlerPlugin {
                     // Systems that depend on ToOrchestrator Resource:
                     // Since the resource is not init but is created from a system, we need to check if it exists before using it
                     menu_updates_inputs,
-                    game_related_inputs, //.run_if(no_active_cutscene),
+                    game_related_inputs,
                 ).run_if(resource_exists::<ToOrchestrator>)
             ))
         ;

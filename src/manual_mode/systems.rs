@@ -53,7 +53,7 @@ pub fn spawn_manual_mode_panel(
         false => Visibility::Hidden,
     };
     let galaxy_tab_visibility = match manual_mode_panel.active_tab {
-        Tab::Galaxy => Visibility::Visible,
+        Tab::Galaxy => Visibility::Inherited,
         _ => Visibility::Hidden,
     };
     let explorer1_tab_visibility = match manual_mode_panel.active_tab {

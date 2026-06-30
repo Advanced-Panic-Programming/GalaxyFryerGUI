@@ -43,6 +43,20 @@ impl LogMessage {
         }
     }
 
+    pub fn send_sunray_ack(planet_id: ID) -> Self {
+        Self {
+            level: Info,
+            message: format!("Sunray sent to planet #{}", planet_id + 1),
+        }
+    }
+
+    pub fn send_asteroid_ack(planet_id: ID) -> Self {
+        Self {
+            level: Info,
+            message: format!("Asteroid sent to planet #{}", planet_id + 1),
+        }
+    }
+
     pub fn manual_mode_ack() -> Self {
         Self {
             level: Info,

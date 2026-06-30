@@ -77,7 +77,7 @@ pub fn game_related_inputs(
     }
     // Set Automatic Mode
     if keyboard_input.just_pressed(KeyCode::KeyA) && *current_state.get() != AppState::PauseMenu && current_mode.current == Mode::Manual {
-        let _ = gui_to_orch.0.send(AutomaticMode); // sends ManualMode message to orchestrator
+        let _ = gui_to_orch.0.send(AutomaticMode); // sends AutomaticMode message to orchestrator
         // Set Manual Mode Panel to not visible
         manual_mode_panel.visible = false;
         // Update Resource

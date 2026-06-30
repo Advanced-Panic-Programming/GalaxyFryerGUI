@@ -40,6 +40,12 @@ pub fn receive_from_orchestrator(
                 automatic_mode_writer.write(ReceivedAutomaticModeAck);
                 log.write(LogMessage::automatic_mode_ack());
             }
+            SendSunrayAck { p_id } => {
+                log.write(LogMessage::send_sunray_ack(p_id));
+            }
+            SendAsteroidAck { p_id } => {
+                log.write(LogMessage::send_asteroid_ack(p_id));
+            }
             SendPlanetState{p_id, planet_state} => {
                 planet_state_writer.write(ReceivedPlanetState{
                     planet_id: p_id,

@@ -180,7 +180,7 @@ pub fn scroll_log_ui(
 
 pub fn cleanup_log_ui(
     mut commands: Commands,
-    query: Query<Entity, With<LogUI>>,
+    query: Query<Entity, (With<LogUI>, Without<ChildOf>)>,
     mut displayed: ResMut<DisplayedLogEntries>,
 ) {
     displayed.count = 0;

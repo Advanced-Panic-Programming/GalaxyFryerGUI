@@ -265,7 +265,6 @@ pub fn cell_image(charged: bool, cell_sprites: &EnergyCellsSpritesData) -> Handl
     if charged {
         cell_sprites.energy_cell.charged.clone()
     } else {
-        println!("HERE");println!("HERE");println!("HERE");println!("HERE");
         cell_sprites.energy_cell.empty.clone()
     }
 }
