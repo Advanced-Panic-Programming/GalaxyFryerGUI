@@ -27,12 +27,12 @@ pub fn spawn_planets(
     for planet in planet_data.planets.iter() {
 
         let sprite_path = if planet.alive {
-            &planet.alive_sprite_path
+            &planet.alive_sprite
         } else {
-            &planet.destroyed_sprite_path
+            &planet.destroyed_sprite
         };
 
-        let texture: Handle<Image> = asset_server.load(sprite_path);
+        let texture: Handle<Image> = sprite_path.clone();
 
         let entity  = commands.spawn((
             Sprite {
@@ -112,19 +112,15 @@ pub fn update_planets_sprites(
         let current_handle = &sprite.image;
 
         let expected = if should_be_alive {
-            &curr_planet.alive_sprite_path
+            &curr_planet.alive_sprite
         } else {
-            &curr_planet.destroyed_sprite_path
+            &curr_planet.destroyed_sprite
         };
 
         // if handle doesn't match expected image: update
-        if asset_server
-            .get_path(current_handle)
-            .map_or(true, |p| p.path().to_str() != Some(expected.as_str()))
-        {
-            sprite.image = asset_server.load(expected);
+        if sprite.image != *expected {
+            sprite.image = expected.clone();
         }
-
     }
 }
 

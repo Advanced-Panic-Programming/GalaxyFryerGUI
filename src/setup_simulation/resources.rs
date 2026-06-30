@@ -33,8 +33,8 @@ pub struct PlanetSpriteInfo {
     pub angle: f32,
     pub speed: f32,
     pub timer: Timer,
-    pub alive_sprite_path: String,
-    pub destroyed_sprite_path: String,
+    pub alive_sprite: Handle<Image>,
+    pub destroyed_sprite: Handle<Image>,
 }
 
 #[derive(Resource, Default)]

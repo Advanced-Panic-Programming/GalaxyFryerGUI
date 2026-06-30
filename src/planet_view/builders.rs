@@ -27,10 +27,10 @@ pub fn spawn_corner_planet(
     planet_sprite: &PlanetSpriteInfo,
     planet_id: ID,
 ) {
-    let sprite_path = if planet_sprite.alive {
-        &planet_sprite.alive_sprite_path
+    let planet = if planet_sprite.alive {
+        &planet_sprite.alive_sprite
     } else {
-        &planet_sprite.destroyed_sprite_path
+        &planet_sprite.destroyed_sprite
     };
 
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(72), 144, 1, None, None);
@@ -38,7 +38,7 @@ pub fn spawn_corner_planet(
 
     commands.spawn((
         Sprite {
-            image: asset_server.load(sprite_path),
+            image: planet.clone(),
             texture_atlas: Some(TextureAtlas {
                 layout: atlas_handle,
                 index: 0,

@@ -50,11 +50,11 @@ pub const EXPLORERS_BAG_FONT_PATH: &str = "fonts/FiraMono-Medium.ttf";
 /// Native sprite: 288×288 px. Display at 160×160 px.
 pub const EXPLORER_SIZE: Vec2 = Vec2::new(160.0, 160.0);
 pub const EXPLORER1_POS: Vec3 = Vec3::new(0.0, -320.0, Z_EXPLORER);
-pub const EXPLORER2_POS: Vec3 = Vec3::new(350.0, -320.0, Z_EXPLORER);
+pub const EXPLORER2_POS: Vec3 = Vec3::new(250.0, -320.0, Z_EXPLORER);
 
 /// Vertical offset from sprite centre to bag-label centre (pixels).
 pub const BAG_LABEL_OFFSET_Y: f32 = 100.0;
-pub const BAG_FONT_SIZE: f32 = 24.0;
+pub const BAG_FONT_SIZE: f32 = 14.0;
 
 /// Position of the bag label given the explorer's world position.
 #[inline]

@@ -10,17 +10,9 @@ BUG NOTI:
 
 TODO:
 - aggiungere SFX
-- modifica risorsa planet Spirtes in modo che inizializzi solo una volta gli Handle<Image> e assicurati che tutti i sistemi usino quelle risorse!!!
 - Sistemare dimensione bottoni tab explorer nel pannello manual mode (il testo va a capo) e la riga del pianeta è più a sinistra del resto
 - Aggiungere log per azioni non possibili (move to planet fallita) e per start e stop explorer AI
 - Input handler NON COMPLETO!!! Mancano tutti gli aggiornamenti della galassia! (?Creare un nuovo modulo galaxy_update?)
 - Quando un explorer/pianeta muore, non puoi più inviargli comandi -> disattiva bottone (cambia colore)
-- remove cycle explorer? Currently not working
 - Quando explorer muore, metti una freccia grigia/con teschio
-!!! Quando vado in PlanetState, manda richiesta all' orchestrator per aggiornare lo stato del pianeta
 ??? Aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all' orchestrator per aggiornare le risorse ???
-- PlanetView Mostrare anche la bag dell'esploratore
-- Nella cutscene Destroyed Asteroid, fare che l'asteroide arriva da sinistra e va verso il razzo che arriva da destra (ora l'asteroide è fermo al centro)
-
-Esc -> manda stop simulation che triggera stop planet AI
-Play -> Deve mandare Resume Simulation che fa ripartire i pianeti

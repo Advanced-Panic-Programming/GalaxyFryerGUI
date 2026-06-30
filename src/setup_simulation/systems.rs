@@ -55,6 +55,7 @@ fn compute_orbit_from_size(width: f32, _height: f32) -> GalaxyOrbit {
 
 pub fn init_planets_sprites_data_resource(
     mut planets_data: ResMut<PlanetsSpritesData>,
+    asset_server: Res<AssetServer>,
 ) {
     let planets_sprites = vec![
         "planets/planet1.png",
@@ -88,8 +89,8 @@ pub fn init_planets_sprites_data_resource(
                 angle,
                 speed: 0.5,
                 timer: Timer::from_seconds(1.0, TimerMode::Repeating),
-                alive_sprite_path: planets_sprites[i].to_string(),
-                destroyed_sprite_path: destroyed_planets_sprites[i].to_string(),
+                alive_sprite: asset_server.load(planets_sprites[i]),
+                destroyed_sprite: asset_server.load(destroyed_planets_sprites[i]),
             })
         }
     }
