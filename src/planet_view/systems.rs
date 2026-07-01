@@ -233,8 +233,7 @@ pub fn update_explorers(
     mut sprite_query: Query<(Entity, &ExplorerSprite, &mut Sprite)>,
     mut label_query: Query<(Entity, &ExplorerBagLabel, &mut Text2d)>,
     root_query: Query<Entity, (With<SpawnedByPlanetView>, Without<CornerPlanet>)>,
-    width: f32,
-    height: f32,
+    window_size: Res<WindowSize>,
 ) {
     if !explorers_data.is_changed() {
         return;
@@ -243,16 +242,16 @@ pub fn update_explorers(
     let Some(planet_index) = require_selected(&selected, "update_explorers") else {
         return;
     };
-    
+
     let explorer1_pos = Vec3::new(
-        adapt_to_width(width, EXPLORER1_X),
-        adapt_to_height(height, EXPLORER1_Y),
+        adapt_to_width(window_size.width, EXPLORER1_X),
+        adapt_to_height(window_size.height, EXPLORER1_Y),
         EXPLORER_Z,
     );
-    
+
     let explorer2_pos = Vec3::new(
-        adapt_to_width(width, EXPLORER2_X),
-        adapt_to_height(height, EXPLORER2_Y),
+        adapt_to_width(window_size.width, EXPLORER2_X),
+        adapt_to_height(window_size.height, EXPLORER2_Y),
         EXPLORER_Z,
     );
 
