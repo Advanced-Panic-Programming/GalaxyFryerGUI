@@ -5,7 +5,7 @@ use crate::galaxy_view::messages::{ReceivedExplorerBag, ReceivedExplorerMove, Re
 use crate::galaxy_view::resources::ExplorerArrowAtlas;
 use crate::galaxy_view::utils::*;
 use crate::manual_mode::resources::{CombinableResourcesOnPlanet, CombineResourceSpinner, GeneratableResourcesOnPlanet, GenerateResourceSpinner};
-use crate::planet_view::utils::{adapt_to_height, adapt_to_width, EXPLORER_SIZE};
+use crate::planet_view::utils::{adapt_to_height, adapt_to_width};
 // =====================
 // === Setup Systems ===
 // =====================

@@ -14,7 +14,7 @@ mod log;
 mod manual_mode;
 
 use bevy::prelude::*;
-use bevy::window::{WindowMode, WindowResolution};
+use bevy::window::{WindowMode};
 use crate::galaxy_view::plugin::GalaxyViewPlugin;
 use crate::input_handler::plugin::InputHandlerPlugin;
 use crate::setup_simulation::plugin::SetupSimulationPlugin;

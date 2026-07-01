@@ -3,7 +3,6 @@ use bevy::prelude::*;
 // Viewport
 
 pub const TERRAIN_SIZE: Vec2 = Vec2::new(1920.0, 1080.0);
-pub const TERRAIN_SCALE: f32 = 1.0;
 
 // Z-layers (Higher values render on top)
 

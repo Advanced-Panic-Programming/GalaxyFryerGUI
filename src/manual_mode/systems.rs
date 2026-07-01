@@ -354,36 +354,6 @@ fn spawn_explorer_tab(
                                     ));
                                 });
 
-                            // Row 2: Bag
-                            left_column.spawn(Node {
-                                flex_direction: FlexDirection::Row,
-                                align_items: AlignItems::Center,
-                                column_gap: Px(10.0),
-                                ..default()
-                            })
-                                .with_children(|row| {
-                                    row.spawn((
-                                        Text::new(""),
-                                        TextFont {
-                                            font: font.clone(),
-                                            font_size: FS_NM,
-                                            ..default()
-                                        },
-                                        TextColor(TEXT_LABEL),
-                                    ));
-
-                                    row.spawn((
-                                        Text::new(explorer_bag.to_string()),
-                                        TextFont {
-                                            font: font.clone(),
-                                            font_size: FS_NM,
-                                            ..default()
-                                        },
-                                        TextColor(TEXT_VALUE),
-                                        BagViewMarker { explorer_id },
-                                    ));
-                                });
-
                             // Move
                             left_column.spawn(Node {
                                 flex_direction: FlexDirection::Row,
@@ -451,18 +421,12 @@ fn spawn_explorer_tab(
                                         GenerateResourceSpinnerDecrementButton { explorer_id },
                                     );
 
-                                    row.spawn((
-                                        Text::new(
-                                            basic_resource_type_to_string(current_generate)
-                                        ),
-                                        TextFont {
-                                            font: font.clone(),
-                                            font_size: FS_NM,
-                                            ..default()
-                                        },
-                                        TextColor(TEXT_VALUE),
+                                    spinner_value_slot(
+                                        row,
+                                        font.clone(),
+                                        &basic_resource_type_to_string(current_generate),
                                         GenerateResourceSpinnerValue {explorer_id},
-                                    ));
+                                    );
 
                                     small_arrow_btn(
                                         row,
@@ -505,18 +469,12 @@ fn spawn_explorer_tab(
                                         CombinableResourceSpinnerDecrementButton{explorer_id},
                                     );
 
-                                    row.spawn((
-                                        Text::new(
-                                            complex_resource_type_to_string(current_combine)
-                                        ),
-                                        TextFont {
-                                            font: font.clone(),
-                                            font_size: FS_NM,
-                                            ..default()
-                                        },
-                                        TextColor(TEXT_VALUE),
+                                    spinner_value_slot(
+                                        row,
+                                        font.clone(),
+                                        &complex_resource_type_to_string(current_combine),
                                         CombineResourceSpinnerValue{explorer_id},
-                                    ));
+                                    );
 
                                     small_arrow_btn(
                                         row,
@@ -561,6 +519,41 @@ fn spawn_explorer_tab(
                                         StopAIButton { explorer_id },
                                     );
                                 });
+                        });
+
+                    // =========================================
+                    //   MIDDLE COLUMN
+                    // =========================================
+                    // Its own flex column, separate from the button rows above,
+                    // so a growing bag content never pushes the buttons around.
+                    main_row.spawn(Node {
+                        width: Px(BAG_COLUMN_WIDTH),
+                        height: Val::Percent(100.0),
+                        flex_direction: FlexDirection::Column,
+                        row_gap: Px(6.0),
+                        overflow: Overflow::clip_y(),
+                        ..default()
+                    })
+                        .with_children(|bag_column| {
+                            bag_column.spawn((
+                                Text::new("Bag"),
+                                TextFont {
+                                    font: fb.clone(),
+                                    font_size: FS_NM,
+                                    ..default()
+                                },
+                                TextColor(TEXT_LABEL),
+                            ));
+                            bag_column.spawn((
+                                Text::new(explorer_bag.to_string()),
+                                TextFont {
+                                    font: font.clone(),
+                                    font_size: FS_NM,
+                                    ..default()
+                                },
+                                TextColor(TEXT_VALUE),
+                                BagViewMarker { explorer_id },
+                            ));
                         });
 
                     // =====================================================
