@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use bevy::prelude::*;
 use std::fmt;
-use common_game::components::resource::{BasicResource, BasicResourceType, ComplexResourceType};
+use common_game::components::resource::{BasicResourceType, ComplexResourceType};
 use common_game::utils::ID;
 
 // ---------------------------------------------------------------
@@ -32,30 +32,21 @@ impl Default for ManualModePanel {
 // ---------------------------------------------------------------
 //      Spinners
 // ---------------------------------------------------------------
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct PlanetSpinner {
     value: usize,
 }
 
 impl PlanetSpinner {
-    pub fn new() -> Self {
-        Self { value: 0 }
-    }
     pub fn increase(&mut self) {
         self.value = if self.value >= 6 { 0 } else { self.value + 1 };
     }
     pub fn decrease(&mut self) {
-        self.value = if self.value <= 0 { 6 } else { self.value - 1 };
+        self.value = if self.value == 0 { 6 } else { self.value - 1 };
     }
     /// Returns the actual planet index 0-6
     pub fn get_current_value(&self) -> usize {
         self.value
-    }
-}
-
-impl Default for PlanetSpinner {
-    fn default() -> Self {
-        PlanetSpinner { value: 0 }
     }
 }
 
@@ -75,7 +66,7 @@ pub struct GeneratableResourcesOnPlanet {
 impl Default for GeneratableResourcesOnPlanet {
     fn default() -> Self {
         let mut spinners = Vec::new();
-        for i in 0..7 {
+        for _ in 0..7 {
             let spinner = GenerateResourceSpinner::new_empty();
             spinners.push(spinner);
         }
@@ -124,7 +115,7 @@ pub struct CombinableResourcesOnPlanet {
 impl Default for CombinableResourcesOnPlanet {
     fn default() -> Self {
         let mut spinners = Vec::new();
-        for i in 0..7 {
+        for _ in 0..7 {
             let spinner = CombineResourceSpinner::new_empty();
             spinners.push(spinner);
         }
@@ -254,7 +245,6 @@ impl_spinner_display!(GenerateResourceSpinner);
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
-    use bevy::ecs::error::panic;
     use common_game::components::resource::{BasicResourceType, ComplexResourceType};
     use crate::manual_mode::resources::{CombinableResourcesOnPlanet, CombineResourceSpinner, GeneratableResourcesOnPlanet, GenerateResourceSpinner, PlanetSpinner};
 
@@ -286,7 +276,7 @@ mod tests {
 
     #[test]
     fn test_planet_spinner_display() {
-        let mut planet_spinner = PlanetSpinner::new();
+        let mut planet_spinner = PlanetSpinner::default();
         assert_eq!(planet_spinner.get_current_value(), 0);
         println!("{}", planet_spinner); // 1
         planet_spinner.decrease();
