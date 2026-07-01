@@ -1,6 +1,6 @@
 pub const SPACE_BACKGROUND_PATH: &str = "backgrounds/space_bg.png";
 pub const ALIVE_PLANET_TERRAIN_SPRITE_PATH: &str = "backgrounds/planet_terrain.png";
-pub const DESTROYED_PLANET_TERRAIN_SPRITE_PATH: &str = "backgrounds/planet_terrain.png"; //TODO!
+pub const DESTROYED_PLANET_TERRAIN_SPRITE_PATH: &str = "backgrounds/destroyed_planet_terrain.png";
 pub const EXPLORER1_ALIVE_PATH: &str = "explorers/explorer1_alive.png";
 pub const EXPLORER1_DEAD_PATH: &str = "explorers/explorer1_dead_with_rocks.png";
 pub const EXPLORER1_ALIVE_ARROW_PATH: &str = "explorer_arrows/red_explorer_arrow.png";
