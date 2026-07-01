@@ -160,11 +160,15 @@ pub fn init_explorer_sprites_resource(
     let explorer1 = ExplorerSpriteInfo {
         alive_sprite: asset_server.load(EXPLORER1_ALIVE_PATH),
         dead_sprite: asset_server.load(EXPLORER1_DEAD_PATH),
+        alive_arrow_sprite: asset_server.load(EXPLORER1_ALIVE_ARROW_PATH),
+        dead_arrow_sprite: asset_server.load(EXPLORER1_DEAD_ARROW_PATH),
     };
 
     let explorer2 = ExplorerSpriteInfo {
         alive_sprite: asset_server.load(EXPLORER2_ALIVE_PATH),
         dead_sprite: asset_server.load(EXPLORER2_DEAD_PATH),
+        alive_arrow_sprite: asset_server.load(EXPLORER2_ALIVE_ARROW_PATH),
+        dead_arrow_sprite: asset_server.load(EXPLORER2_DEAD_ARROW_PATH),
     };
 
     commands.insert_resource(ExplorerSpriteData {

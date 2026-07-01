@@ -190,6 +190,8 @@ pub struct ExplorerSpriteData {
 pub struct ExplorerSpriteInfo {
     pub alive_sprite: Handle<Image>,
     pub dead_sprite: Handle<Image>,
+    pub alive_arrow_sprite: Handle<Image>,
+    pub dead_arrow_sprite: Handle<Image>,
 }
 
 #[derive(Resource)]

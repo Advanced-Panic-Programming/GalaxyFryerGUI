@@ -147,11 +147,11 @@ pub fn setup_explorer_arrow_atlas(
 
     pub fn spawn_explorer_arrows(
         mut commands: Commands,
-        asset_server: Res<AssetServer>,
         explorers: Res<ExplorersData>,
         atlas: Res<ExplorerArrowAtlas>,
         planets: Query<(Entity, &Planet)>,
         arrows: Query<&ExplorerArrow>,
+        explorer_sprite_data: Res<ExplorerSpriteData>,
     ) {
         let explorer_states = [
             (0, &explorers.explorer1),
@@ -163,9 +163,9 @@ pub fn setup_explorer_arrow_atlas(
                 13,
                 ANIMATION_FPS,
             );
-            if !explorer.is_alive() {
-                continue;
-            }
+            // if !explorer.is_alive() {
+            //     continue;
+            // }
             let arrow_exists = arrows
                 .iter()
                 .any(|a| a.explorer_id == explorer_id);
@@ -181,8 +181,20 @@ pub fn setup_explorer_arrow_atlas(
                 continue;
             };
             let texture_path = match explorer_id {
-                0 => EXPLORER_1_SPRITE_PATH,
-                1 => EXPLORER_2_SPRITE_PATH,
+                0 => {
+                    if explorer.is_alive() {
+                        explorer_sprite_data.explorer1.alive_arrow_sprite.clone()
+                    } else {
+                        explorer_sprite_data.explorer1.dead_arrow_sprite.clone()
+                    }
+                },
+                1 => {
+                    if explorer.is_alive() {
+                        explorer_sprite_data.explorer2.alive_arrow_sprite.clone()
+                    } else {
+                        explorer_sprite_data.explorer2.dead_arrow_sprite.clone()
+                    }
+                },
                 _ => unreachable!(),
             };
             commands
@@ -190,7 +202,7 @@ pub fn setup_explorer_arrow_atlas(
                 .with_children(|parent| {
                     parent.spawn((
                         Sprite {
-                            image: asset_server.load(texture_path),
+                            image: texture_path,
                             custom_size: Some(
                                 Vec2::splat(
                                     EXPLORER_ARROW_DIMENSION,
@@ -300,19 +312,29 @@ pub fn update_explorer_arrow_offsets(
     }
 }
 
-pub fn despawn_dead_explorer_arrows(
-    mut commands: Commands,
+// This system update the arrow sprite to show that the explorer died
+pub fn change_dead_explorers_arrows(
     explorers: Res<ExplorersData>,
-    arrows: Query<(Entity, &ExplorerArrow)>,
+    explorer_sprite_data: Res<ExplorerSpriteData>,
+    mut arrows: Query<(&mut Sprite, &ExplorerArrow)>,
 ) {
-    for (entity, arrow) in arrows.iter() {
-        let alive = match arrow.explorer_id {
-            0 => explorers.explorer1.is_alive(),
-            1 => explorers.explorer2.is_alive(),
-            _ => false,
-        };
-        if !alive {
-            commands.entity(entity).despawn();
+    if !explorers.is_changed() {
+        return;
+    }
+
+    for (mut sprite, arrow) in arrows.iter_mut() {
+        match arrow.explorer_id {
+            0 => {
+                if !explorers.explorer1.is_alive() {
+                    sprite.image = explorer_sprite_data.explorer1.dead_arrow_sprite.clone()
+                }
+            }
+            1 => {
+                if !explorers.explorer2.is_alive() {
+                    sprite.image = explorer_sprite_data.explorer2.dead_arrow_sprite.clone()
+                }
+            }
+            _ => {}
         }
     }
 }

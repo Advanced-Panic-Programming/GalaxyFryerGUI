@@ -40,7 +40,7 @@ impl Plugin for GalaxyViewPlugin {
                 spawn_explorer_arrows,
                 update_explorer_arrow_binding,
                 update_explorer_arrow_offsets,
-                despawn_dead_explorer_arrows,
+                change_dead_explorers_arrows,
             ).run_if(in_state(GalaxyView))
             )
             // Update Systems (always)

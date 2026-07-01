@@ -3,8 +3,12 @@ pub const ALIVE_PLANET_TERRAIN_SPRITE_PATH: &str = "backgrounds/planet_terrain.p
 pub const DESTROYED_PLANET_TERRAIN_SPRITE_PATH: &str = "backgrounds/planet_terrain.png"; //TODO!
 pub const EXPLORER1_ALIVE_PATH: &str = "explorers/explorer1_alive.png";
 pub const EXPLORER1_DEAD_PATH: &str = "explorers/explorer1_dead_with_rocks.png";
+pub const EXPLORER1_ALIVE_ARROW_PATH: &str = "explorer_arrows/red_explorer_arrow.png";
+pub const EXPLORER1_DEAD_ARROW_PATH: &str = "explorer_arrows/red_dead_explorer_arrow.png";
 pub const EXPLORER2_ALIVE_PATH: &str = "explorers/explorer2_alive.png";
 pub const EXPLORER2_DEAD_PATH: &str = "explorers/explorer2_dead_with_rocks.png";
+pub const EXPLORER2_ALIVE_ARROW_PATH: &str = "explorer_arrows/green_explorer_arrow.png";
+pub const EXPLORER2_DEAD_ARROW_PATH: &str = "explorer_arrows/green_dead_explorer_arrow.png";
 
 pub const EMPTY_BASE_ROCKET_SPRITE_PATH: &str = "rocket/rocket_base.png";
 pub const FULL_BUILT_ROCKET_SPRITE_PATH: &str = "rocket/full_built_rocket.png";
