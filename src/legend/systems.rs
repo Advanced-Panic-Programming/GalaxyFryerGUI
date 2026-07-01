@@ -17,7 +17,7 @@ fn keycap() -> KeyCapBundle {
             border: UiRect::all(Val::Px(KEYCAP_BORDER_WIDTH)),
             ..default()
         },
-        background_color: BackgroundColor { 0: KEYCAP_BACKGROUND_COLOR },
+        background_color: BackgroundColor(KEYCAP_BACKGROUND_COLOR),
         border_color: BorderColor::all(KEYCAP_BORDER_COLOR),
         border_radius: BorderRadius::all(Val::Px(KEYCAP_BORDER_RADIUS)),
     }

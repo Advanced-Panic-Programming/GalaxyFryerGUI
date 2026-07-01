@@ -137,26 +137,26 @@ fn spawn_tab_bar(parent: &mut RelatedSpawnerCommands<ChildOf>, font: Handle<Font
     parent
         .spawn((Node {
             width: Val::Percent(100.0),
-            height: Val::Px(TAB_HEIGHT),
+            height: Px(TAB_HEIGHT),
             flex_direction: FlexDirection::Row,
             align_items: AlignItems::FlexStart,
             justify_content: JustifyContent::FlexStart,
             border: UiRect::bottom(Px(BORDER_WIDTH)),
-            column_gap: Val::Px(6.0),
+            column_gap: Px(6.0),
             // padding: UiRect::horizontal(Val::Px(TAB_PADDING)),
             padding: UiRect::new(
-                Val::Px(TAB_PADDING), // left
-                Val::Px(TAB_PADDING), // right
-                Val::Px(TAB_PADDING), // top
-                Val::Px(0.0), // bottom
+                Px(TAB_PADDING), // left
+                Px(TAB_PADDING), // right
+                Px(TAB_PADDING), // top
+                Px(0.0), // bottom
             ),
             ..default()
             },
             BorderRadius::new(
-                Val::Px(8.0),
-                Val::Px(8.0),
-                Val::Px(0.0),
-                Val::Px(0.0),
+                Px(8.0),
+                Px(8.0),
+                Px(0.0),
+                Px(0.0),
             ),
         ))
         .with_children(|bar| {
@@ -168,21 +168,21 @@ fn spawn_tab_bar(parent: &mut RelatedSpawnerCommands<ChildOf>, font: Handle<Font
                 bar.spawn((
                     Button,
                     Node {
-                        width: Val::Px(TAB_WIDTH),
+                        width: Px(TAB_WIDTH),
                         height: Val::Percent(100.0),
                         justify_content: JustifyContent::Center,
                         align_items: AlignItems::Center,
-                        border: UiRect::all(Val::Px(BORDER_WIDTH)),
-                        padding: UiRect::horizontal(Val::Px(TAB_PADDING)),
+                        border: UiRect::all(Px(BORDER_WIDTH)),
+                        padding: UiRect::horizontal(Px(TAB_PADDING)),
                         ..default()
                     },
                     BackgroundColor(TAB_INACTIVE_BG),
                     BorderColor::all(TAB_BORDER),
                     BorderRadius::new(
-                        Val::Px(8.0),
-                        Val::Px(8.0),
-                        Val::Px(0.0),
-                        Val::Px(0.0),
+                        Px(8.0),
+                        Px(8.0),
+                        Px(0.0),
+                        Px(0.0),
                     ),
                     TabButton{ tab },
                 ))
@@ -214,8 +214,8 @@ fn spawn_galaxy_tab(
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Column,
-                padding: UiRect::all(Val::Px(18.0)),
-                row_gap: Val::Px(14.0),
+                padding: UiRect::all(Px(18.0)),
+                row_gap: Px(14.0),
                 ..default()
             },
             visibility,
@@ -227,7 +227,7 @@ fn spawn_galaxy_tab(
             tab.spawn(Node {
                 flex_direction: FlexDirection::Row,
                 align_items: AlignItems::Center,
-                column_gap: Val::Px(10.0),
+                column_gap: Px(10.0),
                 ..default()
             })
                 .with_children(|row| {
@@ -250,7 +250,7 @@ fn spawn_galaxy_tab(
             tab.spawn(Node {
                 flex_direction: FlexDirection::Row,
                 align_items: AlignItems::Center,
-                column_gap: Val::Px(12.0),
+                column_gap: Px(12.0),
                 ..default()
             })
                 .with_children(|row| {
@@ -306,8 +306,8 @@ fn spawn_explorer_tab(
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Row,
-                column_gap: Val::Px(EXPLOER_TAB_COLUMNS_GAP),
-                padding: UiRect::axes(Val::Px(25.0), Val::Px(8.0)),
+                column_gap: Px(EXPLOER_TAB_COLUMNS_GAP),
+                padding: UiRect::axes(Px(25.0), Px(8.0)),
                 ..default()
             })
                 .with_children(|main_row| {
@@ -318,7 +318,7 @@ fn spawn_explorer_tab(
 
                     main_row.spawn(Node {
                         flex_direction: FlexDirection::Column,
-                        row_gap: Val::Px(20.0),
+                        row_gap: Px(20.0),
                         flex_grow: 3.0,
                         ..default()
                     })
@@ -328,7 +328,7 @@ fn spawn_explorer_tab(
                             left_column.spawn(Node {
                                 flex_direction: FlexDirection::Row,
                                 align_items: AlignItems::Center,
-                                column_gap: Val::Px(10.0),
+                                column_gap: Px(10.0),
                                 ..default()
                             })
                                 .with_children(|row| {
@@ -358,7 +358,7 @@ fn spawn_explorer_tab(
                             left_column.spawn(Node {
                                 flex_direction: FlexDirection::Row,
                                 align_items: AlignItems::Center,
-                                column_gap: Val::Px(10.0),
+                                column_gap: Px(10.0),
                                 ..default()
                             })
                                 .with_children(|row| {
@@ -388,7 +388,7 @@ fn spawn_explorer_tab(
                             left_column.spawn(Node {
                                 flex_direction: FlexDirection::Row,
                                 align_items: AlignItems::Center,
-                                column_gap: Val::Px(10.0),
+                                column_gap: Px(10.0),
                                 ..default()
                             })
                                 .with_children(|row| {
@@ -431,7 +431,7 @@ fn spawn_explorer_tab(
                             left_column.spawn(Node {
                                 flex_direction: FlexDirection::Row,
                                 align_items: AlignItems::Center,
-                                column_gap: Val::Px(10.0),
+                                column_gap: Px(10.0),
                                 ..default()
                             })
                                 .with_children(|row| {
@@ -485,7 +485,7 @@ fn spawn_explorer_tab(
                             left_column.spawn(Node {
                                 flex_direction: FlexDirection::Row,
                                 align_items: AlignItems::Center,
-                                column_gap: Val::Px(10.0),
+                                column_gap: Px(10.0),
                                 ..default()
                             })
                                 .with_children(|row| {
@@ -539,7 +539,7 @@ fn spawn_explorer_tab(
                             left_column.spawn(Node {
                                 flex_direction: FlexDirection::Row,
                                 align_items: AlignItems::Center,
-                                column_gap: Val::Px(10.0),
+                                column_gap: Px(10.0),
                                 ..default()
                             })
                                 .with_children(|row| {
@@ -568,7 +568,7 @@ fn spawn_explorer_tab(
                     // =====================================================
 
                     main_row.spawn(Node {
-                        width: Val::Px(250.0),
+                        width: Px(250.0),
                         height: Val::Percent(100.0),
                         flex_direction: FlexDirection::Column,
                         ..default()

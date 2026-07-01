@@ -275,7 +275,6 @@ pub fn animate_cutscene(
     timer: Res<CutsceneTimer>,
     active: Res<ActiveCutscene>,
     mut sprite_q: Query<(&CutsceneAnim, &mut Sprite, &mut Transform), Without<Text2d>>,
-    mut text_q: Query<(&CutsceneAnim, &mut TextColor), With<Text2d>>,
 ) {
     if active.current.is_none() {
         return;

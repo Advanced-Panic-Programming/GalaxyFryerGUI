@@ -3,7 +3,6 @@ use galaxy_view::systems::*;
 use crate::app_states::AppState::GalaxyView;
 use crate::galaxy_view;
 use crate::galaxy_view::messages::*;
-use crate::setup_simulation::resources::ExplorersData;
 
 pub struct GalaxyViewPlugin;
 

@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use crate::app_states::AppState::{GalaxyView, PlanetView};
-use crate::cutscene::messages::Cutscene;
 use crate::cutscene::resources::{ActiveCutscene, CutsceneTimer};
 use crate::cutscene::systems::*;
 
@@ -10,7 +9,6 @@ impl Plugin for CutscenePlugin {
     fn build(&self, app: &mut App) {
         app
             // Message
-            .add_message::<Cutscene>()
             // Resources
             .init_resource::<ActiveCutscene>()
             .insert_resource(

@@ -6,7 +6,6 @@ pub const ASTEROID_SPRITE_PATH: &str = "planets/asteroid.png";
 pub const DESTROYED_ASTEROID_SPRITE_PATH: &str = "planets/destroyedAsteroid.png";
 pub const ASTEROID_ANIMATION_FRAMES: usize = 144;
 pub const ASTEROID_ANIMATION_FPS: f32 = 24.0;
-pub const ROCKET_SPRITE_PATH: &str = "assets/clean_rocket.png";
 pub const EXPLOSION_SPRITE_PATH: &str = "effects/explosion_96x96_12_frames.png";
 pub const EXPLOSION_ANIMATION_FRAMES: usize = 12;
 pub const EXPLOSION_SPRITE_SCALE: f32 = 4.0;

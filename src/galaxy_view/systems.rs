@@ -1,6 +1,4 @@
-use std::ops::DerefMut;
 use bevy::prelude::*;
-use common_game::utils::ID;
 use crate::setup_simulation::resources::*;
 use crate::galaxy_view::components::*;
 use crate::galaxy_view::messages::{ReceivedExplorerBag, ReceivedExplorerMove, ReceivedExplorerPosition, ReceivedKilledExplorer, ReceivedPlanetCombine, ReceivedPlanetDestroyed, ReceivedPlanetGenerate, ReceivedPlanetState};
@@ -13,7 +11,6 @@ use crate::manual_mode::resources::{CombinableResourcesOnPlanet, CombineResource
 
 pub fn spawn_planets(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
     planet_data: Res<PlanetsSpritesData>,
     mut galaxy: ResMut<Galaxy>,
@@ -62,14 +59,12 @@ pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfi
     for (mut config, mut sprite) in &mut query {
         config.frame_timer.tick(time.delta());
 
-        if config.frame_timer.just_finished() {
-            if let Some(atlas) = &mut sprite.texture_atlas {
+         if config.frame_timer.just_finished() && let Some(atlas) = &mut sprite.texture_atlas {
                 if atlas.index >= config.last_sprite_index {
                     atlas.index = config.first_sprite_index;
                 } else {
                     atlas.index += 1;
                 }
-            }
         }
     }
 }
@@ -77,7 +72,6 @@ pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfi
 pub fn update_planets_sprites(
     time: Res<Time>,
     orbit: Res<GalaxyOrbit>,
-    asset_server: Res<AssetServer>,
     mut planets: ResMut<PlanetsSpritesData>,
     mut query: Query<(&mut Transform, &mut Sprite, &mut Planet)>,
 ) {
@@ -109,7 +103,6 @@ pub fn update_planets_sprites(
 
         // Check if the planet exploded
         let should_be_alive = curr_planet.alive;
-        let current_handle = &sprite.image;
 
         let expected = if should_be_alive {
             &curr_planet.alive_sprite
@@ -366,10 +359,8 @@ pub fn update_planets_data(
 
     if !planet_destroyed_reader.is_empty() {
         for msg in planet_destroyed_reader.read() {
-            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) {
-                if planet.get_alive() {
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) && planet.get_alive() {
                     planet.kill();
-                }
             }
             planets_sprites.planets[msg.planet_id as usize].alive = false; //TODO! Implement methods for the struct
         }
@@ -447,7 +438,7 @@ pub fn update_planets_data(
 //             continue;
 //         }
 //
-//         // Trova l’entity del pianeta
+//         // Trova entity del pianeta
 //         let (planet_entity, _) = match planets.iter().find(|(_, p)| p.index == planet_index) {
 //             Some(p) => p,
 //             None => continue,

@@ -4,7 +4,7 @@ use crate::app_state_manager::messages::*;
 use crate::app_state_manager::resources::{CurrentMode, Mode};
 use crate::app_states::AppState;
 use crate::manual_mode::resources::ManualModePanel;
-use crate::setup_simulation::resources::{Explorer, ExplorersData, SelectedPlanet};
+use crate::setup_simulation::resources::{ExplorersData, SelectedPlanet};
 use crate::setup_orchestrator::resources::*;
 
 fn digit_to_index(key: &KeyCode) -> Option<usize> {
@@ -28,17 +28,17 @@ pub fn app_states_affected_inputs(
     mut planet_view_writer: MessageWriter<PlanetViewPressed>,
 ) {
     // GalaxyView State
-    if keyboard_input.just_pressed(KeyCode::KeyG) {
-        if *current_state.get() != AppState::GalaxyView && *current_state.get() != AppState::PauseMenu {
-            galaxy_view_writer.write(GalaxyViewPressed);
-        }
+    if keyboard_input.just_pressed(KeyCode::KeyG) 
+        && *current_state.get() != AppState::GalaxyView 
+        && *current_state.get() != AppState::PauseMenu {
+        galaxy_view_writer.write(GalaxyViewPressed);
     }
     // PlanetView State
-    if let Some(key) = keyboard_input.get_just_pressed().next() && *current_state.get() != AppState::PauseMenu {
-        if let Some(index) = digit_to_index(key) {
+    if let Some(key) = keyboard_input.get_just_pressed().next() 
+        && *current_state.get() != AppState::PauseMenu
+        && let Some(index) = digit_to_index(key) {
             let _ = selected_planet.set(index);
             planet_view_writer.write(PlanetViewPressed);
-        }
     }
 }
 
@@ -96,8 +96,8 @@ pub fn game_related_inputs(
         }
     }
     // Cycle Explorer -> sets PlanetView
-    if keyboard_input.just_pressed(KeyCode::KeyE) {
-        if *current_state.get() != AppState::PauseMenu {
+    if keyboard_input.just_pressed(KeyCode::KeyE)
+        && *current_state.get() != AppState::PauseMenu {
             explorer_data.switch_last_cycle();
             planet_view_writer.write(PlanetViewPressed);
             if explorer_data.get_last_cycle() {
@@ -115,6 +115,5 @@ pub fn game_related_inputs(
                     }
                 }
             }
-        }
     }
 }

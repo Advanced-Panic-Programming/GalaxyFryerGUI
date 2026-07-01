@@ -17,7 +17,6 @@ pub const Z_BAG_LABEL: f32 = 3.0;
 /// Position of the animated planet in the top-right corner.
 pub const CORNER_PLANET_X: f32 = -800.0; // in a 1920x1080 -> conversion done in the system
 pub const CORNER_PLANET_Y: f32 = 400.0; // in a 1920x1080 -> conversion done in the system
-pub const CORNER_PLANET_Z: f32 = -50.0;
 /// Uniform scale applied to the 72 px atlas frame.
 pub const CORNER_PLANET_SCALE: f32 = 3.0;
 pub const ANIMATION_FPS: u8 = 12;

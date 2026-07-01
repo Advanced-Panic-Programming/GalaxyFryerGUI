@@ -69,7 +69,6 @@ pub fn spawn_corner_planet_system(
         &mut commands,
         &mut layouts,
         &planets_sprites_data.planets[index],
-        index as ID,
         window,
     );
 }
@@ -140,7 +139,6 @@ pub fn on_planet_changed(
         &mut commands,
         &mut layouts,
         &planets_sprites_data.planets[planet_index],
-        planet_index as ID,
         window,
     );
 
@@ -181,13 +179,13 @@ pub fn update_terrain_and_rocket(
     let planet_info = &planets_data.planets[planet_index];
 
     // Terrain background
-    for (mut sprite) in terrain_query.iter_mut() {
+    for mut sprite in terrain_query.iter_mut() {
         sprite.image = terrain_image(planet_info, &planet_terrain_sprite_data.terrain);
     }
 
     // Rocket (may not exist on all planets)
     if planet_info.can_have_rocket() {
-        for (mut sprite) in rocket_query.iter_mut() {
+        for mut sprite in rocket_query.iter_mut() {
             sprite.image = rocket_image(planet_info, &rocket_sprites_data);
         }
     }
@@ -321,14 +319,13 @@ pub fn animate_corner_planet(
 
     config.frame_timer.tick(time.delta());
 
-    if config.frame_timer.just_finished() {
-        if let Some(atlas) = &mut sprite.texture_atlas {
+    if config.frame_timer.just_finished()
+        && let Some(atlas) = &mut sprite.texture_atlas {
             atlas.index = if atlas.index >= config.last_sprite_index {
                 config.first_sprite_index
             } else {
                 atlas.index + 1
             };
-        }
     }
 }
 
@@ -352,10 +349,9 @@ pub fn periodically_ask_planet_state(
         Timer::from_seconds(0.5, TimerMode::Repeating)
     });
 
-    if timer.tick(time.delta()).just_finished() {
-        if let Some(planet_id ) = selected_planet.get() {
+    if timer.tick(time.delta()).just_finished()
+        && let Some(planet_id ) = selected_planet.get() {
             let _ = sender.0.send(AskPlanetState { planet_id: planet_id as ID });
-        }
     }
 }
 

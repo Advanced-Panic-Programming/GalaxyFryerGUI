@@ -1,9 +1,5 @@
-use bevy::ecs::system::command::insert_resource;
 use bevy::prelude::*;
-use crate::app_state_manager::messages::SetupOrchestratorCompleted;
-use crate::app_states::AppState;
 use crate::app_states::AppState::*;
-use crate::setup_orchestrator::resources;
 use crate::setup_orchestrator::systems::*;
 use crate::setup_orchestrator::resources::*;
 

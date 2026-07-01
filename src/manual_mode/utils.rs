@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use common_game::components::resource::{BasicResourceType, ComplexResourceType};
-use common_game::utils::ID;
 
 // Fonts
 pub const FONT: &str = "fonts/FiraMono-Medium.ttf";

@@ -142,7 +142,6 @@ pub fn update_combine_spinner_value(
 }
 
 pub fn update_explorers_info(
-    asset_server: Res<AssetServer>,
     explorers_data: Res<ExplorersData>,
     check_root: Query<Entity, With<ManualModePanelRoot>>,
     explorer_sprite_data: Res<ExplorerSpriteData>, // Guaranteed to exist bc it has been added in simulation_setup that runs before every other system

@@ -12,7 +12,7 @@ use crate::planet_view::components::*;
 use crate::planet_view::utils::*;
 use crate::setup_simulation::resources::{
     EnergyCellsSpritesData, ExplorerSpriteData, ExplorerSpriteInfo, ExplorersData,
-    PlanetInfo, PlanetSpriteInfo, PlanetTerrainSpriteInfo, PlanetsSpritesData,
+    PlanetInfo, PlanetSpriteInfo, PlanetTerrainSpriteInfo,
     RocketSpritesData,
 };
 
@@ -24,7 +24,6 @@ pub fn spawn_corner_planet(
     commands: &mut Commands,
     layouts: &mut Assets<TextureAtlasLayout>,
     planet_sprite: &PlanetSpriteInfo,
-    planet_id: ID,
     window: &Window,
 ) {
     let planet = if planet_sprite.alive {
@@ -55,7 +54,7 @@ pub fn spawn_corner_planet(
             .with_scale(Vec3::splat(CORNER_PLANET_SCALE)),
         AnimationConfig::new(0, 143, ANIMATION_FPS),
         SpawnedByPlanetView,
-        CornerPlanet { planet_id },
+        CornerPlanet,
     ));
 }
 
@@ -88,7 +87,7 @@ pub fn spawn_planet_view(
             spawn_terrain_background(parent, planet_info, terrain_sprites);
             spawn_rocket(parent, planet_info, rocket_sprites);
             spawn_energy_cells(parent, planet_info, cell_sprites);
-            spawn_explorers(parent, planet_info, explorers_data, explorer_sprites, font, planet_index);
+            spawn_explorers(parent, explorers_data, explorer_sprites, font, planet_index);
         });
     } else {
         commands
@@ -99,7 +98,7 @@ pub fn spawn_planet_view(
             ))
             .with_children(|parent| {
                 spawn_terrain_background(parent, planet_info, terrain_sprites);
-                spawn_explorers(parent, planet_info, explorers_data, explorer_sprites, font, planet_index);
+                spawn_explorers(parent, explorers_data, explorer_sprites, font, planet_index);
             });
     }
 
@@ -145,9 +144,7 @@ pub fn spawn_rocket(
             ..default()
         },
         Transform::from_translation(ROCKET_POS),
-        Rocket {
-            planet_id: planet_info.get_id(),
-        },
+        Rocket,
     ));
 }
 
@@ -169,7 +166,6 @@ pub fn spawn_energy_cells(
             },
             Transform::from_xyz(cell_x(i), CELLS_Y, Z_CELLS),
             EnergyCell {
-                planet_id: planet_info.get_id(),
                 cell_index: i,
             },
         ));
@@ -181,7 +177,6 @@ pub fn spawn_energy_cells(
 /// Spawns whichever explorers are currently on `planet_index`.
 pub fn spawn_explorers(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
-    planet_info: &PlanetInfo,
     explorers_data: &ExplorersData,
     explorer_sprites: &ExplorerSpriteData,
     font: Handle<Font>,
@@ -229,7 +224,7 @@ fn spawn_single_explorer(
         ExplorerSprite { explorer_id },
     ));
 
-    // Text2d auto-inserts Transform as a required component; we override it via
+    // Text 2d auto-inserts Transform as a required component; we override it via
     // .insert() to avoid a duplicate-component conflict in the spawn tuple.
     parent
         .spawn((

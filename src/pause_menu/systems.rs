@@ -1,12 +1,6 @@
-use bevy::color::palettes::css::WHITE;
-use bevy::pbr::Shadow;
 use bevy::prelude::*;
-use bevy::sprite::Text2dShadow;
+use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::AskPlanetState;
 use crate::app_state_manager::messages::{PlayPressed, ExitPressed};
-use crate::app_states::AppState;
-use crate::app_states::AppState::PauseMenu;
-use crate::galaxy_view::components::AnimationConfig;
-use crate::galaxy_view::utils::{ANIMATION_FPS, PLANET_INITIAL_SPLAT};
 use crate::pause_menu::components::*;
 use crate::pause_menu::utils::*;
 use crate::setup_orchestrator::resources::ToOrchestrator;
@@ -189,15 +183,11 @@ pub fn animate_logo(
 
         timer.tick(time.delta());
 
-        if timer.just_finished() {
-
-            if let Some(atlas) = &mut sprite.texture_atlas {
-
-                if atlas.index >= indices.last {
-                    atlas.index = indices.first;
-                } else {
-                    atlas.index += 1;
-                }
+        if timer.just_finished() && let Some(atlas) = &mut sprite.texture_atlas {
+            if atlas.index >= indices.last {
+                atlas.index = indices.first;
+            } else {
+                atlas.index += 1;
             }
         }
     }
@@ -261,5 +251,14 @@ pub fn despawn_pause_menu(
 ) {
     for entity in query.iter() {
         commands.entity(entity).despawn();
+    }
+}
+
+// Needs to be done after the setup_orchestrator module and before the actual simulation start in AppState::GalaxyView
+pub fn init_planet_states(
+    sender: Res<ToOrchestrator>,
+) {
+    for planet_id in 0..7 {
+        let _ = sender.0.send(AskPlanetState { planet_id });
     }
 }

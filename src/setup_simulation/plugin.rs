@@ -1,6 +1,4 @@
 use bevy::prelude::*;
-use bevy::window::{WindowMode, WindowResolution};
-use crate::app_states::AppState;
 use crate::app_states::AppState::*;
 use crate::setup_simulation::resources::*;
 use crate::setup_simulation::systems::*;
@@ -29,7 +27,7 @@ impl Plugin for SetupSimulationPlugin {
                     init_explorer_sprites_resource,
                     init_rocket_sprites_resource,
                     init_energy_cell_sprites_resource,
-                )
+                ).chain()
             )
             // Update system: sends SetupSimulationCompleted Message -> AppStateManager will change app state
             // Bevy guarantees that "Update" systems will be executed only AFTER the "OnEnter" systems 

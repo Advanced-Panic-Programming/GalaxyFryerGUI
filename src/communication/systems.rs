@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 use crate::log::resources::LogMessage;
-use common_game::utils::ID;
 use galaxy_fryer::app::gui_protocol::OrchestratorToGUI::*;
-use crate::setup_orchestrator::resources::{FromOrchestrator, OrchestratorMode, ToOrchestrator};
+use crate::setup_orchestrator::resources::FromOrchestrator;
 use crate::galaxy_view::messages::*;
 
 /// This function manages the orchestrator messages and generates the corresponding events 
@@ -62,9 +61,9 @@ pub fn receive_from_orchestrator(
             }
             SendAsteroidDestroyed{p_id} => {
                 // Generate in-game event
-                asteroid_destroyed_writer.write(ReceivedAsteroidDestroyed{planet_id: p_id});
+                asteroid_destroyed_writer.write(ReceivedAsteroidDestroyed);
                 // Activate cutscene
-                asteroid_destroyed_cutscene_writer.write(AsteroidDestroyedCutscene{planet_id: p_id});
+                asteroid_destroyed_cutscene_writer.write(AsteroidDestroyedCutscene);
                 // Log
                 log.write(LogMessage::asteroid_destroyed(p_id));
             }

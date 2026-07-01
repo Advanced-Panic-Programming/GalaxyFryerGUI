@@ -12,9 +12,7 @@ pub struct SpawnedByPlanetView;
 
 /// The animated planet sprite shown in the corner of the screen.
 #[derive(Component)]
-pub struct CornerPlanet {
-    pub planet_id: ID,
-}
+pub struct CornerPlanet;
 
 // ── Terrain / background ──────────────────────────────────────────────────────
 
@@ -27,9 +25,7 @@ pub struct TerrainBackground;
 
 /// The rocket sprite. `planet_id` lets update systems find it without ambiguity.
 #[derive(Component)]
-pub struct Rocket {
-    pub planet_id: ID,
-}
+pub struct Rocket;
 
 // ── Energy cells ──────────────────────────────────────────────────────────────
 
@@ -37,7 +33,6 @@ pub struct Rocket {
 /// update systems can patch individual cells without rebuilding the whole row.
 #[derive(Component)]
 pub struct EnergyCell {
-    pub planet_id: ID,
     pub cell_index: usize,
 }
 
@@ -49,7 +44,7 @@ pub struct ExplorerSprite {
     pub explorer_id: ID,
 }
 
-/// The explorer's bag label (Text2d).
+/// The explorer's bag label (Text 2d).
 #[derive(Component)]
 pub struct ExplorerBagLabel {
     pub explorer_id: ID,

@@ -1,9 +1,6 @@
 use std::collections::HashSet;
 use bevy::prelude::*;
 use bevy::window::WindowResized;
-use galaxy_fryer::explorer::bag::BagView;
-use crate::app_states::AppState;
-use crate::app_states::AppState::{GalaxyView, PlanetView, SetupOrchestrator};
 use crate::setup_simulation::utils::*;
 use crate::setup_simulation::resources::*;
 use crate::app_state_manager::messages::SetupSimulationCompleted;
@@ -12,8 +9,8 @@ use crate::app_state_manager::messages::SetupSimulationCompleted;
 // === SetUp Systems ===
 // ======================
 
-pub fn spawn_camera(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2d::default());
+pub fn spawn_camera(mut commands: Commands) {
+    commands.spawn(Camera2d);
 }
 
 pub fn spawn_background(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -57,25 +54,23 @@ pub fn init_planets_sprites_data_resource(
     mut planets_data: ResMut<PlanetsSpritesData>,
     asset_server: Res<AssetServer>,
 ) {
-    let planets_sprites = vec![
+    let planets_sprites = [
         "planets/planet1.png",
         "planets/planet2.png",
         "planets/planet3.png",
         "planets/planet4.png",
         "planets/planet5.png",
         "planets/planet6.png",
-        "planets/planet7.png",
-    ];
+        "planets/planet7.png"];
 
-    let destroyed_planets_sprites = vec![
+    let destroyed_planets_sprites = [
         "destroyedPlanets/destroyedPlanet1.png",
         "destroyedPlanets/destroyedPlanet2.png",
         "destroyedPlanets/destroyedPlanet3.png",
         "destroyedPlanets/destroyedPlanet4.png",
         "destroyedPlanets/destroyedPlanet5.png",
         "destroyedPlanets/destroyedPlanet6.png",
-        "destroyedPlanets/destroyedPlanet7.png",
-    ];
+        "destroyedPlanets/destroyedPlanet7.png"];
 
 
     let angles_deg = [90.0, 38.58, 347.16, 295.74, 244.32, 192.9, 141.48];
@@ -101,31 +96,31 @@ pub fn init_planets_data_resource(
     mut planets_data: ResMut<PlanetsData>,
 ) {
     // Planet 1 - Rustrelli - D
-    let rustrelli = PlanetInfo::new(0, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
+    let rustrelli = PlanetInfo::new(true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(rustrelli);
     
     // Planet 2 - Houston we have a borrow
-    let huston_we_have_a_borrow = PlanetInfo::new(1, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    let huston_we_have_a_borrow = PlanetInfo::new(true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(huston_we_have_a_borrow);
     
     // Planet 3 - Enterprise - C
-    let entrerprise = PlanetInfo::new(2, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    let entrerprise = PlanetInfo::new(true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(entrerprise);
     
     // Planet 4 - One-Million-Crabs - D
-    let one_million_crabs = PlanetInfo::new(3, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
+    let one_million_crabs = PlanetInfo::new(true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(one_million_crabs);
     
     // Planet 5 - Rusty Crab - C
-    let rusty_crab = PlanetInfo::new(4, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    let rusty_crab = PlanetInfo::new(true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(rusty_crab);
     
     // Planet 6 - Orbitron - D
-    let orbitron = PlanetInfo::new(5, true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
+    let orbitron = PlanetInfo::new(true, Vec::new(),0, false, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(orbitron);
     
     // Planet 7 - Trip - A
-    let trip = PlanetInfo::new(6, true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
+    let trip = PlanetInfo::new(true, Vec::new(),0, true, false, HashSet::new(), HashSet::new());
     planets_data.planets.push(trip);
 }
 
