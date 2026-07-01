@@ -17,6 +17,7 @@ impl Plugin for SetupSimulationPlugin {
             .insert_resource(SelectedPlanet::default())
             // ===== OnEnter Setup =====
             .add_systems(OnEnter(SetupSimulation), (
+                    init_window_size_res,
                     spawn_camera,
                     spawn_background,
                     init_galaxy_orbit,

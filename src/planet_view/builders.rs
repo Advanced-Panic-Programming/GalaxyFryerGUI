@@ -10,11 +10,7 @@ use galaxy_fryer::explorer::bag::BagView;
 use crate::galaxy_view::components::AnimationConfig;
 use crate::planet_view::components::*;
 use crate::planet_view::utils::*;
-use crate::setup_simulation::resources::{
-    EnergyCellsSpritesData, ExplorerSpriteData, ExplorerSpriteInfo, ExplorersData,
-    PlanetInfo, PlanetSpriteInfo, PlanetTerrainSpriteInfo,
-    RocketSpritesData,
-};
+use crate::setup_simulation::resources::{EnergyCellsSpritesData, ExplorerSpriteData, ExplorerSpriteInfo, ExplorersData, PlanetInfo, PlanetSpriteInfo, PlanetTerrainSpriteInfo, RocketSpritesData};
 
 // ── Corner planet ─────────────────────────────────────────────────────────────
 
@@ -24,7 +20,8 @@ pub fn spawn_corner_planet(
     commands: &mut Commands,
     layouts: &mut Assets<TextureAtlasLayout>,
     planet_sprite: &PlanetSpriteInfo,
-    window: &Window,
+    window_width: f32,
+    window_height: f32,
 ) {
     let planet = if planet_sprite.alive {
         &planet_sprite.alive_sprite
@@ -34,9 +31,6 @@ pub fn spawn_corner_planet(
 
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(72), 144, 1, None, None);
     let atlas_handle = layouts.add(layout);
-
-    let width = window.width();
-    let height = window.height();
     
     commands.spawn((
         Sprite {
@@ -48,9 +42,9 @@ pub fn spawn_corner_planet(
             ..default()
         },
         Transform::from_translation(Vec3::new(
-            adapt_to_width(width, CORNER_PLANET_X), 
-            adapt_to_height(height, CORNER_PLANET_Y), 
-            adapt_scale_to_current_screen(width*height, CORNER_PLANET_SCALE)))
+            adapt_to_width(window_width, CORNER_PLANET_X),
+            adapt_to_height(window_height, CORNER_PLANET_Y),
+            adapt_scale_to_current_screen(window_width*window_height, CORNER_PLANET_SCALE)))
             .with_scale(Vec3::splat(CORNER_PLANET_SCALE)),
         AnimationConfig::new(0, 143, ANIMATION_FPS),
         SpawnedByPlanetView,
@@ -74,6 +68,8 @@ pub fn spawn_planet_view(
     explorer_sprites: &ExplorerSpriteData,
     font: Handle<Font>,
     planet_index: usize,
+    width: f32,
+    height: f32,
 ) {
 
     if planet_info.get_alive() {
@@ -84,10 +80,10 @@ pub fn spawn_planet_view(
             SpawnedByPlanetView,
         ))
         .with_children(|parent| {
-            spawn_terrain_background(parent, planet_info, terrain_sprites);
-            spawn_rocket(parent, planet_info, rocket_sprites);
-            spawn_energy_cells(parent, planet_info, cell_sprites);
-            spawn_explorers(parent, explorers_data, explorer_sprites, font, planet_index);
+            spawn_terrain_background(parent, planet_info, terrain_sprites, width, height);
+            spawn_rocket(parent, planet_info, rocket_sprites, width, height);
+            spawn_energy_cells(parent, planet_info, cell_sprites, width, height);
+            spawn_explorers(parent, explorers_data, explorer_sprites, font, planet_index, width, height);
         });
     } else {
         commands
@@ -97,8 +93,8 @@ pub fn spawn_planet_view(
                 SpawnedByPlanetView,
             ))
             .with_children(|parent| {
-                spawn_terrain_background(parent, planet_info, terrain_sprites);
-                spawn_explorers(parent, explorers_data, explorer_sprites, font, planet_index);
+                spawn_terrain_background(parent, planet_info, terrain_sprites, width, height);
+                spawn_explorers(parent, explorers_data, explorer_sprites, font, planet_index, width, height);
             });
     }
 
@@ -111,6 +107,8 @@ pub fn spawn_terrain_background(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     planet_info: &PlanetInfo,
     terrain_sprites: &PlanetTerrainSpriteInfo,
+    width: f32,
+    height: f32,
 ) {
     let image = terrain_image(planet_info, terrain_sprites);
     parent.spawn((
@@ -119,7 +117,8 @@ pub fn spawn_terrain_background(
             custom_size: Some(TERRAIN_SIZE),
             ..default()
         },
-        Transform::from_xyz(0.0, 0.0, Z_TERRAIN),
+        Transform::from_xyz(0.0, 0.0, TERRAIN_Z)
+            .with_scale(Vec3::splat(adapt_scale_to_current_screen(width*height, TERRAIN_SCALE))),
         TerrainBackground,
     ));
 }
@@ -131,6 +130,8 @@ pub fn spawn_rocket(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     planet_info: &PlanetInfo,
     rocket_sprites: &RocketSpritesData,
+    width: f32,
+    height: f32,
 ) {
     if !planet_info.can_have_rocket() {
         return;
@@ -140,10 +141,14 @@ pub fn spawn_rocket(
     parent.spawn((
         Sprite {
             image,
-            custom_size: Some(ROCKET_SIZE),
+            custom_size: Some(ROCKET_SCALE),
             ..default()
         },
-        Transform::from_translation(ROCKET_POS),
+        Transform::from_translation(Vec3::new(
+            adapt_to_width(width, ROCKET_X),
+            adapt_to_height(height, ROCKET_Y),
+            ROCKET_Z,
+        )),
         Rocket,
     ));
 }
@@ -155,6 +160,8 @@ pub fn spawn_energy_cells(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     planet_info: &PlanetInfo,
     cell_sprites: &EnergyCellsSpritesData,
+    width: f32,
+    height: f32,
 ) {
     for (i, &charged) in planet_info.get_energy_cells().iter().enumerate() {
         let image = cell_image(charged, cell_sprites);
@@ -164,7 +171,8 @@ pub fn spawn_energy_cells(
                 custom_size: Some(CELL_SIZE),
                 ..default()
             },
-            Transform::from_xyz(cell_x(i), CELLS_Y, Z_CELLS),
+            Transform::from_xyz(adapt_to_width(width, cell_x(i)), adapt_to_height(height, CELLS_Y), CELLS_Z)
+                .with_scale(Vec3::splat(adapt_scale_to_current_screen(width*height, 1.0))),
             EnergyCell {
                 cell_index: i,
             },
@@ -181,10 +189,25 @@ pub fn spawn_explorers(
     explorer_sprites: &ExplorerSpriteData,
     font: Handle<Font>,
     planet_index: usize,
+    width: f32,
+    height: f32,
 ) {
+
+    let explorer1_pos = Vec3::new(
+        adapt_to_width(width, EXPLORER1_X),
+        adapt_to_height(height, EXPLORER1_Y),
+        EXPLORER_Z,
+    );
+
+    let explorer2_pos = Vec3::new(
+        adapt_to_width(width, EXPLORER2_X),
+        adapt_to_height(height, EXPLORER2_Y),
+        EXPLORER_Z,
+    );
+
     let explorer_configs = [
-        (0 as ID, &explorers_data.explorer1, &explorer_sprites.explorer1, EXPLORER1_POS),
-        (1 as ID, &explorers_data.explorer2, &explorer_sprites.explorer2, EXPLORER2_POS),
+        (0 as ID, &explorers_data.explorer1, &explorer_sprites.explorer1, explorer1_pos),
+        (1 as ID, &explorers_data.explorer2, &explorer_sprites.explorer2, explorer2_pos),
     ];
 
     for (id, explorer, sprite_info, pos) in explorer_configs {

@@ -4,6 +4,22 @@ use std::result::Result;
 use common_game::components::resource::{BasicResourceType, ComplexResourceType};
 use galaxy_fryer::explorer::bag::BagView;
 
+// Window
+#[derive(Resource)]
+pub struct WindowSize {
+    pub width: f32,
+    pub height: f32,
+}
+
+impl Default for WindowSize {
+    fn default() -> Self {
+        Self {
+            width: 1920.0,
+            height: 1080.0,
+        }
+    }
+}
+
 // Galaxy
 #[derive(Resource, Default)]
 pub struct Galaxy {

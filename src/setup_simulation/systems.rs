@@ -9,6 +9,16 @@ use crate::app_state_manager::messages::SetupSimulationCompleted;
 // === SetUp Systems ===
 // ======================
 
+pub fn init_window_size_res(mut commands: Commands, windows: Query<&Window>) {
+    
+    let window = windows.single().unwrap();
+    
+    commands.insert_resource(WindowSize {
+        width: window.width(),
+        height: window.height()
+    })
+}
+
 pub fn spawn_camera(mut commands: Commands) {
     commands.spawn(Camera2d);
 }

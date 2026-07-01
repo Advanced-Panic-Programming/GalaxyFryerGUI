@@ -24,10 +24,7 @@ use crate::planet_view::builders::*;
 use crate::planet_view::components::*;
 use crate::planet_view::utils::*;
 use crate::setup_orchestrator::resources::ToOrchestrator;
-use crate::setup_simulation::resources::{
-    EnergyCellsSpritesData, ExplorerSpriteData, ExplorersData, PlanetTerrainSpriteData,
-    PlanetsData, PlanetsSpritesData, RocketSpritesData, SelectedPlanet,
-};
+use crate::setup_simulation::resources::{EnergyCellsSpritesData, ExplorerSpriteData, ExplorersData, PlanetTerrainSpriteData, PlanetsData, PlanetsSpritesData, RocketSpritesData, SelectedPlanet, WindowSize};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -57,19 +54,18 @@ pub fn spawn_corner_planet_system(
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
     planets_sprites_data: Res<PlanetsSpritesData>,
     selected_planet: Res<SelectedPlanet>,
-    windows: Query<&Window>,
+    window_size: Res<WindowSize>,
 ) {
     let Some(index) = require_selected(&selected_planet, "spawn_corner_planet") else {
         return;
     };
 
-    let window = windows.single().unwrap();
-
     spawn_corner_planet(
         &mut commands,
         &mut layouts,
         &planets_sprites_data.planets[index],
-        window,
+        window_size.width,
+        window_size.height,
     );
 }
 
@@ -85,6 +81,7 @@ pub fn spawn_planet_view_system(
     explorer_sprite_data: Res<ExplorerSpriteData>,
     rocket_sprites_data: Res<RocketSpritesData>,
     energy_cells_sprites_data: Res<EnergyCellsSpritesData>,
+    window_size: Res<WindowSize>
 ) {
     let Some(planet_index) = require_selected(&selected, "spawn_planet_view") else {
         return;
@@ -100,6 +97,8 @@ pub fn spawn_planet_view_system(
         &explorer_sprite_data,
         asset_server.load(EXPLORERS_BAG_FONT_PATH),
         planet_index,
+        window_size.width,
+        window_size.height,
     );
 }
 
@@ -121,7 +120,7 @@ pub fn on_planet_changed(
     rocket_sprites_data: Res<RocketSpritesData>,
     energy_cells_sprites_data: Res<EnergyCellsSpritesData>,
     existing: Query<Entity, (With<SpawnedByPlanetView>, Without<ChildOf>)>,
-    windows: Query<&Window>,
+    window_size: Res<WindowSize>,
 ) {
     if !selected.is_changed() {
         return;
@@ -133,13 +132,12 @@ pub fn on_planet_changed(
 
     despawn_view(&mut commands, &existing);
 
-    let window = windows.single().unwrap();
-
     spawn_corner_planet(
         &mut commands,
         &mut layouts,
         &planets_sprites_data.planets[planet_index],
-        window,
+        window_size.width,
+        window_size.height,
     );
 
     spawn_planet_view(
@@ -152,6 +150,8 @@ pub fn on_planet_changed(
         &explorer_sprite_data,
         asset_server.load(EXPLORERS_BAG_FONT_PATH),
         planet_index,
+        window_size.width,
+        window_size.height,
     );
 }
 
@@ -233,6 +233,8 @@ pub fn update_explorers(
     mut sprite_query: Query<(Entity, &ExplorerSprite, &mut Sprite)>,
     mut label_query: Query<(Entity, &ExplorerBagLabel, &mut Text2d)>,
     root_query: Query<Entity, (With<SpawnedByPlanetView>, Without<CornerPlanet>)>,
+    width: f32,
+    height: f32,
 ) {
     if !explorers_data.is_changed() {
         return;
@@ -241,10 +243,22 @@ pub fn update_explorers(
     let Some(planet_index) = require_selected(&selected, "update_explorers") else {
         return;
     };
+    
+    let explorer1_pos = Vec3::new(
+        adapt_to_width(width, EXPLORER1_X),
+        adapt_to_height(height, EXPLORER1_Y),
+        EXPLORER_Z,
+    );
+    
+    let explorer2_pos = Vec3::new(
+        adapt_to_width(width, EXPLORER2_X),
+        adapt_to_height(height, EXPLORER2_Y),
+        EXPLORER_Z,
+    );
 
     let explorer_configs = [
-        (0 as ID, &explorers_data.explorer1, &explorer_sprite_data.explorer1, EXPLORER1_POS),
-        (1 as ID, &explorers_data.explorer2, &explorer_sprite_data.explorer2, EXPLORER2_POS),
+        (0 as ID, &explorers_data.explorer1, &explorer_sprite_data.explorer1, explorer1_pos),
+        (1 as ID, &explorers_data.explorer2, &explorer_sprite_data.explorer2, explorer2_pos),
     ];
 
     for (explorer_id, explorer, sprite_info, position) in explorer_configs {

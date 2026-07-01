@@ -3,14 +3,15 @@ use bevy::prelude::*;
 // Viewport
 
 pub const TERRAIN_SIZE: Vec2 = Vec2::new(1920.0, 1080.0);
+pub const TERRAIN_SCALE: f32 = 1.0;
 
 // Z-layers (Higher values render on top)
 
-pub const Z_TERRAIN: f32 = -80.0;
-pub const Z_ROCKET: f32 = 1.0;
-pub const Z_CELLS: f32 = 1.0;
-pub const Z_EXPLORER: f32 = 2.0;
-pub const Z_BAG_LABEL: f32 = 3.0;
+pub const TERRAIN_Z: f32 = -80.0;
+pub const ROCKET_Z: f32 = 1.0;
+pub const CELLS_Z: f32 = 1.0;
+pub const EXPLORER_Z: f32 = 2.0;
+pub const BAG_LABEL_Z: f32 = 3.0;
 
 // Corner planet
 
@@ -22,10 +23,11 @@ pub const CORNER_PLANET_SCALE: f32 = 3.0;
 pub const ANIMATION_FPS: u8 = 12;
 
 // Rocket
+pub const ROCKET_X: f32 = -680.0;
+pub const ROCKET_Y: f32 = -350.0;
 
 // Native sprite: 1024×1024 px (too big).
-pub const ROCKET_SIZE: Vec2 = Vec2::new(600.0, 600.0);
-pub const ROCKET_POS: Vec3 = Vec3::new(-680.0, -350.0, Z_ROCKET);
+pub const ROCKET_SCALE: Vec2 = Vec2::new(600.0, 600.0);
 
 // Energy cells
 
@@ -48,8 +50,10 @@ pub const EXPLORERS_BAG_FONT_PATH: &str = "fonts/FiraMono-Medium.ttf";
 
 /// Native sprite: 288×288 px. Display at 160×160 px.
 pub const EXPLORER_SIZE: Vec2 = Vec2::new(160.0, 160.0);
-pub const EXPLORER1_POS: Vec3 = Vec3::new(0.0, -320.0, Z_EXPLORER);
-pub const EXPLORER2_POS: Vec3 = Vec3::new(250.0, -320.0, Z_EXPLORER);
+pub const EXPLORER1_X: f32 = 0.0;
+pub const EXPLORER1_Y: f32 = -320.0;
+pub const EXPLORER2_X: f32 = 250.0;
+pub const EXPLORER2_Y: f32 = -320.0;
 
 /// Vertical offset from sprite centre to bag-label centre (pixels).
 pub const BAG_LABEL_OFFSET_Y: f32 = 100.0;
@@ -61,7 +65,7 @@ pub fn bag_label_pos(explorer_pos: Vec3) -> Vec3 {
     Vec3::new(
         explorer_pos.x,
         explorer_pos.y + BAG_LABEL_OFFSET_Y,
-        Z_BAG_LABEL,
+        BAG_LABEL_Z,
     )
 }
 

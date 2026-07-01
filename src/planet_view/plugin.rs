@@ -10,6 +10,7 @@ use bevy::prelude::*;
 
 use crate::app_states::AppState::PlanetView;
 use crate::planet_view::systems::*;
+use crate::setup_simulation::resources::WindowSize;
 
 pub struct PlanetViewPlugin;
 
@@ -35,7 +36,7 @@ impl Plugin for PlanetViewPlugin {
                     // Full respawn when the selected planet changes.
                     // Must run before patch systems so they don't try to query
                     // entities that were just despawned.
-                    on_planet_changed,
+                    on_planet_changed.run_if(resource_exists::<WindowSize>),
                     // Patch systems — react to data changes on the current planet.
                     // These are no-ops when their respective resource is unchanged.
                     update_terrain_and_rocket,
@@ -45,8 +46,7 @@ impl Plugin for PlanetViewPlugin {
                     animate_corner_planet,
                     // System to periodically update SelectedPlanet PlanetState
                     periodically_ask_planet_state,
-                )
-                    .run_if(in_state(PlanetView))
+                ).run_if(in_state(PlanetView))
                     // Ensure on_planet_changed always completes before the patch
                     // systems run, so patches never operate on stale entities.
                     .chain(),
