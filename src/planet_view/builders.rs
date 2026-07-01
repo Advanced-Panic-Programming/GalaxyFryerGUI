@@ -80,7 +80,7 @@ pub fn spawn_planet_view(
             SpawnedByPlanetView,
         ))
         .with_children(|parent| {
-            spawn_terrain_background(parent, planet_info, terrain_sprites, width, height);
+            spawn_terrain_background(parent, planet_info, terrain_sprites);
             spawn_rocket(parent, planet_info, rocket_sprites, width, height);
             spawn_energy_cells(parent, planet_info, cell_sprites, width, height);
             spawn_explorers(parent, explorers_data, explorer_sprites, font, planet_index, width, height);
@@ -93,7 +93,7 @@ pub fn spawn_planet_view(
                 SpawnedByPlanetView,
             ))
             .with_children(|parent| {
-                spawn_terrain_background(parent, planet_info, terrain_sprites, width, height);
+                spawn_terrain_background(parent, planet_info, terrain_sprites);
                 spawn_explorers(parent, explorers_data, explorer_sprites, font, planet_index, width, height);
             });
     }
@@ -107,8 +107,6 @@ pub fn spawn_terrain_background(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     planet_info: &PlanetInfo,
     terrain_sprites: &PlanetTerrainSpriteInfo,
-    width: f32,
-    height: f32,
 ) {
     let image = terrain_image(planet_info, terrain_sprites);
     parent.spawn((
@@ -117,8 +115,7 @@ pub fn spawn_terrain_background(
             custom_size: Some(TERRAIN_SIZE),
             ..default()
         },
-        Transform::from_xyz(0.0, 0.0, TERRAIN_Z)
-            .with_scale(Vec3::splat(adapt_scale_to_current_screen(width*height, TERRAIN_SCALE))),
+        Transform::from_xyz(0.0, 0.0, TERRAIN_Z),
         TerrainBackground,
     ));
 }

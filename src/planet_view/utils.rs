@@ -24,7 +24,7 @@ pub const ANIMATION_FPS: u8 = 12;
 
 // Rocket
 pub const ROCKET_X: f32 = -680.0;
-pub const ROCKET_Y: f32 = -350.0;
+pub const ROCKET_Y: f32 = -320.0;
 
 // Native sprite: 1024×1024 px (too big).
 pub const ROCKET_SCALE: Vec2 = Vec2::new(600.0, 600.0);
