@@ -1,12 +1,7 @@
 use bevy::prelude::*;
 
-// Viewport
-
-pub const TERRAIN_SIZE: Vec2 = Vec2::new(1920.0, 1080.0);
-
-// Z-layers (Higher values render on top)
-
 pub const TERRAIN_Z: f32 = -80.0;
+pub const TERRAIN_SCALE: f32 = 1.0;
 pub const ROCKET_Z: f32 = 1.0;
 pub const CELLS_Z: f32 = 1.0;
 pub const EXPLORER_Z: f32 = 2.0;
@@ -15,8 +10,9 @@ pub const BAG_LABEL_Z: f32 = 3.0;
 // Corner planet
 
 /// Position of the animated planet in the top-right corner.
-pub const CORNER_PLANET_X: f32 = -800.0; // in a 1920x1080 -> conversion done in the system
-pub const CORNER_PLANET_Y: f32 = 400.0; // in a 1920x1080 -> conversion done in the system
+pub const CORNER_PLANET_X: f32 = -800.0; // In a 1920x1080
+pub const CORNER_PLANET_Y: f32 = 400.0; // In a 1920x1080
+pub const CORNER_PLANET_Z: f32 = 30.0;
 /// Uniform scale applied to the 72 px atlas frame.
 pub const CORNER_PLANET_SCALE: f32 = 3.0;
 pub const ANIMATION_FPS: u8 = 12;
@@ -66,22 +62,4 @@ pub fn bag_label_pos(explorer_pos: Vec3) -> Vec3 {
         explorer_pos.y + BAG_LABEL_OFFSET_Y,
         BAG_LABEL_Z,
     )
-}
-
-const WIDTH: f32 = 1920.0;
-const HEIGHT: f32 = 1080.0;
-
-/// Uses WIDTH = 1920
-pub fn adapt_to_width(window_width: f32, original_x: f32) -> f32 {
-    (window_width * original_x) / WIDTH
-}
-
-/// Uses HEIGHT = 1080
-pub fn adapt_to_height(window_height: f32, original_y: f32) -> f32 {
-    (window_height * original_y) / HEIGHT
-}
-
-/// window_area is window.width() * window.height()
-pub fn adapt_scale_to_current_screen(window_area: f32, original_scale: f32) -> f32 {
-    (window_area * original_scale) / (WIDTH * HEIGHT)
 }

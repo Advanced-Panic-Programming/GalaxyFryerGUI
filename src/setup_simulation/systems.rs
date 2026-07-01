@@ -1,70 +1,108 @@
 use std::collections::HashSet;
 use bevy::prelude::*;
+use bevy::camera::ScalingMode;
 use bevy::window::WindowResized;
 use crate::setup_simulation::utils::*;
 use crate::setup_simulation::resources::*;
 use crate::app_state_manager::messages::SetupSimulationCompleted;
+use crate::setup_simulation::components::SpaceBackground;
+// ======================
+// === Camera Systems ===
+// ======================
+
+/// Spawns the main 2D camera with a fixed virtual resolution
+/// (`DESIGN_WIDTH` x `DESIGN_HEIGHT`). `ScalingMode::AutoMin` shows *at least*
+/// that much world space, scaled uniformly to fit any window size
+pub fn spawn_camera(mut commands: Commands) {
+    commands.spawn((
+        Camera2d,
+        Projection::Orthographic(OrthographicProjection {
+            scaling_mode: ScalingMode::AutoMin {
+                min_width: DESIGN_WIDTH,
+                min_height: DESIGN_HEIGHT,
+            },
+            ..OrthographicProjection::default_2d()
+        }),
+    ));
+}
+
+/// Sets the initial UI scale from the window at startup. Needed in addition to
+/// `update_ui_scale_on_resize` because `main.rs` switches to fullscreen in
+/// `PostStartup`, i.e. after this runs — see that system for why UI needs its
+/// own scale (unlike the 2D world, it isn't covered by the camera projection).
+pub fn init_ui_scale(windows: Query<&Window>, mut ui_scale: ResMut<UiScale>) {
+    let Ok(window) = windows.single() else {
+        return;
+    };
+    ui_scale.0 = ui_scale_for_size(window.width(), window.height());
+}
+
+/// Keeps the UI scale in sync with the window.
+///
+/// `bevy_ui` is a render layer entirely separate from the 2D world camera, so
+/// the `ScalingMode::AutoMin` projection above has no effect on it: panel,
+/// text and button sizes are plain pixel values and stay visually tiny on a
+/// big monitor/fullscreen unless something scales them. `UiScale` is Bevy's
+/// global multiplier for the whole UI tree; this system keeps it proportional
+/// to how much bigger the real window is than the design resolution.
+pub fn update_ui_scale_on_resize(
+    mut resize_events: MessageReader<WindowResized>,
+    mut ui_scale: ResMut<UiScale>,
+) {
+    let Some(event) = resize_events.read().last() else {
+        return;
+    };
+    ui_scale.0 = ui_scale_for_size(event.width, event.height);
+}
+
+/// Uses the smaller of the two axis ratios (like `ScalingMode::AutoMin` would)
+/// so the UI never overflows the window on either axis, then applies
+/// `UI_SCALE_BOOST` on top so menus read comfortably rather than just barely
+/// fitting.
+fn ui_scale_for_size(width: f32, height: f32) -> f32 {
+    (width / DESIGN_WIDTH).min(height / DESIGN_HEIGHT) * UI_SCALE_BOOST
+}
 
 // ======================
 // === SetUp Systems ===
 // ======================
 
-pub fn init_window_size_res(mut commands: Commands, windows: Query<&Window>) {
+pub fn spawn_background(mut commands: Commands, asset_server: Res<AssetServer>, windows: Query<&Window>){
+    let size = windows.single().map(|w| visible_world_size(w.width(), w.height())).unwrap_or(Vec2::new(DESIGN_WIDTH, DESIGN_HEIGHT));
 
-    let window = windows.single().unwrap();
-
-    commands.insert_resource(WindowSize {
-        width: window.width(),
-        height: window.height()
-    })
+    commands.spawn(
+        (
+            Sprite {
+                image: asset_server.load(SPACE_BACKGROUND_PATH),
+                custom_size: Some(size),
+                ..default()
+            },
+            Transform::from_translation(Vec3::new(0.0, 0.0, -100.0)),
+            SpaceBackground,
+        )
+    );
 }
 
-pub fn update_window_size_on_resize(
+/// Keeps the space background sized to fully cover the camera's visible area
+pub fn update_background_size_on_resize(
     mut resize_events: MessageReader<WindowResized>,
-    mut window_size: ResMut<WindowSize>,
+    mut background_query: Query<&mut Sprite, With<SpaceBackground>>,
 ) {
-    if !resize_events.is_empty() {
-        for event in resize_events.read() {
-            window_size.width = event.width;
-            window_size.height = event.height;
-        }
+    let Some(event) = resize_events.read().last() else {
+        return;
+    };
+    let size = visible_world_size(event.width, event.height);
+    for mut sprite in background_query.iter_mut() {
+        sprite.custom_size = Some(size);
     }
 }
 
-pub fn spawn_camera(mut commands: Commands) {
-    commands.spawn(Camera2d);
+pub fn init_galaxy_orbit(mut commands: Commands) {
+    commands.insert_resource(compute_orbit_from_size(DESIGN_WIDTH));
 }
-
-pub fn spawn_background(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn((Sprite {
-        image: asset_server.load(SPACE_BACKGROUND_PATH),
-        custom_size: Some(Vec2::new(1920.0, 1080.0)),
-        ..default()
-    },
-    Transform::from_translation(Vec3::new(0.0, 0.0, -100.0)),
-    ));
-}
-
-pub fn init_galaxy_orbit(mut commands: Commands, windows: Query<&Window>) {
-    let window = windows.single().unwrap();
-    let orbit = compute_orbit_from_window(window);
-    commands.insert_resource(orbit);
-}
-
-fn compute_orbit_from_window(window: &Window) -> GalaxyOrbit {
-    compute_orbit_from_size(window.width(), window.height())
-}
-
-fn compute_orbit_from_size(width: f32, _height: f32) -> GalaxyOrbit {
-
+fn compute_orbit_from_size(width: f32) -> GalaxyOrbit {
     let total_galaxy_width = 2.0 * ORBIT_A + 175.0;
     let orbit_center_x = - (width / 2.0) + (total_galaxy_width / 2.0) + LEFT_MARGIN;
-
-    // Clamp if the screen is too small — prevent planets from going off-screen
-    // let min_x = (-width / 2.0 + LEFT_MARGIN)/2.0;
-    // let max_x = 0.0; // don’t move past screen center
-    // let safe_center_x = center_x.clamp(min_x, max_x);
-
     GalaxyOrbit {
         center: Vec3::new(orbit_center_x, 0.0, 0.0),
         a: ORBIT_A,
@@ -219,25 +257,6 @@ pub fn init_energy_cell_sprites_resource(
     commands.insert_resource(EnergyCellsSpritesData {
         energy_cell,
     })
-}
-
-// ======================
-// === Update Systems ===
-// ======================
-
-pub fn update_orbit_on_window_resized(
-    mut resize_events: MessageReader<WindowResized>,
-    mut orbit: ResMut<GalaxyOrbit>,
-) {
-    if !resize_events.is_empty() {
-        for event in resize_events.read() {
-            let new_orbit = compute_orbit_from_size(event.width, event.height);
-            // Keep the same ellipse shape ratio, but update center
-            orbit.center = new_orbit.center;
-            orbit.a = new_orbit.a;
-            orbit.b = new_orbit.b;
-        }
-    }
 }
 
 // SetupSimulationEnd

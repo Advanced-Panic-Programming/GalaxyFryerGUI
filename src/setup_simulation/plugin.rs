@@ -17,10 +17,10 @@ impl Plugin for SetupSimulationPlugin {
             .insert_resource(SelectedPlanet::default())
             // ===== OnEnter Setup =====
             .add_systems(OnEnter(SetupSimulation), (
-                    init_window_size_res,
                     spawn_camera,
                     spawn_background,
                     init_galaxy_orbit,
+                    init_ui_scale,
                     init_planets_sprites_data_resource,
                     init_planets_data_resource,
                     init_selected_planet_resource,
@@ -32,12 +32,10 @@ impl Plugin for SetupSimulationPlugin {
             )
             // Update system: sends SetupSimulationCompleted Message -> AppStateManager will change app state
             // Bevy guarantees that "Update" systems will be executed only AFTER the "OnEnter" systems 
-            .add_systems(Update, finish_simulation_setup.run_if(in_state(SetupSimulation)))
             // ===== Update systems =====
-            .add_systems(Update, (
-                update_orbit_on_window_resized,
-                update_window_size_on_resize,
-            )) // Runs even if the app is in a different state
+            .add_systems(Update, finish_simulation_setup.run_if(in_state(SetupSimulation)))
+            // This system will even after exiting SetupSimulation
+            .add_systems(Update, (update_ui_scale_on_resize, update_background_size_on_resize))
         ;
     }
 }

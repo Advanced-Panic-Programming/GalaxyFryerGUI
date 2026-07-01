@@ -5,7 +5,6 @@ use crate::galaxy_view::messages::{ReceivedExplorerBag, ReceivedExplorerMove, Re
 use crate::galaxy_view::resources::ExplorerArrowAtlas;
 use crate::galaxy_view::utils::*;
 use crate::manual_mode::resources::{CombinableResourcesOnPlanet, CombineResourceSpinner, GeneratableResourcesOnPlanet, GenerateResourceSpinner};
-use crate::planet_view::utils::{adapt_to_height, adapt_to_width};
 // =====================
 // === Setup Systems ===
 // =====================
@@ -13,15 +12,14 @@ use crate::planet_view::utils::{adapt_to_height, adapt_to_width};
 pub fn spawn_galaxy_map(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    window_size: Res<WindowSize>,
 ) {
     commands.spawn((
         Sprite {
             image: asset_server.load(GALAXY_MAP_SPRITE_PATH),
-            custom_size: Some(Vec2::new(adapt_to_width(window_size.width, GALAXY_MAP_SIZE.x), adapt_to_height(window_size.height, GALAXY_MAP_SIZE.y))),
+            custom_size: Some(GALAXY_MAP_SIZE),
             ..default()
         },
-        Transform::from_translation(Vec3::new(adapt_to_width(window_size.width, GALAXY_MAP_X), adapt_to_height(window_size.height, GALAXY_MAP_Y), GALAXY_MAP_Z)),
+        Transform::from_translation(Vec3::new(GALAXY_MAP_X, GALAXY_MAP_Y, GALAXY_MAP_Z)),
         GalaxyMap,
         SpawnedByGalaxyView,
     ));

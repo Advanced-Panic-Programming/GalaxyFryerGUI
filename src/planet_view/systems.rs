@@ -1,22 +1,5 @@
-//! Systems for PlanetView.
-//!
-//! Three clearly separated categories:
-//!
-//! **OnEnter** — full cold spawn. Always run after `cleanup`.
-//!   • `spawn_corner_planet`
-//!   • `spawn_planet_view`
-//!
-//! **Update** — targeted patch systems. Each reacts to exactly one resource
-//!   change and touches the minimal set of entities needed.
-//!   • `on_planet_changed`   — SelectedPlanet changed → full respawn
-//!   • `update_terrain`      — PlanetsData changed → swap terrain + rocket image
-//!   • `update_energy_cells` — PlanetsData changed → swap individual cell images
-//!   • `update_explorers`    — ExplorersData changed → add/remove/update explorer entities
-//!   • `animate_corner_planet`
-//!
-//! **OnExit** — `cleanup`.
-
 use bevy::prelude::*;
+use bevy::window::WindowResized;
 use common_game::utils::ID;
 use galaxy_fryer::app::gui_protocol::GUIToOrchestrator::AskPlanetState;
 use crate::galaxy_view::components::AnimationConfig;
@@ -24,9 +7,14 @@ use crate::planet_view::builders::*;
 use crate::planet_view::components::*;
 use crate::planet_view::utils::*;
 use crate::setup_orchestrator::resources::ToOrchestrator;
-use crate::setup_simulation::resources::{EnergyCellsSpritesData, ExplorerSpriteData, ExplorersData, PlanetTerrainSpriteData, PlanetsData, PlanetsSpritesData, RocketSpritesData, SelectedPlanet, WindowSize};
+use crate::setup_simulation::resources::{EnergyCellsSpritesData, ExplorerSpriteData, ExplorersData, PlanetTerrainSpriteData, PlanetsData, PlanetsSpritesData, RocketSpritesData, SelectedPlanet};
+use crate::setup_simulation::utils::{visible_world_size, DESIGN_HEIGHT, DESIGN_WIDTH};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+/// The terrain size to use when a real window isn't available.
+fn fallback_terrain_size() -> Vec2 {
+    Vec2::new(DESIGN_WIDTH, DESIGN_HEIGHT)
+}
 
 /// Despawns every entity tagged `SpawnedByPlanetView`, including their children.
 fn despawn_view(commands: &mut Commands, query: &Query<Entity, (With<SpawnedByPlanetView>, Without<ChildOf>)>) {
@@ -54,7 +42,6 @@ pub fn spawn_corner_planet_system(
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
     planets_sprites_data: Res<PlanetsSpritesData>,
     selected_planet: Res<SelectedPlanet>,
-    window_size: Res<WindowSize>,
 ) {
     let Some(index) = require_selected(&selected_planet, "spawn_corner_planet") else {
         return;
@@ -64,8 +51,6 @@ pub fn spawn_corner_planet_system(
         &mut commands,
         &mut layouts,
         &planets_sprites_data.planets[index],
-        window_size.width,
-        window_size.height,
     );
 }
 
@@ -81,11 +66,15 @@ pub fn spawn_planet_view_system(
     explorer_sprite_data: Res<ExplorerSpriteData>,
     rocket_sprites_data: Res<RocketSpritesData>,
     energy_cells_sprites_data: Res<EnergyCellsSpritesData>,
-    window_size: Res<WindowSize>
+    windows: Query<&Window>,
 ) {
     let Some(planet_index) = require_selected(&selected, "spawn_planet_view") else {
         return;
     };
+
+    let terrain_size = windows.single()
+        .map(|w| visible_world_size(w.width(), w.height()))
+        .unwrap_or_else(|_| fallback_terrain_size());
 
     spawn_planet_view(
         &mut commands,
@@ -97,12 +86,9 @@ pub fn spawn_planet_view_system(
         &explorer_sprite_data,
         asset_server.load(EXPLORERS_BAG_FONT_PATH),
         planet_index,
-        window_size.width,
-        window_size.height,
+        terrain_size,
     );
 }
-
-// ── Update: planet changed (full respawn) ─────────────────────────────────────
 
 /// When the user selects a different planet, tears down the whole view and
 /// rebuilds it from scratch. This is the only case that warrants a full respawn:
@@ -120,9 +106,9 @@ pub fn on_planet_changed(
     rocket_sprites_data: Res<RocketSpritesData>,
     energy_cells_sprites_data: Res<EnergyCellsSpritesData>,
     existing: Query<Entity, (With<SpawnedByPlanetView>, Without<ChildOf>)>,
-    window_size: Res<WindowSize>,
+    windows: Query<&Window>,
 ) {
-    if !selected.is_changed() && !window_size.is_changed() {
+    if !selected.is_changed() {
         return;
     }
 
@@ -136,9 +122,11 @@ pub fn on_planet_changed(
         &mut commands,
         &mut layouts,
         &planets_sprites_data.planets[planet_index],
-        window_size.width,
-        window_size.height,
     );
+
+    let terrain_size = windows.single()
+        .map(|w| visible_world_size(w.width(), w.height()))
+        .unwrap_or_else(|_| fallback_terrain_size());
 
     spawn_planet_view(
         &mut commands,
@@ -150,12 +138,9 @@ pub fn on_planet_changed(
         &explorer_sprite_data,
         asset_server.load(EXPLORERS_BAG_FONT_PATH),
         planet_index,
-        window_size.width,
-        window_size.height,
+        terrain_size,
     );
 }
-
-// ── Update: planet data changed (same planet, patch sprites) ──────────────────
 
 /// Swaps the terrain background and rocket images when `PlanetsData` changes
 /// (planet destroyed, rocket built/used).
@@ -233,7 +218,6 @@ pub fn update_explorers(
     mut sprite_query: Query<(Entity, &ExplorerSprite, &mut Sprite)>,
     mut label_query: Query<(Entity, &ExplorerBagLabel, &mut Text2d)>,
     root_query: Query<Entity, (With<SpawnedByPlanetView>, Without<CornerPlanet>)>,
-    window_size: Res<WindowSize>,
 ) {
     if !explorers_data.is_changed() {
         return;
@@ -243,17 +227,8 @@ pub fn update_explorers(
         return;
     };
 
-    let explorer1_pos = Vec3::new(
-        adapt_to_width(window_size.width, EXPLORER1_X),
-        adapt_to_height(window_size.height, EXPLORER1_Y),
-        EXPLORER_Z,
-    );
-
-    let explorer2_pos = Vec3::new(
-        adapt_to_width(window_size.width, EXPLORER2_X),
-        adapt_to_height(window_size.height, EXPLORER2_Y),
-        EXPLORER_Z,
-    );
+    let explorer1_pos = Vec3::new(EXPLORER1_X, EXPLORER1_Y, EXPLORER_Z);
+    let explorer2_pos = Vec3::new(EXPLORER2_X, EXPLORER2_Y, EXPLORER_Z);
 
     let explorer_configs = [
         (0 as ID, &explorers_data.explorer1, &explorer_sprite_data.explorer1, explorer1_pos),
@@ -318,10 +293,21 @@ pub fn update_explorers(
     }
 }
 
-// ── Update: corner planet animation ───────────────────────────────────────────
+/// Keeps the terrain background sized to fully cover the camera's visible area during PlanetView
+pub fn update_terrain_size_on_resize(
+    mut resize_events: MessageReader<WindowResized>,
+    mut terrain_query: Query<&mut Sprite, With<TerrainBackground>>,
+) {
+    let Some(event) = resize_events.read().last() else {
+        return;
+    };
+    let size = visible_world_size(event.width, event.height);
+    for mut sprite in terrain_query.iter_mut() {
+        sprite.custom_size = Some(size);
+    }
+}
 
-/// Advances the corner-planet sprite-sheet animation by one frame when the
-/// per-frame timer fires.
+/// Advances the corner-planet sprite-sheet animation by one frame when the per-frame timer fires.
 pub fn animate_corner_planet(
     time: Res<Time>,
     mut query: Query<(&mut AnimationConfig, &mut Sprite), With<CornerPlanet>>,
