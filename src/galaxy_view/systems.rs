@@ -5,9 +5,27 @@ use crate::galaxy_view::messages::{ReceivedExplorerBag, ReceivedExplorerMove, Re
 use crate::galaxy_view::resources::ExplorerArrowAtlas;
 use crate::galaxy_view::utils::*;
 use crate::manual_mode::resources::{CombinableResourcesOnPlanet, CombineResourceSpinner, GeneratableResourcesOnPlanet, GenerateResourceSpinner};
+use crate::planet_view::utils::{adapt_to_height, adapt_to_width, EXPLORER_SIZE};
 // =====================
 // === Setup Systems ===
 // =====================
+
+pub fn spawn_galaxy_map(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    window_size: Res<WindowSize>,
+) {
+    commands.spawn((
+        Sprite {
+            image: asset_server.load(GALAXY_MAP_SPRITE_PATH),
+            custom_size: Some(Vec2::new(adapt_to_width(window_size.width, GALAXY_MAP_SIZE.x), adapt_to_height(window_size.height, GALAXY_MAP_SIZE.y))),
+            ..default()
+        },
+        Transform::from_translation(Vec3::new(adapt_to_width(window_size.width, GALAXY_MAP_X), adapt_to_height(window_size.height, GALAXY_MAP_Y), GALAXY_MAP_Z)),
+        GalaxyMap,
+        SpawnedByGalaxyView,
+    ));
+}
 
 pub fn spawn_planets(
     mut commands: Commands,
@@ -388,96 +406,6 @@ pub fn update_planets_data(
 // ====================
 // ===== Explorer =====
 // ====================
-
-// pub fn bound_explorer_arrows(
-//     mut commands: Commands,
-//     asset_server: Res<AssetServer>,
-//     explorers: Res<ExplorersData>,
-//     planets: Query<(Entity, &Planet)>,
-//     arrows: Query<(Entity, &ExplorerArrow)>,
-// ) {
-//     // Stati esploratori
-//     let explorer_states = [(1, &explorers.explorer1), (2, &explorers.explorer2)];
-//
-//     // Conta esploratori per pianeta
-//     let mut explorers_on_planet = HashMap::<usize, usize>::new();
-//     for (_, e) in &explorer_states {
-//         if e.is_alive() {
-//             *explorers_on_planet.entry(e.get_current_planet_index()).or_insert(0) += 1;
-//         }
-//     }
-//
-//     // Helper: calcola offset per evitare sovrapposizioni
-//     fn explorer_offset(explorer_id: usize, count: usize) -> Vec3 {
-//         match count {
-//             1 => Vec3::new(0.0, EXPLORER_ARROW_VERTICAL_OFFSET, 0.1),
-//             2 => {
-//                 if explorer_id == 1 {
-//                     Vec3::new(-EXPLORER_ARROW_HORIZONTAL_OFFSET, EXPLORER_ARROW_VERTICAL_OFFSET, 0.1)
-//                 } else {
-//                     Vec3::new(EXPLORER_ARROW_HORIZONTAL_OFFSET, EXPLORER_ARROW_VERTICAL_OFFSET, 0.1)
-//                 }
-//             }
-//             _ => Vec3::new(0.0, EXPLORER_ARROW_VERTICAL_OFFSET, 0.1),
-//         }
-//     }
-//
-//     for (explorer_id, explorer) in &explorer_states {
-//         let alive = explorer.is_alive();
-//         let planet_index = explorer.get_current_planet_index();
-//
-//         let existing_arrow_entity = arrows
-//             .iter()
-//             .find(|(_, a)| a.explorer_id == *explorer_id)
-//             .map(|(e, _)| e);
-//
-//         if !alive {
-//             if let Some(ent) = existing_arrow_entity {
-//                 commands.entity(ent).despawn();
-//             }
-//             continue;
-//         }
-//
-//         // Trova entity del pianeta
-//         let (planet_entity, _) = match planets.iter().find(|(_, p)| p.index == planet_index) {
-//             Some(p) => p,
-//             None => continue,
-//         };
-//
-//         let same_planet_count = *explorers_on_planet.get(&planet_index).unwrap_or(&1);
-//         let offset = explorer_offset(*explorer_id, same_planet_count);
-//
-//         let texture_path = match explorer_id {
-//             1 => "objects/explorer1_arrow.png",
-//             2 => "objects/explorer2_arrow.png",
-//             _ => unreachable!(),
-//         };
-//         let texture = asset_server.load(texture_path);
-//
-//         match existing_arrow_entity {
-//             None => {
-//                 // Spawn nuova arrow come child del pianeta
-//                 commands.entity(planet_entity).with_children(|parent| {
-//                     parent.spawn((
-//                         Sprite {
-//                             image: texture,
-//                             custom_size: Some(Vec2::new(32.0, 32.0)),
-//                             ..default()
-//                         },
-//                         Transform::from_translation(offset),
-//                         ExplorerArrow { planet_index, explorer_id: *explorer_id },
-//                     ));
-//                 });
-//             }
-//             Some(arrow_ent) => {
-//                 // Aggiorna parent e offset se necessario
-//                 commands.entity(arrow_ent)
-//                     .set_parent_in_place(planet_entity)
-//                     .insert(ExplorerArrow { planet_index, explorer_id: *explorer_id });
-//             }
-//         }
-//     }
-// }
 
 pub fn update_explorer_data (
     // Event readers

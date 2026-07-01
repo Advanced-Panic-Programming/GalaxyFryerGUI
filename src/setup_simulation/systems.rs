@@ -10,13 +10,25 @@ use crate::app_state_manager::messages::SetupSimulationCompleted;
 // ======================
 
 pub fn init_window_size_res(mut commands: Commands, windows: Query<&Window>) {
-    
+
     let window = windows.single().unwrap();
-    
+
     commands.insert_resource(WindowSize {
         width: window.width(),
         height: window.height()
     })
+}
+
+pub fn update_window_size_on_resize(
+    mut resize_events: MessageReader<WindowResized>,
+    mut window_size: ResMut<WindowSize>,
+) {
+    if !resize_events.is_empty() {
+        for event in resize_events.read() {
+            window_size.width = event.width;
+            window_size.height = event.height;
+        }
+    }
 }
 
 pub fn spawn_camera(mut commands: Commands) {

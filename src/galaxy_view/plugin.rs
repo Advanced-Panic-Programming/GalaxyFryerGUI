@@ -27,6 +27,7 @@ impl Plugin for GalaxyViewPlugin {
             
             // OnEnter Systems
             .add_systems(OnEnter(GalaxyView), (
+                spawn_galaxy_map,
                 spawn_planets,
                 setup_explorer_arrow_atlas,
             ))

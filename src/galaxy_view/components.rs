@@ -2,6 +2,9 @@ use std::time::Duration;
 use bevy::prelude::*;
 
 #[derive(Component)]
+pub struct GalaxyMap;
+
+#[derive(Component)]
 pub struct SpawnedByGalaxyView;
 
 #[derive(Component)]

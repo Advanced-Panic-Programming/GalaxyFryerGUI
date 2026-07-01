@@ -122,7 +122,7 @@ pub fn on_planet_changed(
     existing: Query<Entity, (With<SpawnedByPlanetView>, Without<ChildOf>)>,
     window_size: Res<WindowSize>,
 ) {
-    if !selected.is_changed() {
+    if !selected.is_changed() && !window_size.is_changed() {
         return;
     }
 

@@ -34,7 +34,10 @@ impl Plugin for SetupSimulationPlugin {
             // Bevy guarantees that "Update" systems will be executed only AFTER the "OnEnter" systems 
             .add_systems(Update, finish_simulation_setup.run_if(in_state(SetupSimulation)))
             // ===== Update systems =====
-            .add_systems(Update, update_orbit_on_window_resized) // Runs even if the app is in a different state
+            .add_systems(Update, (
+                update_orbit_on_window_resized,
+                update_window_size_on_resize,
+            )) // Runs even if the app is in a different state
         ;
     }
 }
