@@ -552,6 +552,10 @@ fn spawn_explorer_tab(
                                     ..default()
                                 },
                                 TextColor(TEXT_VALUE),
+                                TextLayout {
+                                    linebreak: LineBreak::NoWrap,
+                                    ..default()
+                                },
                                 BagViewMarker { explorer_id },
                             ));
                         });
