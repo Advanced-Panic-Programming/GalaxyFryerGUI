@@ -29,6 +29,7 @@ impl Plugin for SetupSimulationPlugin {
                     init_rocket_sprites_resource,
                     init_energy_cell_sprites_resource,
                     init_button_click_sound_resource,
+                    init_explosion_sound_resource,
                     play_background_music,
                 ).chain()
             )
@@ -38,8 +39,8 @@ impl Plugin for SetupSimulationPlugin {
             .add_systems(Update, finish_simulation_setup.run_if(in_state(SetupSimulation)))
             // This systems will run even after exiting SetupSimulation
             .add_systems(Update, (
-                    update_ui_scale_on_resize, 
-                    update_background_size_on_resize, 
+                    update_ui_scale_on_resize,
+                    update_background_size_on_resize,
                     play_sound_on_button_press,
                 )
             )

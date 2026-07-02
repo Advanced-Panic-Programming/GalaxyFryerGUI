@@ -1,7 +1,8 @@
 use bevy::math::Vec2;
 
 pub const SOUNDTRACK_PATH: &str = "music/soundtrack.mp3";
-pub const BUTTON_CLICK_SOUND_PATH: &str = "music/button_click2.mp3";
+pub const BUTTON_CLICK_SOUND_PATH: &str = "music/button_click.ogg";
+pub const EXPLOSION_SFX_PATH: &str = "effects/explosion_sfx.mp3";
 pub const SPACE_BACKGROUND_PATH: &str = "backgrounds/space_bg.png";
 pub const ALIVE_PLANET_TERRAIN_SPRITE_PATH: &str = "backgrounds/planet_terrain.png";
 pub const DESTROYED_PLANET_TERRAIN_SPRITE_PATH: &str = "backgrounds/destroyed_planet_terrain.png";

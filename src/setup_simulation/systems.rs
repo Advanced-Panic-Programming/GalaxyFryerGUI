@@ -303,6 +303,14 @@ pub fn play_sound_on_button_press(
     }
 }
 
+pub fn init_explosion_sound_resource(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let sound_handle = asset_server.load(EXPLOSION_SFX_PATH);
+    commands.insert_resource(ExplosionSound(sound_handle));
+}
+
 // SetupSimulationEnd
 pub fn finish_simulation_setup(
     mut writer: MessageWriter<SetupSimulationCompleted>,

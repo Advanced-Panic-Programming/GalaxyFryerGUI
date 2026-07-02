@@ -1,5 +1,8 @@
 use bevy::color::Color;
 
+// Cutscene duration time
+pub const IMPACT_TIME: f32 = 1.3;
+
 pub const FONT_PATH: &str = "fonts/BoldPixel.ttf";
 pub const CAPTION_POSITION_Y: f32 = 300.0;
 pub const ASTEROID_SPRITE_PATH: &str = "planets/asteroid.png";

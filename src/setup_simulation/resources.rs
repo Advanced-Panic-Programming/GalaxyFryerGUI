@@ -207,3 +207,6 @@ pub struct EnergyCellsSpriteInfo {
 
 #[derive(Resource)]
 pub struct ButtonClickSound(pub Handle<AudioSource>);
+
+#[derive(Resource)]
+pub struct ExplosionSound(pub Handle<AudioSource>);

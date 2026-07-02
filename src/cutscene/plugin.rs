@@ -30,6 +30,7 @@ impl Plugin for CutscenePlugin {
                     handle_cutscene,
                     spawn_cutscene_visuals,
                     animate_cutscene,
+                    play_cutscene_sounds,
                     update_cutscene,
                 )
                     .chain()
