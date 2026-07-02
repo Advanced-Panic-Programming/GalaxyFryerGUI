@@ -10,7 +10,7 @@ impl Plugin for InputHandlerPlugin {
             .add_systems(Update, (
                 app_states_affected_inputs,
                 (
-                    // Systems that depend on ToOrchestrator Resource:
+                    // These systems depend on the 'ToOrchestrator' resource:
                     // Since the resource is not init but is created from a system, we need to check if it exists before using it
                     menu_updates_inputs,
                     game_related_inputs,

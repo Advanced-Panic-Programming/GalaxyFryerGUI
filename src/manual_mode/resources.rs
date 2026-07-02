@@ -4,9 +4,9 @@ use std::fmt;
 use common_game::components::resource::{BasicResourceType, ComplexResourceType};
 use common_game::utils::ID;
 
-// ---------------------------------------------------------------
+// ==========================
 //      ManualModePanel
-// ---------------------------------------------------------------
+// ==========================
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Tab {
@@ -29,9 +29,9 @@ impl Default for ManualModePanel {
     }
 }
 
-// ---------------------------------------------------------------
+// ==========================
 //      Spinners
-// ---------------------------------------------------------------
+// ==========================
 #[derive(Resource, Default)]
 pub struct PlanetSpinner {
     value: usize,
@@ -238,9 +238,9 @@ impl_spinner_display!(CombineResourceSpinner);
 impl_spinner_display!(GenerateResourceSpinner);
 
 
-// ---------------------------------------------------------------
+// ====================================================
 //      ExplorerPanel -> Info in Res<ExplorersData>
-// ---------------------------------------------------------------
+// ====================================================
 
 #[cfg(test)]
 mod tests {

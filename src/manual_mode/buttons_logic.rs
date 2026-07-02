@@ -7,9 +7,9 @@ use crate::setup_orchestrator::resources::ToOrchestrator;
 use crate::setup_simulation::resources::ExplorersData;
 // This module contains all the buttons logic
 
-// ---------------------------------------------------------------
+// ==========================
 //      Galaxy Tab Buttons
-// ---------------------------------------------------------------
+// ==========================
 
 pub fn handle_planet_spinner_dec(
     check_root: Query<Entity, With<ManualModePanelRoot>>,
@@ -83,9 +83,9 @@ pub fn handle_send_asteroid(
     }
 }
 
-// ---------------------------------------------------------------
+// =============================
 //      Explorers Tab Buttons
-// ---------------------------------------------------------------
+// =============================
 pub fn handle_move_to_planet_button(
     check_root: Query<Entity, With<ManualModePanelRoot>>,
     query: Query<(&Interaction, &MoveButton), (Changed<Interaction>, With<MoveButton>)>,
@@ -330,9 +330,9 @@ pub fn handle_stop_ai_button(
     }
 }
 
-// ---------------------------------------------------------------
-//      change tab handlers
-// ---------------------------------------------------------------
+// ==========================
+//    change tab handlers
+// ==========================
 pub fn update_selected_tab(
     query: Query<(&Interaction, &TabButton), Changed<Interaction>>,
     mut manual_mode_panel: ResMut<ManualModePanel>,

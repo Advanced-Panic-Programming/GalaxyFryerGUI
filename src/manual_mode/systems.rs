@@ -9,10 +9,10 @@ use crate::manual_mode::components::*;
 use crate::manual_mode::builders::*;
 use crate::manual_mode::utils::*;
 use crate::setup_simulation::resources::{ExplorerSpriteData, ExplorersData};
-// ---------------------------------------------------------------
-//      Spawn / Despawn
-// ---------------------------------------------------------------
 
+// =========================
+//      Spawn / Despawn
+// =========================
 pub fn spawn_manual_mode_panel(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -130,9 +130,9 @@ pub fn despawn_manual_mode_panel(
     }
 }
 
-// ---------------------------------------------------------------
+// =========================
 //      Tab bar
-// ---------------------------------------------------------------
+// =========================
 fn spawn_tab_bar(parent: &mut RelatedSpawnerCommands<ChildOf>, font: Handle<Font>) {
     parent
         .spawn((Node {
@@ -197,9 +197,9 @@ fn spawn_tab_bar(parent: &mut RelatedSpawnerCommands<ChildOf>, font: Handle<Font
         });
 }
 
-// ---------------------------------------------------------------
+// =========================
 //      Galaxy Tab
-// ---------------------------------------------------------------
+// =========================
 fn spawn_galaxy_tab(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     font: Handle<Font>,
@@ -260,9 +260,9 @@ fn spawn_galaxy_tab(
         });
 }
 
-// ---------------------------------------------------------------
+// =========================
 //      Explorers Tab
-// ---------------------------------------------------------------
+// =========================
 
 fn spawn_explorer_tab(
     parent: &mut RelatedSpawnerCommands<ChildOf>,

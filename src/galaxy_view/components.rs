@@ -15,7 +15,7 @@ pub struct Planet {
 #[derive(Component)]
 pub struct ExplorerArrow {
     pub planet_index: usize,
-    pub explorer_id: usize, // 1 or 2
+    pub explorer_id: usize,
 }
 
 #[derive(Component)]

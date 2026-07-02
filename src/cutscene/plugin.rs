@@ -10,7 +10,6 @@ pub struct CutscenePlugin;
 impl Plugin for CutscenePlugin {
     fn build(&self, app: &mut App) {
         app
-            // Message
             // Resources
             .init_resource::<ActiveCutscene>()
             .insert_resource(

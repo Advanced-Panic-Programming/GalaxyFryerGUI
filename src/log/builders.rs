@@ -2,6 +2,7 @@ use common_game::utils::ID;
 use crate::log::resources::*;
 use crate::log::resources::LogLevel::*;
 
+/// Default builders for messages so that every system uses the same format
 impl LogMessage {
     // Planet
     pub fn planet_destroyed(p_id: ID) -> Self {

@@ -14,8 +14,8 @@ pub fn spawn_log_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             LogUI,
             Node {
                 position_type: PositionType::Absolute,
-                right: Val::Px(LOG_RIGHT_OFFSET), // Try Percent
-                top: Val::Px(LOG_TOP_OFFSET), // Try Percent
+                right: Val::Px(LOG_RIGHT_OFFSET),
+                top: Val::Px(LOG_TOP_OFFSET),
                 bottom: Val::Px(0.0),
                 border: UiRect::all(Val::Px(LOG_BORDER_WIDTH)),
                 padding: UiRect::all(Val::Px(LOG_PADDING)),

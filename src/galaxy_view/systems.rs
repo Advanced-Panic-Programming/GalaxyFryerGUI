@@ -5,10 +5,10 @@ use crate::galaxy_view::messages::{ReceivedExplorerBag, ReceivedExplorerMove, Re
 use crate::galaxy_view::resources::ExplorerArrowAtlas;
 use crate::galaxy_view::utils::*;
 use crate::manual_mode::resources::{CombinableResourcesOnPlanet, CombineResourceSpinner, GeneratableResourcesOnPlanet, GenerateResourceSpinner};
+
 // =====================
 // === Setup Systems ===
 // =====================
-
 pub fn spawn_galaxy_map(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -154,89 +154,87 @@ pub fn setup_explorer_arrow_atlas(
     );
 }
 
-    pub fn spawn_explorer_arrows(
-        mut commands: Commands,
-        explorers: Res<ExplorersData>,
-        atlas: Res<ExplorerArrowAtlas>,
-        planets: Query<(Entity, &Planet)>,
-        arrows: Query<&ExplorerArrow>,
-        explorer_sprite_data: Res<ExplorerSpriteData>,
-    ) {
-        let explorer_states = [
-            (0, &explorers.explorer1),
-            (1, &explorers.explorer2),
-        ];
-        for (explorer_id, explorer) in explorer_states {
-            let animation = AnimationConfig::new(
-                0,
-                13,
-                ANIMATION_FPS,
-            );
-            // if !explorer.is_alive() {
-            //     continue;
-            // }
-            let arrow_exists = arrows
-                .iter()
-                .any(|a| a.explorer_id == explorer_id);
-            if arrow_exists {
-                continue;
-            }
-            let planet_index =
-                explorer.get_current_planet_index();
-            let Some((planet_entity, _)) = planets
-                .iter()
-                .find(|(_, p)| p.index == planet_index)
-            else {
-                continue;
-            };
-            let texture_path = match explorer_id {
-                0 => {
-                    if explorer.is_alive() {
-                        explorer_sprite_data.explorer1.alive_arrow_sprite.clone()
-                    } else {
-                        explorer_sprite_data.explorer1.dead_arrow_sprite.clone()
-                    }
-                },
-                1 => {
-                    if explorer.is_alive() {
-                        explorer_sprite_data.explorer2.alive_arrow_sprite.clone()
-                    } else {
-                        explorer_sprite_data.explorer2.dead_arrow_sprite.clone()
-                    }
-                },
-                _ => unreachable!(),
-            };
-            commands
-                .entity(planet_entity)
-                .with_children(|parent| {
-                    parent.spawn((
-                        Sprite {
-                            image: texture_path,
-                            custom_size: Some(
-                                Vec2::splat(
-                                    EXPLORER_ARROW_DIMENSION,
-                                ),
-                            ),
-                            texture_atlas: Some(TextureAtlas {
-                                layout: atlas.layout.clone(),
-                                index: 0,
-                            }),
-                            ..default()
-                        },
-                        Transform::from_scale(
-                            Vec3::splat(
-                                EXPLORER_INITIAL_SPLAT,
+pub fn spawn_explorer_arrows(
+    mut commands: Commands,
+    explorers: Res<ExplorersData>,
+    atlas: Res<ExplorerArrowAtlas>,
+    planets: Query<(Entity, &Planet)>,
+    arrows: Query<&ExplorerArrow>,
+    explorer_sprite_data: Res<ExplorerSpriteData>,
+) {
+    let explorer_states = [
+        (0, &explorers.explorer1),
+        (1, &explorers.explorer2),
+    ];
+    for (explorer_id, explorer) in explorer_states {
+        let animation = AnimationConfig::new(
+            0,
+            13,
+            ANIMATION_FPS,
+        );
+
+        let arrow_exists = arrows
+            .iter()
+            .any(|a| a.explorer_id == explorer_id);
+        if arrow_exists {
+            continue;
+        }
+        let planet_index =
+            explorer.get_current_planet_index();
+        let Some((planet_entity, _)) = planets
+            .iter()
+            .find(|(_, p)| p.index == planet_index)
+        else {
+            continue;
+        };
+        let texture_path = match explorer_id {
+            0 => {
+                if explorer.is_alive() {
+                    explorer_sprite_data.explorer1.alive_arrow_sprite.clone()
+                } else {
+                    explorer_sprite_data.explorer1.dead_arrow_sprite.clone()
+                }
+            },
+            1 => {
+                if explorer.is_alive() {
+                    explorer_sprite_data.explorer2.alive_arrow_sprite.clone()
+                } else {
+                    explorer_sprite_data.explorer2.dead_arrow_sprite.clone()
+                }
+            },
+            _ => unreachable!(),
+        };
+        commands
+            .entity(planet_entity)
+            .with_children(|parent| {
+                parent.spawn((
+                    Sprite {
+                        image: texture_path,
+                        custom_size: Some(
+                            Vec2::splat(
+                                EXPLORER_ARROW_DIMENSION,
                             ),
                         ),
-                        ExplorerArrow {
-                            explorer_id,
-                            planet_index,
-                        },
-                        animation,
-                        SpawnedByGalaxyView,
-                    ));
-                });
-        }
+                        texture_atlas: Some(TextureAtlas {
+                            layout: atlas.layout.clone(),
+                            index: 0,
+                        }),
+                        ..default()
+                    },
+                    Transform::from_scale(
+                        Vec3::splat(
+                            EXPLORER_INITIAL_SPLAT,
+                        ),
+                    ),
+                    ExplorerArrow {
+                        explorer_id,
+                        planet_index,
+                    },
+                    animation,
+                    SpawnedByGalaxyView,
+                ));
+            });
+    }
 }
 
     pub fn update_explorer_arrow_binding(
@@ -281,6 +279,9 @@ pub fn setup_explorer_arrow_atlas(
             );
         }
 }
+
+/// This system handles the explorers' arrows position when both explorers are on the same planet.
+/// It applies an offset so that both arrows are visible (they will slightly overlap in order to both point to the planet)
 pub fn update_explorer_arrow_offsets(
     explorers: Res<ExplorersData>,
     mut arrows: Query<(
@@ -291,10 +292,7 @@ pub fn update_explorer_arrow_offsets(
         explorers.explorer1.get_current_planet_index();
     let e2_planet =
         explorers.explorer2.get_current_planet_index();
-    let same_planet =
-        explorers.explorer1.is_alive()
-            && explorers.explorer2.is_alive()
-            && e1_planet == e2_planet;
+    let same_planet = e1_planet == e2_planet;
     for (arrow, mut transform) in arrows.iter_mut() {
         let offset = if same_planet {
             match arrow.explorer_id {
@@ -321,7 +319,7 @@ pub fn update_explorer_arrow_offsets(
     }
 }
 
-// This system update the arrow sprite to show that the explorer died
+/// This system update the arrow sprite to show that the explorer died
 pub fn change_dead_explorers_arrows(
     explorers: Res<ExplorersData>,
     explorer_sprite_data: Res<ExplorerSpriteData>,
@@ -348,6 +346,11 @@ pub fn change_dead_explorers_arrows(
     }
 }
 
+// ============================
+//   Resources update systems
+// ============================
+
+/// This system updates the 'PlanetData' resource when the corresponding event (ReceivedPlanetState, ReceivedPlanetDestroyed, ...) is triggered.
 pub fn update_planets_data(
     // Event readers
     mut planet_state_reader: MessageReader<ReceivedPlanetState>,
@@ -378,7 +381,7 @@ pub fn update_planets_data(
             if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) && planet.get_alive() {
                     planet.kill();
             }
-            planets_sprites.planets[msg.planet_id as usize].alive = false; //TODO! Implement methods for the struct
+            planets_sprites.planets[msg.planet_id as usize].alive = false;
         }
     }
 
@@ -401,10 +404,6 @@ pub fn update_planets_data(
     }
 }
 
-// ====================
-// ===== Explorer =====
-// ====================
-
 pub fn update_explorer_data (
     // Event readers
     mut explorer_position_reader: MessageReader<ReceivedExplorerPosition>,
@@ -414,51 +413,39 @@ pub fn update_explorer_data (
     // Resource
     mut explorer_data: ResMut<ExplorersData>,
 ) {
-
     // Before updating I should check if the explorer is alive, BUT, if the explorer is dead, no updated will arrive!
 
-    if !explorer_position_reader.is_empty() {
-        for msg in explorer_position_reader.read() {
-            match msg.explorer_id {
-                0 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize)}
-                1 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize)}
-                _ => {}
-            }
+    for msg in explorer_position_reader.read() {
+        match msg.explorer_id {
+            0 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize)}
+            1 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize)}
+            _ => {}
         }
-        explorer_position_reader.clear(); //TODO! check when to put the clear()
     }
 
-    if !explorer_bag_reader.is_empty() {
-        for msg in explorer_bag_reader.read() {
-            match msg.explorer_id {
-                0 => {explorer_data.explorer1.set_bag(msg.explorer_bag.clone()); println!("EXPLORER 1 {}", explorer_data.explorer1.get_bag())}
-                1 => {explorer_data.explorer2.set_bag(msg.explorer_bag.clone()); println!("EXPLORER 2 {}", explorer_data.explorer2.get_bag())}
-                _ => {}
-            }
+
+    for msg in explorer_bag_reader.read() {
+        match msg.explorer_id {
+            0 => {explorer_data.explorer1.set_bag(msg.explorer_bag.clone()); println!("EXPLORER 1 {}", explorer_data.explorer1.get_bag())}
+            1 => {explorer_data.explorer2.set_bag(msg.explorer_bag.clone()); println!("EXPLORER 2 {}", explorer_data.explorer2.get_bag())}
+            _ => {}
         }
-        explorer_bag_reader.clear();
     }
 
-    if !explorer_move_reader.is_empty() {
-        for msg in explorer_move_reader.read() {
-            match msg.explorer_id {
-                0 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize)}
-                1 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize)}
-                _ => {}
-            }
+    for msg in explorer_move_reader.read() {
+        match msg.explorer_id {
+            0 => {explorer_data.explorer1.set_current_planet_index(msg.planet_id as usize)}
+            1 => {explorer_data.explorer2.set_current_planet_index(msg.planet_id as usize)}
+            _ => {}
         }
-        explorer_move_reader.clear();
     }
 
-    if !killed_explorer_message.is_empty() {
-        for msg in killed_explorer_message.read() {
-            match msg.explorer_id {
-                0 => {explorer_data.explorer1.kill()}
-                1 => {explorer_data.explorer2.kill()}
-                _ => {}
-            }
+    for msg in killed_explorer_message.read() {
+        match msg.explorer_id {
+            0 => {explorer_data.explorer1.kill()}
+            1 => {explorer_data.explorer2.kill()}
+            _ => {}
         }
-        killed_explorer_message.clear();
     }
 }
 
@@ -467,6 +454,8 @@ pub fn update_explorer_data (
 // === OnExit Systems ===
 // ======================
 
+/// This system despawns every entity related to the 'GalaxyView' app state. It runs when we change state.
+/// It despawns only the graphic entities (sprites, animations, ...) not the resources behind.
 pub fn cleanup(
     mut commands: Commands,
     query: Query<Entity, (With<SpawnedByGalaxyView>, Without<ChildOf>)>,

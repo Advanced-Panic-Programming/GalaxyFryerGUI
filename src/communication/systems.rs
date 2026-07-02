@@ -26,13 +26,15 @@ pub fn receive_from_orchestrator(
     mut automatic_mode_writer: MessageWriter<ReceivedAutomaticModeAck>,
     mut simulation_end_writer: MessageWriter<ReceivedSimulationEnd>,
     // Log
-    mut log: MessageWriter<LogMessage>, // Not all events are registered in the log //TODO! It's OK? read protocol
+    mut log: MessageWriter<LogMessage>,
 ){
     while let Ok(msg) = receiver.0.try_recv() {
         match msg {
             DefaultMessage => {}
             ManualModeAck => {
+                // Generates the corresponding in game event
                 manual_mode_writer.write(ReceivedManualModeAck);
+                // Generates a 'LogMessage' event handled by the LogPlugin
                 log.write(LogMessage::manual_mode_ack());
             }
             AutomaticModeAck => {

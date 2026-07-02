@@ -10,7 +10,7 @@ use crate::setup_orchestrator::resources::ToOrchestrator;
 use crate::setup_simulation::resources::{EnergyCellsSpritesData, ExplorerSpriteData, ExplorersData, PlanetTerrainSpriteData, PlanetsData, PlanetsSpritesData, RocketSpritesData, SelectedPlanet};
 use crate::setup_simulation::utils::{visible_world_size, DESIGN_HEIGHT, DESIGN_WIDTH};
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// Helpers
 /// The terrain size to use when a real window isn't available.
 fn fallback_terrain_size() -> Vec2 {
     Vec2::new(DESIGN_WIDTH, DESIGN_HEIGHT)
@@ -33,7 +33,6 @@ fn require_selected(selected: &SelectedPlanet, caller: &str) -> Option<usize> {
     index
 }
 
-// ── OnEnter ───────────────────────────────────────────────────────────────────
 
 /// Spawns the animated corner-planet sprite.
 /// Must run after `cleanup` so no stale entity lingers from a previous visit.
@@ -201,7 +200,6 @@ pub fn update_energy_cells(
     }
 }
 
-// ── Update: explorer data changed ─────────────────────────────────────────────
 
 /// Reacts to changes in `ExplorersData`:
 /// - Explorer moved away from this planet → despawn its sprite + bag label.
@@ -353,8 +351,6 @@ pub fn periodically_ask_planet_state(
             let _ = sender.0.send(AskPlanetState { planet_id: planet_id as ID });
     }
 }
-
-// ── OnExit ────────────────────────────────────────────────────────────────────
 
 /// Removes every entity owned by the planet view, including their full child
 /// hierarchy. Runs on state exit and before every full respawn.

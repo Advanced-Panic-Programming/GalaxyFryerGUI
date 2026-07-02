@@ -32,11 +32,12 @@ pub fn setup_orchestrator(mut commands: Commands) {
 
     let _ = gui_to_orch_s.send(GUIToOrchestrator::ManualMode);
 
-    // Adding channels as Bevy resources in order to use them in the GUI
+    // Adding channels as Bevy resources in order to use them across other Bevy systems in the GUI
     commands.insert_resource(ToOrchestrator(gui_to_orch_s));
     commands.insert_resource(FromOrchestrator(orch_to_gui_r));
 }
 
+/// Notifies through an event that the orchestrator and the relative resource has been initialized
 pub fn setup_orchestrator_completed(mut writer: MessageWriter<SetupOrchestratorCompleted>) {
     writer.write(SetupOrchestratorCompleted);
 }

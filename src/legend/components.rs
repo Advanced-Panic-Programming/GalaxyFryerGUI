@@ -3,6 +3,5 @@ use bevy::prelude::*;
 pub struct LegendUI;
 #[derive(Component)]
 pub struct ModeLegendLabel;
-
 #[derive(Component)]
 pub struct ModeLegendKey;

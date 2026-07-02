@@ -22,7 +22,7 @@ pub struct AsteroidDestroyedCutscene;
 #[derive(Message)]
 pub struct ReceivedPlanetState{
     pub planet_id: ID,
-    pub dummy_planet_state: DummyPlanetState, // rocket and energy cells
+    pub dummy_planet_state: DummyPlanetState, // contains rocket and energy cells info
 }
 #[derive(Message)]
 pub struct ReceivedPlanetGenerate {

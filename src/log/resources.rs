@@ -1,13 +1,14 @@
 use std::collections::VecDeque;
 use bevy::prelude::*;
 
+/// General log message structure
 #[derive(Message)]
 pub struct LogMessage {
     pub level: LogLevel,
     pub message: String,
 }
 
-// Still don't know if useful
+/// Indicates the gravity of the message. Used to print with different colors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LogLevel {
     Basic,
@@ -22,6 +23,7 @@ pub struct LogEntry {
     pub message: Box<str>, // saves 8 byte per entry
 }
 
+/// This is the struct that stores all the log messages
 #[derive(Resource)]
 pub struct LogStore {
     entries: VecDeque<LogEntry>,

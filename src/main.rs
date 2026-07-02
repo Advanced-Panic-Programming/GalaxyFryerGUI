@@ -33,7 +33,7 @@ use crate::simulation_end::plugin::SimulationEndPlugin;
 fn main() {
 
     App::new()
-        // ===== Default Plugins ===== (MUST be before everything else)
+        // ===== Default Plugins ===== (MUST be before everything else as a Bevy constraint)
         .add_plugins(DefaultPlugins
             .set(ImagePlugin::default_nearest())
             .set(WindowPlugin {
@@ -66,6 +66,9 @@ fn main() {
         .run();
 }
 
+/// This system modifies the application window to 'BorderlessFullscreen'. We have tried to start the application already in this mode,
+/// but it caused problems related to how Bevy works and with the OS.
+/// So this is a work-around that manages to set the window to full screen.
 fn set_fullscreen(mut windows: Query<&mut Window>) {
     for mut win in windows.iter_mut() {
         win.mode = WindowMode::BorderlessFullscreen(MonitorSelection::Current);

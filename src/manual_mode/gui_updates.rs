@@ -56,6 +56,7 @@ pub fn update_tab_selector_colors(
     }
 }
 
+/// This system moves the planet orbit up when the manual mode is active in order to not cover up the planets.
 pub fn update_orbit_for_manual_mode(
     state: Res<ManualModePanel>,
     mut orbit: ResMut<GalaxyOrbit>,

@@ -65,7 +65,7 @@ pub fn spawn_cutscene_visuals(
                 TextureAtlasLayout::from_grid(UVec2::splat(72), 144, 1, None, None),
             );
 
-            // PlanetStill (z = 103): shows the intact planet, scales in then fades out at impact.
+            // PlanetStill: shows the intact planet, scales in then fades out at impact.
             commands.spawn((
                 CutsceneEntity,
                 CutsceneAnim::PlanetStill,
@@ -86,7 +86,7 @@ pub fn spawn_cutscene_visuals(
                 TextureAtlasLayout::from_grid(UVec2::splat(72), EXPLOSION_ANIMATION_FRAMES as u32, 1, None, None),
             );
 
-            // PlanetDestruction (z = 103): break-apart sequence starting at impact.
+            // PlanetDestruction: break-apart sequence starting at impact.
             commands.spawn((
                 CutsceneEntity,
                 CutsceneAnim::PlanetDestruction { num_frames: EXPLOSION_ANIMATION_FRAMES },
@@ -102,7 +102,7 @@ pub fn spawn_cutscene_visuals(
                 Transform::from_xyz(0.0, 30.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(PLANET_SPRITE_SCALE))
             ));
 
-            // Asteroid sprite (z = 104 → in front of asteroid).
+            // Asteroid sprite → in front of planet.
             // asteroid.png is 72×72 px
             let asteroid_atlas = layouts.add(
                 TextureAtlasLayout::from_grid(UVec2::splat(72), 144, 1, None, None),
@@ -120,7 +120,7 @@ pub fn spawn_cutscene_visuals(
                     }),
                     ..default()
                 },
-                Transform::from_xyz(700.0, 0.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
+                Transform::from_xyz(700.0, 0.0, CUTSCENE_ELEMENTS_Z + 1.0).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
             ));
 
             let explosion_layout = layouts.add(
@@ -151,7 +151,7 @@ pub fn spawn_cutscene_visuals(
                     .with_scale(Vec3::splat(EXPLOSION_SPRITE_SCALE)),
             ));
 
-            // Caption text (z = 105).
+            // Caption text.
             commands.spawn((
                 CutsceneEntity,
                 CutsceneAnim::Caption,
@@ -174,7 +174,7 @@ pub fn spawn_cutscene_visuals(
                 TextureAtlasLayout::from_grid(UVec2::splat(72), 144, 1, None, None),
             );
 
-            // Asteroid sprite (z = 103): shows the intact asteroid, scales in then fades out at impact.
+            // Asteroid sprite: shows the intact asteroid, scales in then fades out at impact.
             // Centered at origin so the rocket nose aligns with it at impact.
             commands.spawn((
                 CutsceneEntity,
@@ -196,7 +196,7 @@ pub fn spawn_cutscene_visuals(
                 TextureAtlasLayout::from_grid(UVec2::splat(72), ASTEROID_ANIMATION_FRAMES as u32, 1, None, None),
             );
 
-            // AsteroidDestruction (z = 104): break-apart sequence starting at impact.
+            // AsteroidDestruction: break-apart sequence starting at impact.
             commands.spawn((
                 CutsceneEntity,
                 CutsceneAnim::AsteroidDestruction {num_frames: ASTEROID_ANIMATION_FRAMES},
@@ -212,10 +212,7 @@ pub fn spawn_cutscene_visuals(
                 Transform::from_xyz(0.0, 0.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
             ));
 
-            // Rocket sprite (z = 104 → in front of asteroid).
-            // rocket_pixel.png is 92×43 px (cropped from clean_rocket.png, facing left).
-            // At scale 2.5 → 230×107 px.  Half-width = 115.
-            // Final x = 80 → nose at 80 − 115 = −35, well inside the asteroid.
+            // Rocket sprite
             commands.spawn((
                 CutsceneEntity,
                 CutsceneAnim::IncomingRocketSprite,
@@ -224,7 +221,7 @@ pub fn spawn_cutscene_visuals(
                     color: Color::srgba(1.0, 1.0, 1.0, 0.0),
                     ..default()
                 },
-                Transform::from_xyz(700.0, 0.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(ROCKET_SPRITE_SCALE)),
+                Transform::from_xyz(700.0, 0.0, CUTSCENE_ELEMENTS_Z + 1.0).with_scale(Vec3::splat(ROCKET_SPRITE_SCALE)),
             ));
 
             let explosion_layout = layouts.add(
@@ -255,7 +252,7 @@ pub fn spawn_cutscene_visuals(
                     .with_scale(Vec3::splat(EXPLOSION_SPRITE_SCALE)),
             ));
 
-            // Caption text (z = 105).
+            // Caption text
             commands.spawn((
                 CutsceneEntity,
                 CutsceneAnim::Caption,
@@ -283,7 +280,7 @@ pub fn animate_cutscene(
     let t = timer.0.elapsed_secs();
     let gf = global_fade(t);
 
-    // ── Sprite entities ───────────────────────────────────────────────────
+    // Sprite entities
     for (anim, mut sprite, mut transform) in sprite_q.iter_mut() {
         match anim {
             CutsceneAnim::Overlay => {
@@ -339,7 +336,7 @@ pub fn animate_cutscene(
                 let scale = tween(t, 0.3, 0.9, 0.0, 3.0);
                 transform.scale = Vec3::splat(scale);
                 let alpha = tween(t, 0.3, 0.9, 0.0, 1.0)  // fade in
-                    * tween(t, 1.1, 1.5, 1.0, 0.0)   // fade out as destruction begins
+                    * tween(t, 1.1, 1.5, 1.0, 0.0) // fade out as destruction begins
                     * gf;
                 sprite.color = with_alpha(sprite.color, alpha);
             }
@@ -385,7 +382,7 @@ pub fn animate_cutscene(
                 sprite.color = with_alpha(sprite.color, alpha);
             }
 
-            CutsceneAnim::Caption => {} // I like it to be still
+            CutsceneAnim::Caption => {} // We could animate the text, but I like it to be still
         }
     }
 }
@@ -407,7 +404,7 @@ pub fn update_cutscene(
         for entity in entities.iter() {
             commands.entity(entity).despawn();
         }
-        // Start the next queued cutscene (or None if the queue is empty).
+        // Start the next queued cutscene if the queue is not empty
         active_cutscene.current = active_cutscene.pending.pop_front();
         active_cutscene.spawned = false;
         timer.0.reset();

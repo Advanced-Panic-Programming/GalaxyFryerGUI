@@ -9,9 +9,7 @@ pub struct PlanetViewPlugin;
 impl Plugin for PlanetViewPlugin {
     fn build(&self, app: &mut App) {
         app
-            // ── OnEnter ───────────────────────────────────────────────────────
-            // chain() guarantees cleanup → spawn_corner_planet → spawn_planet_view
-            // in that exact order.
+            // OnEnter
             .add_systems(
                 OnEnter(PlanetView),
                 (
@@ -19,18 +17,17 @@ impl Plugin for PlanetViewPlugin {
                     cleanup,
                     spawn_corner_planet_system,
                     spawn_planet_view_system,
-                ).chain(),
+                ).chain(), // chain() guarantees cleanup → spawn_corner_planet → spawn_planet_view in that exact order.
             )
-            // ── Update ────────────────────────────────────────────────────────
+            // Update
             .add_systems(
                 Update,
                 (
                     // Full respawn when the selected planet changes.
-                    // Must run before patch systems so they don't try to query
+                    // Must run before the other systems so they don't try to query
                     // entities that were just despawned.
                     on_planet_changed,
-                    // Patch systems — react to data changes on the current planet.
-                    // These are no-ops when their respective resource is unchanged.
+                    // These systems react to data changes on the current planet.
                     update_terrain_and_rocket,
                     update_energy_cells,
                     update_explorers,
@@ -40,11 +37,11 @@ impl Plugin for PlanetViewPlugin {
                     periodically_ask_planet_state,
                     update_terrain_size_on_resize,
                 ).run_if(in_state(PlanetView))
-                    // Ensure on_planet_changed always completes before the patch
-                    // systems run, so patches never operate on stale entities.
+                    // Ensure on_planet_changed always completes before the other
+                    // systems run, in order to never operate on stale entities.
                     .chain(),
             )
-            // ── OnExit ────────────────────────────────────────────────────────
+            // OnExit
             .add_systems(OnExit(PlanetView), cleanup);
     }
 }

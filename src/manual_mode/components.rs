@@ -29,9 +29,9 @@ pub struct TabContent {
     pub tab: Tab,
 }
 
-// ---------------------------------------------------------------
+// ==========================
 //      Spinners Buttons
-// ---------------------------------------------------------------
+// ==========================
 #[derive(Component)]
 pub struct PlanetSpinnerValue; // Used to update the spinner value
 
@@ -41,6 +41,7 @@ pub struct PlanetSpinnerDecrementButton;
 #[derive(Component)]
 pub struct PlanetSpinnerIncrementButton;
 
+// Same scheme as the planet spinner above applied to all the other spinners below
 #[derive(Component)]
 pub struct GenerateResourceSpinnerValue {
     pub explorer_id: ID,
@@ -71,18 +72,18 @@ pub struct CombinableResourceSpinnerIncrementButton{
     pub explorer_id: ID,
 }
 
-// ---------------------------------------------------------------
+// ==========================
 //      Galaxy Tab Buttons
-// ---------------------------------------------------------------
+// ==========================
 #[derive(Component)]
 pub struct SendSunrayButton;
 
 #[derive(Component)]
 pub struct SendAsteroidButton;
 
-// ---------------------------------------------------------------
-//      Explorer1/2 Tab Buttons and Markers
-// ---------------------------------------------------------------
+// ====================================================
+//        Explorer1/2 Tab Buttons and Markers
+// ====================================================
 #[derive(Component)]
 pub struct MoveButton {
     pub explorer_id: ID,

@@ -22,9 +22,6 @@ impl Plugin for AppStateManagerPlugin {
             .add_message::<PlanetViewPressed>()
             .add_message::<ActiveManualMode>()
             .add_message::<ActiveAutomaticMode>()
-            // ===== Init State =====
-            // .init_state::<AppState>() // Initialize AppStates : Default (SetUpSimulation)
-
             // Update systems executed in every AppState
             // Systems with ResMut<NextState<AppState>> do NOT need run_if bc the resource is created with init_resource()
             .add_systems(Update, (

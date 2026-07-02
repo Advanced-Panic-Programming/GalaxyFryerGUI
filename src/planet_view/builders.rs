@@ -1,8 +1,3 @@
-//! Pure spawn helpers.
-//!
-//! Every function in this module **only spawns entities** — no queries, no
-//! resource mutations, no change detection. All update logic lives in `systems`.
-
 use bevy::ecs::relationship::RelatedSpawnerCommands;
 use bevy::prelude::*;
 use common_game::utils::ID;
@@ -12,7 +7,9 @@ use crate::planet_view::components::*;
 use crate::planet_view::utils::*;
 use crate::setup_simulation::resources::{EnergyCellsSpritesData, ExplorerSpriteData, ExplorerSpriteInfo, ExplorersData, PlanetInfo, PlanetSpriteInfo, PlanetTerrainSpriteInfo, RocketSpritesData};
 
-// ── Corner planet ─────────────────────────────────────────────────────────────
+// =========================
+//      Corner planet
+// =========================
 
 /// Spawns the animated corner-planet sprite sheet.
 /// The atlas is a single row of 144 frames, each 72×72 px.
@@ -47,12 +44,11 @@ pub fn spawn_corner_planet(
     ));
 }
 
-// ── Full planet view ──────────────────────────────────────────────────────────
-
+// =========================
+//     Full planet view
+// =========================
 /// Spawns the complete planet view: terrain, rocket, energy cells and explorers.
-///
-/// All entities are children of an invisible root (Transform + Visibility) so
-/// they can be bulk-despawned via `despawn_related::<ChildOf>()` on the root.
+/// All entities are children of an invisible root (Transform + Visibility) so they can be despawned via the root.
 pub fn spawn_planet_view(
     commands: &mut Commands,
     planet_info: &PlanetInfo,
@@ -94,9 +90,7 @@ pub fn spawn_planet_view(
 
 }
 
-// ── Terrain ───────────────────────────────────────────────────────────────────
-
-/// Spawns the 1920×1080 terrain background.
+/// Spawns the terrain background.
 pub fn spawn_terrain_background(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     planet_info: &PlanetInfo,
@@ -115,8 +109,6 @@ pub fn spawn_terrain_background(
         TerrainBackground,
     ));
 }
-
-// ── Rocket ────────────────────────────────────────────────────────────────────
 
 /// Spawns the rocket sprite (only if the planet supports one).
 pub fn spawn_rocket(
@@ -144,8 +136,6 @@ pub fn spawn_rocket(
     ));
 }
 
-// ── Energy cells ──────────────────────────────────────────────────────────────
-
 /// Spawns the full row of energy-cell sprites.
 pub fn spawn_energy_cells(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
@@ -167,8 +157,6 @@ pub fn spawn_energy_cells(
         ));
     }
 }
-
-// ── Explorers ─────────────────────────────────────────────────────────────────
 
 /// Spawns whichever explorers are currently on `planet_index`.
 pub fn spawn_explorers(
@@ -232,9 +220,7 @@ fn spawn_single_explorer(
         Transform::from_translation(position),
         ExplorerSprite { explorer_id },
     ));
-
-    // Text 2d auto-inserts Transform as a required component; we override it via
-    // .insert() to avoid a duplicate-component conflict in the spawn tuple.
+    
     parent
         .spawn((
             Text2d::new(format!("{bag}")),
@@ -245,10 +231,7 @@ fn spawn_single_explorer(
         .insert(Transform::from_translation(bag_label_pos(position)));
 }
 
-// ── Image-selection helpers ───────────────────────────────────────────────────
-// These small pure functions centralise every "pick the right handle" decision
-// so callers (spawn + update) share a single source of truth.
-
+// Image-selection helpers: return the correct sprite to spawn based on the current state
 pub fn terrain_image(
     planet_info: &PlanetInfo,
     terrain_sprites: &PlanetTerrainSpriteInfo,
@@ -287,10 +270,7 @@ pub fn explorer_image(alive: bool, sprite_info: &ExplorerSpriteInfo) -> Handle<I
     }
 }
 
-// ── Public re-export of single-explorer spawn ─────────────────────────────────
-// Exposed so `systems::update_explorers` can spawn a late-arriving explorer
-// into an existing view root without duplicating the spawn logic.
-
+// `systems::update_explorers` can spawn a late-arriving explorer into an existing view root without duplicating the spawn logic.
 pub fn spawn_single_explorer_pub(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     explorer_id: ID,

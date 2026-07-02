@@ -5,7 +5,9 @@ use crate::legend::bundles::*;
 use crate::legend::components::{LegendUI, ModeLegendKey, ModeLegendLabel};
 use crate::setup_orchestrator::resources::{CurrentOrchestratorMode, OrchestratorMode};
 
-// Builder functions
+// =====================
+//   Builder functions
+// =====================
 fn keycap() -> KeyCapBundle {
 
     KeyCapBundle {
@@ -131,7 +133,9 @@ fn legend_row_planet_range(
         });
 }
 
-// Spawn/Despawn functions
+// ===========================
+//   Spawn/Despawn functions
+// ===========================
 pub fn spawn_legend(
     mut commands: Commands,
     asset_server: Res<AssetServer>,

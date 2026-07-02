@@ -5,6 +5,7 @@ use super::messages::*;
 use crate::app_states::*;
 use crate::AppState::*;
 use crate::galaxy_view::messages::{ReceivedAutomaticModeAck, ReceivedManualModeAck, ReceivedSimulationEnd};
+use crate::manual_mode::resources::ManualModePanel;
 use crate::setup_orchestrator::resources::{CurrentOrchestratorMode, OrchestratorMode, ToOrchestrator};
 
 pub fn handle_setup_simulation_completed(
@@ -32,6 +33,7 @@ pub fn handle_play_pressed(
     mut next_state: ResMut<NextState<AppState>>,
     gui_to_orchestrator: Res<ToOrchestrator>,
     current_mode: Res<CurrentMode>,
+    mut manual_mode_panel: ResMut<ManualModePanel>,
 ) {
     if !message.is_empty() {
         message.clear();
@@ -39,6 +41,8 @@ pub fn handle_play_pressed(
         next_state.set(GalaxyView);
 
         if current_mode.current == Mode::Automatic {
+            manual_mode_panel.visible = false; // Resolves the sequent issue:
+                // Play -> AutomaticMode -> Esc -> Play -> BUG: manual mode panel visible
             let _ = gui_to_orchestrator.0.send(ResumeSimulationFromAutomatic);
         } else if current_mode.current == Mode::Manual {
             let _ = gui_to_orchestrator.0.send(ResumeSimulationFromManual);
@@ -105,13 +109,13 @@ pub fn handle_simulation_completed(
     }
 }
 
-/// The current flow to set manual mode:
+/// Messages flow to set 'manual mode':
 /// 1) GUI sends 'ManualMode' message to the orchestrator
 /// 2) Orchestrator sends 'ManualModeAck' to the GUI
-/// 3) GUI generates 'ReceivedManualModeAck' event and sets the 'CurrentOrchestratorMode' resource to ManualMode
+/// 3) GUI generates 'ReceivedManualModeAck' event
 /// 4) The event ReceivedManualModeAck is here handled:
-/// - another event is generated: 'ActiveManualMode'
-/// - and the 'CurrentOrchestratorMode' resource is set to ManualMode
+///     - another event is generated: 'ActiveManualMode'
+///     - and the 'CurrentOrchestratorMode' resource is set to 'ManualMode'
 /// 5) The new 'ActiveManualMode' event is handled in the game systems in order to enable the manual mode menu
 pub fn handle_manual_mode(
     mut message: MessageReader<ReceivedManualModeAck>,
@@ -122,17 +126,16 @@ pub fn handle_manual_mode(
         message.clear();
         manual_mode_writer.write(ActiveManualMode);
         orchestrator_mode.mode = OrchestratorMode::ManualMode;
-        //TODO! enable menu manual mode (new plugin)
     }
 }
 
-/// The current flow to set automatic mode:
+/// Messages flow to set automatic mode:
 /// 1) GUI sends 'AutomaticMode' message to the orchestrator
 /// 2) Orchestrator sends 'AutomaticModeAck' to the GUI
 /// 3) GUI generates 'ReceivedAutomaticModeAck' event
 /// 4) The event ReceivedAutomaticModeAck is here handled:
-/// - another event is generated: 'ActiveAutomaticMode'
-/// - and the 'CurrentOrchestratorMode' resource is set to AutomaticMode
+///     - another event is generated: 'ActiveAutomaticMode'
+///     - and the 'CurrentOrchestratorMode' resource is set to 'AutomaticMode'
 /// 5) The new 'ActiveAutomaticMode' event is handled in the game systems in order to disable the manual mode menu
 pub fn handle_automatic_mode(
     mut message: MessageReader<ReceivedAutomaticModeAck>,
@@ -143,6 +146,5 @@ pub fn handle_automatic_mode(
         message.clear();
         automatic_mode_writer.write(ActiveAutomaticMode);
         orchestrator_mode.mode = OrchestratorMode::AutomaticMode;
-        //TODO! disable manual mode menu (new plugin)
     }
 }

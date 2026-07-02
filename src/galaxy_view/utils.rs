@@ -12,7 +12,7 @@ pub const EXPLORER_INITIAL_SPLAT: f32 = 0.5;
 pub const GALAXY_MAP_SPRITE_PATH: &str = "galaxy/galaxy_map.png";
 
 // Original 1020x1020
-pub const GALAXY_MAP_SIZE: Vec2 = Vec2::new(244.0, 244.0); // Referred to 1920x1080
+pub const GALAXY_MAP_SIZE: Vec2 = Vec2::new(244.0, 244.0);
 pub const GALAXY_MAP_X: f32 = 250.0;
 pub const GALAXY_MAP_Y: f32 = 400.0;
 pub const GALAXY_MAP_Z: f32 = 50.0;

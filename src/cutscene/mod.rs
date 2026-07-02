@@ -3,7 +3,6 @@ use common_game::utils::ID;
 pub mod plugin;
 mod systems;
 mod resources;
-pub mod messages;
 mod utils;
 mod components;
 
