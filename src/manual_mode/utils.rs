@@ -26,7 +26,7 @@ pub const TAB_WIDTH: f32 = 170.0;
 pub const EXPLOER_TAB_COLUMNS_GAP: f32 = 80.0; // px
 
 // Bag column (sits between the button column and the explorer sprite)
-pub const BAG_COLUMN_WIDTH: f32 = 160.0; // px
+pub const BAG_COLUMN_WIDTH: f32 = 180.0; // px
 
 pub const BTN_BG: Color = Color::srgb(0.26, 0.18, 0.40); // Color::srgb(0.12, 0.22, 0.42);
 pub const BTN_HOVER_BG: Color = Color::srgb(0.30, 0.22, 0.44); // Color::srgb(0.42, 0.18, 0.42);

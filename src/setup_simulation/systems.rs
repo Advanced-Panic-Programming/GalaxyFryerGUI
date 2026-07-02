@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use bevy::audio::Volume;
 use bevy::prelude::*;
 use bevy::camera::ScalingMode;
 use bevy::window::WindowResized;
@@ -265,8 +266,41 @@ pub fn play_background_music(
 ) {
     commands.spawn((
         AudioPlayer::new(asset_server.load(SOUNDTRACK_PATH)),
-        PlaybackSettings::LOOP,
+        PlaybackSettings {
+            volume: Volume::Linear(0.1), // 0.0 (decrease) - 1.0 (default) - ... (increase)
+            ..PlaybackSettings::LOOP
+        },
     ));
+}
+
+// Loads the button click sound so that it's always available for the systems
+pub fn init_button_click_sound_resource(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let sound_handle = asset_server.load(BUTTON_CLICK_SOUND_PATH);
+    commands.insert_resource(ButtonClickSound(sound_handle));
+}
+
+// Systems with &Interaction are executed in parallel so that there can be more than one system that reads the same queue
+// This way the systems that handle the buttons logic will work normally
+pub fn play_sound_on_button_press(
+    mut commands: Commands,
+    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>)>,
+    sound_resource: Res<ButtonClickSound>,
+) {
+    for interaction in &mut interaction_query {
+        if *interaction == Interaction::Pressed {
+            // Spawn an AudioPlayer with DESPAWN settings so it deletes itself when finished
+            commands.spawn((
+                AudioPlayer::new(sound_resource.0.clone()),
+                PlaybackSettings {
+                    volume: Volume::Linear(3.0), // 0.0 (decrease) - 1.0 (default) - ... (increase)
+                    ..PlaybackSettings::DESPAWN
+                },
+            ));
+        }
+    }
 }
 
 // SetupSimulationEnd

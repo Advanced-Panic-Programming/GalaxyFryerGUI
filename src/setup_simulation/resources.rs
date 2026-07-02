@@ -204,3 +204,6 @@ pub struct EnergyCellsSpriteInfo {
     pub empty: Handle<Image>,
     pub charged: Handle<Image>,
 }
+
+#[derive(Resource)]
+pub struct ButtonClickSound(pub Handle<AudioSource>);
