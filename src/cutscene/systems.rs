@@ -49,10 +49,10 @@ pub fn spawn_cutscene_visuals(
         CutsceneAnim::Overlay,
         Sprite {
             color: Color::srgba(0.0, 0.0, 0.0, 0.0),
-            custom_size: Some(Vec2::new(1920.0, 1080.0)),
+            custom_size: Some(Vec2::splat(10000.0)),
             ..default()
         },
-        Transform::from_xyz(0.0, 0.0, 100.0), // (z = 100 so that it's on top of everything)
+        Transform::from_xyz(0.0, 0.0, CUTSCENE_BASE_Z),
     ));
 
     match cutscene_type {
@@ -78,7 +78,7 @@ pub fn spawn_cutscene_visuals(
                     }),
                     ..default()
                 },
-                Transform::from_xyz(0.0, 30.0, 103.0).with_scale(Vec3::splat(3.0)),
+                Transform::from_xyz(0.0, 30.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(3.0)),
             ));
 
             // Atlas for the destruction animation
@@ -99,7 +99,7 @@ pub fn spawn_cutscene_visuals(
                     }),
                     ..default()
                 },
-                Transform::from_xyz(0.0, 30.0, 103.0).with_scale(Vec3::splat(PLANET_SPRITE_SCALE))
+                Transform::from_xyz(0.0, 30.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(PLANET_SPRITE_SCALE))
             ));
 
             // Asteroid sprite (z = 104 → in front of asteroid).
@@ -120,7 +120,7 @@ pub fn spawn_cutscene_visuals(
                     }),
                     ..default()
                 },
-                Transform::from_xyz(700.0, 0.0, 104.0).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
+                Transform::from_xyz(700.0, 0.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
             ));
 
             let explosion_layout = layouts.add(
@@ -147,7 +147,7 @@ pub fn spawn_cutscene_visuals(
                     }),
                     ..default()
                 },
-                Transform::from_xyz(0.0, 30.0, 104.5)
+                Transform::from_xyz(0.0, 30.0, CUTSCENE_ELEMENTS_Z)
                     .with_scale(Vec3::splat(EXPLOSION_SPRITE_SCALE)),
             ));
 
@@ -162,7 +162,7 @@ pub fn spawn_cutscene_visuals(
                     ..default()
                 },
                 TextColor(Color::srgba(1.0, 0.3, 0.1, 1.0)),
-                Transform::from_xyz(0.0, CAPTION_POSITION_Y, 105.0),
+                Transform::from_xyz(0.0, CAPTION_POSITION_Y, CUTSCENE_ELEMENTS_Z),
             ));
         }
 
@@ -188,7 +188,7 @@ pub fn spawn_cutscene_visuals(
                     }),
                     ..default()
                 },
-                Transform::from_xyz(0.0, 30.0, 103.0).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
+                Transform::from_xyz(0.0, 30.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
             ));
 
             // Atlas for the destruction animation
@@ -209,7 +209,7 @@ pub fn spawn_cutscene_visuals(
                     }),
                     ..default()
                 },
-                Transform::from_xyz(0.0, 0.0, 103.0).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
+                Transform::from_xyz(0.0, 0.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(ASTEROID_SPRITE_SCALE)),
             ));
 
             // Rocket sprite (z = 104 → in front of asteroid).
@@ -224,7 +224,7 @@ pub fn spawn_cutscene_visuals(
                     color: Color::srgba(1.0, 1.0, 1.0, 0.0),
                     ..default()
                 },
-                Transform::from_xyz(700.0, 0.0, 103.5).with_scale(Vec3::splat(ROCKET_SPRITE_SCALE)),
+                Transform::from_xyz(700.0, 0.0, CUTSCENE_ELEMENTS_Z).with_scale(Vec3::splat(ROCKET_SPRITE_SCALE)),
             ));
 
             let explosion_layout = layouts.add(
@@ -251,7 +251,7 @@ pub fn spawn_cutscene_visuals(
                     }),
                     ..default()
                 },
-                Transform::from_xyz(0.0, 0.0, 104.5)
+                Transform::from_xyz(0.0, 0.0, CUTSCENE_ELEMENTS_Z)
                     .with_scale(Vec3::splat(EXPLOSION_SPRITE_SCALE)),
             ));
 
@@ -266,7 +266,7 @@ pub fn spawn_cutscene_visuals(
                     ..default()
                 },
                 TextColor(Color::srgba(1.0, 0.92, 0.3, 1.0)),
-                Transform::from_xyz(0.0, CAPTION_POSITION_Y, 105.0),
+                Transform::from_xyz(0.0, CAPTION_POSITION_Y, CUTSCENE_ELEMENTS_Z),
             ));
         }
     }
