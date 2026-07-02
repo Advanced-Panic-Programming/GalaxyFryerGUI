@@ -1,6 +1,4 @@
-use std::ops::DerefMut;
 use bevy::prelude::*;
-use common_game::utils::ID;
 use crate::setup_simulation::resources::*;
 use crate::galaxy_view::components::*;
 use crate::galaxy_view::messages::{ReceivedExplorerBag, ReceivedExplorerMove, ReceivedExplorerPosition, ReceivedKilledExplorer, ReceivedPlanetCombine, ReceivedPlanetDestroyed, ReceivedPlanetGenerate, ReceivedPlanetState};
@@ -11,9 +9,24 @@ use crate::manual_mode::resources::{CombinableResourcesOnPlanet, CombineResource
 // === Setup Systems ===
 // =====================
 
-pub fn spawn_planets(
+pub fn spawn_galaxy_map(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+) {
+    commands.spawn((
+        Sprite {
+            image: asset_server.load(GALAXY_MAP_SPRITE_PATH),
+            custom_size: Some(GALAXY_MAP_SIZE),
+            ..default()
+        },
+        Transform::from_translation(Vec3::new(GALAXY_MAP_X, GALAXY_MAP_Y, GALAXY_MAP_Z)),
+        GalaxyMap,
+        SpawnedByGalaxyView,
+    ));
+}
+
+pub fn spawn_planets(
+    mut commands: Commands,
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
     planet_data: Res<PlanetsSpritesData>,
     mut galaxy: ResMut<Galaxy>,
@@ -27,12 +40,12 @@ pub fn spawn_planets(
     for planet in planet_data.planets.iter() {
 
         let sprite_path = if planet.alive {
-            &planet.sprite_path
+            &planet.alive_sprite
         } else {
-            &planet.destroyed_sprite_path
+            &planet.destroyed_sprite
         };
 
-        let texture: Handle<Image> = asset_server.load(sprite_path);
+        let texture: Handle<Image> = sprite_path.clone();
 
         let entity  = commands.spawn((
             Sprite {
@@ -62,14 +75,12 @@ pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfi
     for (mut config, mut sprite) in &mut query {
         config.frame_timer.tick(time.delta());
 
-        if config.frame_timer.just_finished() {
-            if let Some(atlas) = &mut sprite.texture_atlas {
+         if config.frame_timer.just_finished() && let Some(atlas) = &mut sprite.texture_atlas {
                 if atlas.index >= config.last_sprite_index {
                     atlas.index = config.first_sprite_index;
                 } else {
                     atlas.index += 1;
                 }
-            }
         }
     }
 }
@@ -77,7 +88,6 @@ pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfi
 pub fn update_planets_sprites(
     time: Res<Time>,
     orbit: Res<GalaxyOrbit>,
-    asset_server: Res<AssetServer>,
     mut planets: ResMut<PlanetsSpritesData>,
     mut query: Query<(&mut Transform, &mut Sprite, &mut Planet)>,
 ) {
@@ -109,22 +119,17 @@ pub fn update_planets_sprites(
 
         // Check if the planet exploded
         let should_be_alive = curr_planet.alive;
-        let current_handle = &sprite.image;
 
         let expected = if should_be_alive {
-            &curr_planet.sprite_path
+            &curr_planet.alive_sprite
         } else {
-            &curr_planet.destroyed_sprite_path
+            &curr_planet.destroyed_sprite
         };
 
         // if handle doesn't match expected image: update
-        if asset_server
-            .get_path(current_handle)
-            .map_or(true, |p| p.path().to_str() != Some(expected.as_str()))
-        {
-            sprite.image = asset_server.load(expected);
+        if sprite.image != *expected {
+            sprite.image = expected.clone();
         }
-
     }
 }
 
@@ -151,11 +156,11 @@ pub fn setup_explorer_arrow_atlas(
 
     pub fn spawn_explorer_arrows(
         mut commands: Commands,
-        asset_server: Res<AssetServer>,
         explorers: Res<ExplorersData>,
         atlas: Res<ExplorerArrowAtlas>,
         planets: Query<(Entity, &Planet)>,
         arrows: Query<&ExplorerArrow>,
+        explorer_sprite_data: Res<ExplorerSpriteData>,
     ) {
         let explorer_states = [
             (0, &explorers.explorer1),
@@ -167,9 +172,9 @@ pub fn setup_explorer_arrow_atlas(
                 13,
                 ANIMATION_FPS,
             );
-            if !explorer.is_alive() {
-                continue;
-            }
+            // if !explorer.is_alive() {
+            //     continue;
+            // }
             let arrow_exists = arrows
                 .iter()
                 .any(|a| a.explorer_id == explorer_id);
@@ -185,8 +190,20 @@ pub fn setup_explorer_arrow_atlas(
                 continue;
             };
             let texture_path = match explorer_id {
-                0 => EXPLORER_1_SPRITE_PATH,
-                1 => EXPLORER_2_SPRITE_PATH,
+                0 => {
+                    if explorer.is_alive() {
+                        explorer_sprite_data.explorer1.alive_arrow_sprite.clone()
+                    } else {
+                        explorer_sprite_data.explorer1.dead_arrow_sprite.clone()
+                    }
+                },
+                1 => {
+                    if explorer.is_alive() {
+                        explorer_sprite_data.explorer2.alive_arrow_sprite.clone()
+                    } else {
+                        explorer_sprite_data.explorer2.dead_arrow_sprite.clone()
+                    }
+                },
                 _ => unreachable!(),
             };
             commands
@@ -194,7 +211,7 @@ pub fn setup_explorer_arrow_atlas(
                 .with_children(|parent| {
                     parent.spawn((
                         Sprite {
-                            image: asset_server.load(texture_path),
+                            image: texture_path,
                             custom_size: Some(
                                 Vec2::splat(
                                     EXPLORER_ARROW_DIMENSION,
@@ -304,19 +321,29 @@ pub fn update_explorer_arrow_offsets(
     }
 }
 
-pub fn despawn_dead_explorer_arrows(
-    mut commands: Commands,
+// This system update the arrow sprite to show that the explorer died
+pub fn change_dead_explorers_arrows(
     explorers: Res<ExplorersData>,
-    arrows: Query<(Entity, &ExplorerArrow)>,
+    explorer_sprite_data: Res<ExplorerSpriteData>,
+    mut arrows: Query<(&mut Sprite, &ExplorerArrow)>,
 ) {
-    for (entity, arrow) in arrows.iter() {
-        let alive = match arrow.explorer_id {
-            0 => explorers.explorer1.is_alive(),
-            1 => explorers.explorer2.is_alive(),
-            _ => false,
-        };
-        if !alive {
-            commands.entity(entity).despawn();
+    if !explorers.is_changed() {
+        return;
+    }
+
+    for (mut sprite, arrow) in arrows.iter_mut() {
+        match arrow.explorer_id {
+            0 => {
+                if !explorers.explorer1.is_alive() {
+                    sprite.image = explorer_sprite_data.explorer1.dead_arrow_sprite.clone()
+                }
+            }
+            1 => {
+                if !explorers.explorer2.is_alive() {
+                    sprite.image = explorer_sprite_data.explorer2.dead_arrow_sprite.clone()
+                }
+            }
+            _ => {}
         }
     }
 }
@@ -348,10 +375,8 @@ pub fn update_planets_data(
 
     if !planet_destroyed_reader.is_empty() {
         for msg in planet_destroyed_reader.read() {
-            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) {
-                if planet.get_alive() {
+            if let Some(planet) = planets_data.planets.get_mut(msg.planet_id as usize) && planet.get_alive() {
                     planet.kill();
-                }
             }
             planets_sprites.planets[msg.planet_id as usize].alive = false; //TODO! Implement methods for the struct
         }
@@ -379,96 +404,6 @@ pub fn update_planets_data(
 // ====================
 // ===== Explorer =====
 // ====================
-
-// pub fn bound_explorer_arrows(
-//     mut commands: Commands,
-//     asset_server: Res<AssetServer>,
-//     explorers: Res<ExplorersData>,
-//     planets: Query<(Entity, &Planet)>,
-//     arrows: Query<(Entity, &ExplorerArrow)>,
-// ) {
-//     // Stati esploratori
-//     let explorer_states = [(1, &explorers.explorer1), (2, &explorers.explorer2)];
-//
-//     // Conta esploratori per pianeta
-//     let mut explorers_on_planet = HashMap::<usize, usize>::new();
-//     for (_, e) in &explorer_states {
-//         if e.is_alive() {
-//             *explorers_on_planet.entry(e.get_current_planet_index()).or_insert(0) += 1;
-//         }
-//     }
-//
-//     // Helper: calcola offset per evitare sovrapposizioni
-//     fn explorer_offset(explorer_id: usize, count: usize) -> Vec3 {
-//         match count {
-//             1 => Vec3::new(0.0, EXPLORER_ARROW_VERTICAL_OFFSET, 0.1),
-//             2 => {
-//                 if explorer_id == 1 {
-//                     Vec3::new(-EXPLORER_ARROW_HORIZONTAL_OFFSET, EXPLORER_ARROW_VERTICAL_OFFSET, 0.1)
-//                 } else {
-//                     Vec3::new(EXPLORER_ARROW_HORIZONTAL_OFFSET, EXPLORER_ARROW_VERTICAL_OFFSET, 0.1)
-//                 }
-//             }
-//             _ => Vec3::new(0.0, EXPLORER_ARROW_VERTICAL_OFFSET, 0.1),
-//         }
-//     }
-//
-//     for (explorer_id, explorer) in &explorer_states {
-//         let alive = explorer.is_alive();
-//         let planet_index = explorer.get_current_planet_index();
-//
-//         let existing_arrow_entity = arrows
-//             .iter()
-//             .find(|(_, a)| a.explorer_id == *explorer_id)
-//             .map(|(e, _)| e);
-//
-//         if !alive {
-//             if let Some(ent) = existing_arrow_entity {
-//                 commands.entity(ent).despawn();
-//             }
-//             continue;
-//         }
-//
-//         // Trova l’entity del pianeta
-//         let (planet_entity, _) = match planets.iter().find(|(_, p)| p.index == planet_index) {
-//             Some(p) => p,
-//             None => continue,
-//         };
-//
-//         let same_planet_count = *explorers_on_planet.get(&planet_index).unwrap_or(&1);
-//         let offset = explorer_offset(*explorer_id, same_planet_count);
-//
-//         let texture_path = match explorer_id {
-//             1 => "objects/explorer1_arrow.png",
-//             2 => "objects/explorer2_arrow.png",
-//             _ => unreachable!(),
-//         };
-//         let texture = asset_server.load(texture_path);
-//
-//         match existing_arrow_entity {
-//             None => {
-//                 // Spawn nuova arrow come child del pianeta
-//                 commands.entity(planet_entity).with_children(|parent| {
-//                     parent.spawn((
-//                         Sprite {
-//                             image: texture,
-//                             custom_size: Some(Vec2::new(32.0, 32.0)),
-//                             ..default()
-//                         },
-//                         Transform::from_translation(offset),
-//                         ExplorerArrow { planet_index, explorer_id: *explorer_id },
-//                     ));
-//                 });
-//             }
-//             Some(arrow_ent) => {
-//                 // Aggiorna parent e offset se necessario
-//                 commands.entity(arrow_ent)
-//                     .set_parent_in_place(planet_entity)
-//                     .insert(ExplorerArrow { planet_index, explorer_id: *explorer_id });
-//             }
-//         }
-//     }
-// }
 
 pub fn update_explorer_data (
     // Event readers
@@ -534,7 +469,7 @@ pub fn update_explorer_data (
 
 pub fn cleanup(
     mut commands: Commands,
-    query: Query<Entity, With<SpawnedByGalaxyView>>,
+    query: Query<Entity, (With<SpawnedByGalaxyView>, Without<ChildOf>)>,
 ) {
     for entity in query.iter() {
         commands.entity(entity).despawn();

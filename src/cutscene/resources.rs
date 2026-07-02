@@ -10,6 +10,7 @@ pub struct ActiveCutscene {
     pub spawned: bool,
     /// Cutscene events queued while another is already playing.
     pub pending: VecDeque<CutSceneType>,
+    pub explosion_sound_played: bool,
 }
 
 #[derive(Resource)]

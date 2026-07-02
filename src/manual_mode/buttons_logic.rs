@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use common_game::utils::ID;
 use galaxy_fryer::app::gui_protocol::GUIToOrchestrator;
-use crate::manual_mode::components::{AskCombineButton, AskGenerateButton, CombinableResourceSpinnerDecrementButton, CombinableResourceSpinnerIncrementButton, CombineButton, GenerateButton, GenerateResourceSpinnerDecrementButton, GenerateResourceSpinnerIncrementButton, ManualModePanelRoot, MoveButton, PlanetSpinnerDecrementButton, PlanetSpinnerIncrementButton, PlanetSpinnerValue, SendAsteroidButton, SendSunrayButton, StartAIButton, StopAIButton, TabButton};
-use crate::manual_mode::resources::{CombinableResourcesOnPlanet, GeneratableResourcesOnPlanet, GenerateResourceSpinner, ManualModePanel, PlanetSpinner, Tab};
+use crate::manual_mode::components::{AskCombineButton, AskGenerateButton, CombinableResourceSpinnerDecrementButton, CombinableResourceSpinnerIncrementButton, CombineButton, GenerateButton, GenerateResourceSpinnerDecrementButton, GenerateResourceSpinnerIncrementButton, ManualModePanelRoot, MoveButton, PlanetSpinnerDecrementButton, PlanetSpinnerIncrementButton, SendAsteroidButton, SendSunrayButton, StartAIButton, StopAIButton, TabButton};
+use crate::manual_mode::resources::{CombinableResourcesOnPlanet, GeneratableResourcesOnPlanet, ManualModePanel, PlanetSpinner};
 use crate::setup_orchestrator::resources::ToOrchestrator;
 use crate::setup_simulation::resources::ExplorersData;
 // This module contains all the buttons logic
@@ -57,11 +57,9 @@ pub fn handle_send_sunray(
     }
 
     for interaction in &query {
-        if *interaction == Interaction::Pressed {
-            if let Some(s) = &sender {
-                let planet_id = ID::from(planet_spinner.get_current_value() as u32);
-                let _ = s.0.send(GUIToOrchestrator::SendSunray { planet_id });
-            }
+        if *interaction == Interaction::Pressed && let Some(s) = &sender {
+            let planet_id = ID::from(planet_spinner.get_current_value() as u32);
+            let _ = s.0.send(GUIToOrchestrator::SendSunray { planet_id });
         }
     }
 }
@@ -78,11 +76,9 @@ pub fn handle_send_asteroid(
     }
 
     for interaction in &query {
-        if *interaction == Interaction::Pressed {
-            if let Some(s) = &sender {
-                let planet_id = ID::from(planet_spinner.get_current_value() as u32);
-                let _ = s.0.send(GUIToOrchestrator::SendAsteroid { planet_id});
-            }
+        if *interaction == Interaction::Pressed && let Some(s) = &sender {
+            let planet_id = ID::from(planet_spinner.get_current_value() as u32);
+            let _ = s.0.send(GUIToOrchestrator::SendAsteroid { planet_id});
         }
     }
 }
@@ -102,11 +98,9 @@ pub fn handle_move_to_planet_button(
     }
 
     for (interaction, btn) in &query {
-        if *interaction == Interaction::Pressed {
-            if let Some(s) = &sender {
-                let planet_id = ID::from(planet_spinner.get_current_value() as u32);
-                let _ = s.0.send(GUIToOrchestrator::MoveExplorer { planet_id, explorer_id: btn.explorer_id});
-            }
+        if *interaction == Interaction::Pressed && let Some(s) = &sender {
+            let planet_id = ID::from(planet_spinner.get_current_value() as u32);
+            let _ = s.0.send(GUIToOrchestrator::MoveExplorer { planet_id, explorer_id: btn.explorer_id});
         }
     }
 }
@@ -124,10 +118,8 @@ pub fn handle_ask_generate_button(
     }
 
     for (interaction, btn) in query.iter() {
-        if *interaction == Interaction::Pressed {
-            if let Some(s) = &sender {
-                let _ = s.0.send(GUIToOrchestrator::AskAvailableGenerate {explorer_id: btn.explorer_id});
-            }
+        if *interaction == Interaction::Pressed && let Some(s) = &sender {
+            let _ = s.0.send(GUIToOrchestrator::AskAvailableGenerate {explorer_id: btn.explorer_id});
         }
     }
 }
@@ -145,24 +137,21 @@ pub fn handle_generate_button(
     }
 
     for (interaction, btn) in query.iter() {
-        if *interaction == Interaction::Pressed {
-            if let Some(s) = &sender {
-
-                let current_planet = match btn.explorer_id {
-                    0 => {
-                        explorers_data.explorer1.get_current_planet_index() as u32
-                    }
-                    1 => {
-                        explorers_data.explorer2.get_current_planet_index() as u32
-                    }
-                    _ => { panic!("Explorer index out of bounds")}
-                };
-
-                if let Some(to_generate) =
-                    generate_spinner.get_generate(current_planet).get_current_value() {
-                        let _ = s.0.send(GUIToOrchestrator::AskToGenerate {
-                            explorer_id: btn.explorer_id, resource: *to_generate });
+        if *interaction == Interaction::Pressed && let Some(s) = &sender {
+            let current_planet = match btn.explorer_id {
+                0 => {
+                    explorers_data.explorer1.get_current_planet_index() as u32
                 }
+                1 => {
+                    explorers_data.explorer2.get_current_planet_index() as u32
+                }
+                _ => { panic!("Explorer index out of bounds")}
+            };
+
+            if let Some(to_generate) =
+                generate_spinner.get_generate(current_planet).get_current_value() {
+                    let _ = s.0.send(GUIToOrchestrator::AskToGenerate {
+                        explorer_id: btn.explorer_id, resource: *to_generate });
             }
         }
     }
@@ -223,10 +212,8 @@ pub fn handle_ask_combine_button(
     }
 
     for (interaction, btn) in query.iter() {
-        if *interaction == Interaction::Pressed {
-            if let Some(s) = &sender {
-                let _ = s.0.send(GUIToOrchestrator::AskAvailableCombine {explorer_id: btn.explorer_id} );
-            }
+        if *interaction == Interaction::Pressed && let Some(s) = &sender {
+            let _ = s.0.send(GUIToOrchestrator::AskAvailableCombine {explorer_id: btn.explorer_id} );
         }
     }
 }
@@ -244,25 +231,21 @@ pub fn handle_combine_button(
     }
 
     for (interaction, btn) in query.iter() {
-        if *interaction == Interaction::Pressed {
-            if let Some(s) = &sender {
-
-                let current_planet = match btn.explorer_id {
-                    0 => {
-                        explorers_data.explorer1.get_current_planet_index() as u32
-                    }
-                    1 => {
-                        explorers_data.explorer2.get_current_planet_index() as u32
-                    }
-                    _ => { panic!("Explorer index out of bounds")}
-                };
-
-                if let Some(to_combine) =
-                    combine_spinner.get_combine(current_planet).get_current_value() {
-                    let _ = s.0.send(GUIToOrchestrator::AskToCombine {
-                        explorer_id: btn.explorer_id, combine: *to_combine });
+        if *interaction == Interaction::Pressed && let Some(s) = &sender {
+            let current_planet = match btn.explorer_id {
+                0 => {
+                    explorers_data.explorer1.get_current_planet_index() as u32
                 }
+                1 => {
+                    explorers_data.explorer2.get_current_planet_index() as u32
+                }
+                _ => { panic!("Explorer index out of bounds")}
+            };
 
+            if let Some(to_combine) =
+                combine_spinner.get_combine(current_planet).get_current_value() {
+                let _ = s.0.send(GUIToOrchestrator::AskToCombine {
+                    explorer_id: btn.explorer_id, combine: *to_combine });
             }
         }
     }
@@ -324,10 +307,8 @@ pub fn handle_start_ai_button(
     }
 
     for (interaction, btn) in query.iter() {
-        if *interaction == Interaction::Pressed {
-            if let Some(s) = &sender {
-                let _ = s.0.send(GUIToOrchestrator::StartExplorerAI {explorer_id: btn.explorer_id});
-            }
+        if *interaction == Interaction::Pressed && let Some(s) = &sender {
+            let _ = s.0.send(GUIToOrchestrator::StartExplorerAI {explorer_id: btn.explorer_id});
         }
     }
 }
@@ -343,10 +324,8 @@ pub fn handle_stop_ai_button(
     }
 
     for (interaction, btn) in query.iter() {
-        if *interaction == Interaction::Pressed {
-            if let Some(s) = &sender {
-                let _ = s.0.send(GUIToOrchestrator::StopExplorerAI {explorer_id: btn.explorer_id});
-            }
+        if *interaction == Interaction::Pressed && let Some(s) = &sender {
+            let _ = s.0.send(GUIToOrchestrator::StopExplorerAI {explorer_id: btn.explorer_id});
         }
     }
 }

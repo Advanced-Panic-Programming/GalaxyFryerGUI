@@ -1,9 +1,11 @@
+use bevy::audio::Volume;
 use bevy::prelude::*;
 use crate::cutscene::components::*;
 use crate::cutscene::CutSceneType;
 use crate::cutscene::resources::*;
 use crate::cutscene::utils::*;
 use crate::galaxy_view::messages::*;
+use crate::setup_simulation::resources::{ExplosionSound, RocketSpritesData};
 
 /// Receives `PlanetDestroyedCutscene` / `AsteroidDestroyedCutscene` messages and
 /// stores the cutscene type in `ActiveCutscene`. Ignores new messages while one is playing.
@@ -31,6 +33,7 @@ pub fn spawn_cutscene_visuals(
     mut active: ResMut<ActiveCutscene>,
     asset_server: Res<AssetServer>,
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,
+    rocket_sprites_data: Res<RocketSpritesData>,
 ) {
     // Only run once per cutscene.
     if active.current.is_none() || active.spawned {
@@ -217,7 +220,7 @@ pub fn spawn_cutscene_visuals(
                 CutsceneEntity,
                 CutsceneAnim::IncomingRocketSprite,
                 Sprite {
-                    image: asset_server.load(ROCKET_SPRITE_PATH),
+                    image: rocket_sprites_data.rocket.flying_rocket.clone(),
                     color: Color::srgba(1.0, 1.0, 1.0, 0.0),
                     ..default()
                 },
@@ -273,7 +276,6 @@ pub fn animate_cutscene(
     timer: Res<CutsceneTimer>,
     active: Res<ActiveCutscene>,
     mut sprite_q: Query<(&CutsceneAnim, &mut Sprite, &mut Transform), Without<Text2d>>,
-    mut text_q: Query<(&CutsceneAnim, &mut TextColor), With<Text2d>>,
 ) {
     if active.current.is_none() {
         return;
@@ -290,18 +292,18 @@ pub fn animate_cutscene(
             }
 
             CutsceneAnim::Explosion { num_frames } => {
-                if t < 1.3 {
+                if t < IMPACT_TIME {
                     continue;
                 }
 
-                let progress = ((t - 1.3) / 0.7).clamp(0.0, 1.0);
+                let progress = ((t - IMPACT_TIME) / 0.7).clamp(0.0, 1.0);
 
                 if let Some(atlas) = &mut sprite.texture_atlas {
                     atlas.index = ((progress * *num_frames as f32) as usize)
                         .min(num_frames - 1);
                 }
 
-                let alpha = tween(t, 1.3, 1.45, 0.0, 1.0)
+                let alpha = tween(t, IMPACT_TIME, 1.45, 0.0, 1.0)
                     * tween(t, 1.8, 2.1, 1.0, 0.0)
                     * gf;
 
@@ -319,16 +321,16 @@ pub fn animate_cutscene(
             }
 
             CutsceneAnim::PlanetDestruction { num_frames } => {
-                if t < 1.3 {
+                if t < IMPACT_TIME {
                     continue;   // skip this entity, keep iterating others
                 }
                 // Advance atlas frame: full animation plays over 0.7 s from impact.
-                let progress = ((t - 1.3) / 0.7).clamp(0.0, 1.0);
+                let progress = ((t - IMPACT_TIME) / 0.7).clamp(0.0, 1.0);
                 if let Some(atlas) = &mut sprite.texture_atlas {
                     atlas.index = ((progress * *num_frames as f32) as usize)
                         .min(num_frames - 1);
                 }
-                let alpha = tween(t, 1.3, 1.5, 0.0, 1.0) * gf;
+                let alpha = tween(t, IMPACT_TIME, 1.5, 0.0, 1.0) * gf;
                 sprite.color = with_alpha(sprite.color, alpha);
             }
 
@@ -343,25 +345,25 @@ pub fn animate_cutscene(
             }
 
             CutsceneAnim::AsteroidDestruction { num_frames } => {
-                if t < 1.3 {
+                if t < IMPACT_TIME {
                     continue;   // skip this entity, keep iterating others
                 }
                 if let Some(atlas) = &mut sprite.texture_atlas {
                     let frame = ((t - 0.3).max(0.0) * ASTEROID_ANIMATION_FPS) as usize;
                     atlas.index = frame % num_frames;
                 }
-                let alpha = tween(t, 1.3, 1.5, 0.0, 1.0) * gf;
+                let alpha = tween(t, IMPACT_TIME, 1.5, 0.0, 1.0) * gf;
                 sprite.color = with_alpha(sprite.color, alpha);
             }
 
             CutsceneAnim::IncomingAsteroidSprite { num_frames } => {
                 // Move from x = 700 (off-screen right) to x = 80 (nose inside asteroid at x=0).
-                let x = tween(t, 0.3, 1.3, 700.0, 80.0);
+                let x = tween(t, 0.3, IMPACT_TIME, 700.0, 80.0);
                 transform.translation.x = x;
-                let alpha = if t < 1.3 {
+                let alpha = if t < IMPACT_TIME {
                     tween(t, 0.3, 0.6, 0.0, 1.0)
                 } else {
-                    tween(t, 1.3, 1.6, 1.0, 0.0)
+                    tween(t, IMPACT_TIME, 1.6, 1.0, 0.0)
                 } * gf;
                 sprite.color = with_alpha(sprite.color, alpha);
                 // Advance atlas frame: full animation plays over 0.7 s from impact.
@@ -373,12 +375,12 @@ pub fn animate_cutscene(
 
             CutsceneAnim::IncomingRocketSprite => {
                 // Move from x = 700 (off-screen right) to x = 80 (nose inside asteroid at x=0).
-                let x = tween(t, 0.3, 1.3, 700.0, 80.0);
+                let x = tween(t, 0.3, IMPACT_TIME, 700.0, 80.0);
                 transform.translation.x = x;
-                let alpha = if t < 1.3 {
+                let alpha = if t < IMPACT_TIME {
                     tween(t, 0.3, 0.6, 0.0, 1.0)
                 } else {
-                    tween(t, 1.3, 1.6, 1.0, 0.0)
+                    tween(t, IMPACT_TIME, 1.6, 1.0, 0.0)
                 } * gf;
                 sprite.color = with_alpha(sprite.color, alpha);
             }
@@ -409,6 +411,35 @@ pub fn update_cutscene(
         active_cutscene.current = active_cutscene.pending.pop_front();
         active_cutscene.spawned = false;
         timer.0.reset();
+        active_cutscene.explosion_sound_played = false;
+    }
+}
+
+pub fn play_cutscene_sounds(
+    timer: Res<CutsceneTimer>,
+    mut active: ResMut<ActiveCutscene>,
+    explosion_sound: Res<ExplosionSound>,
+    mut commands: Commands,
+) {
+    if active.current.is_none() {
+        return;
+    }
+
+    if active.explosion_sound_played {
+        return;
+    }
+
+    // Impact
+    if timer.0.elapsed_secs() >= IMPACT_TIME {
+        active.explosion_sound_played = true;
+
+        commands.spawn((
+            AudioPlayer::new(explosion_sound.0.clone()),
+            PlaybackSettings {
+                volume: Volume::Linear(1.0), // 0.0 (decrease) - 1.0 (default) - ... (increase)
+                ..PlaybackSettings::DESPAWN
+            },
+        ));
     }
 }
 

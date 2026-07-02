@@ -1,10 +1,10 @@
 [package]
-name = "AirFryer"
-version = "0.1.0"
+name = "GalaxyFryerGUI"
+version = "0.4.0"
 edition = "2024"
 
 [dependencies]
-bevy = "0.17.2"
+bevy = { version = "0.17.2", features = ["mp3"] }
 galaxy_fryer = {git="ssh://git@github.com/Advanced-Panic-Programming/GalaxyFryer.git"}
 crossbeam-channel = "0.5.15"
 common-game = { git = "https://github.com/unitn-ap-2025/common", branch = "main" }

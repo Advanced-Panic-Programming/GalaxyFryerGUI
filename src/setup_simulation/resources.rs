@@ -1,12 +1,8 @@
 use std::collections::HashSet;
 use bevy::prelude::*;
 use std::result::Result;
-use std::thread::current;
-use common_game::components::planet::DummyPlanetState;
-use common_game::components::resource::{BasicResource, BasicResourceType, ComplexResource, ComplexResourceType};
-use common_game::utils::ID;
-use galaxy_fryer::app::gui_protocol::OrchestratorToGUI;
-use galaxy_fryer::explorer::bag::{Bag, BagView};
+use common_game::components::resource::{BasicResourceType, ComplexResourceType};
+use galaxy_fryer::explorer::bag::BagView;
 
 // Galaxy
 #[derive(Resource, Default)]
@@ -33,8 +29,8 @@ pub struct PlanetSpriteInfo {
     pub angle: f32,
     pub speed: f32,
     pub timer: Timer,
-    pub sprite_path: String,
-    pub destroyed_sprite_path: String,
+    pub alive_sprite: Handle<Image>,
+    pub destroyed_sprite: Handle<Image>,
 }
 
 #[derive(Resource, Default)]
@@ -66,7 +62,6 @@ pub struct PlanetsData {
 }
 #[derive(Resource)]
 pub struct PlanetInfo {
-    id: ID,
     alive: bool,
     energy_cells: Vec<bool>,
     charged_cells_count: usize,
@@ -78,9 +73,8 @@ pub struct PlanetInfo {
 
 impl PlanetInfo {
     // new
-    pub fn new(id: ID, alive: bool, energy_cells: Vec<bool>, charged_cells_count: usize, can_have_rocket: bool, has_rocket: bool, generate: HashSet<BasicResourceType>, combine: HashSet<ComplexResourceType>,) -> PlanetInfo {
+    pub fn new(alive: bool, energy_cells: Vec<bool>, charged_cells_count: usize, can_have_rocket: bool, has_rocket: bool, generate: HashSet<BasicResourceType>, combine: HashSet<ComplexResourceType>,) -> PlanetInfo {
         PlanetInfo {
-            id,
             alive,
             energy_cells,
             charged_cells_count,
@@ -92,23 +86,34 @@ impl PlanetInfo {
     }
 
     // Getters
-    pub fn get_id(&self) -> ID { self.id }
+    // pub fn get_id(&self) -> ID { self.id }
     pub fn get_alive(&self) -> bool { self.alive }
-    pub fn get_charged_energy_cells_count(&self) -> usize { self.charged_cells_count }
+    /// Return a reference to the bool array of the energy cells
+    pub fn get_energy_cells(&self) -> &[bool] { &self.energy_cells }
+    /// Can the planet have a rocket at all?
     pub fn can_have_rocket(&self) -> bool { self.can_have_rocket }
+    /// The planet has a built rocket (true) or not (false)
     pub fn get_rocket(&self) -> bool { self.has_rocket }
-    pub fn get_generate(&self) -> &HashSet<BasicResourceType> { &self.generate }
-    pub fn get_combine(&self) -> &HashSet<ComplexResourceType> { &self.combine }
+    // pub fn get_generate(&self) -> &HashSet<BasicResourceType> { &self.generate }
+    // pub fn get_combine(&self) -> &HashSet<ComplexResourceType> { &self.combine }
 
     // Setters
-    pub fn set_id(&mut self, id: ID) { self.id = id; }
     pub fn kill(&mut self) { self.alive = false; }
     pub fn set_energy_cells(&mut self, energy_cells: Vec<bool>) { self.energy_cells = energy_cells; }
     pub fn set_charged_cells_count(&mut self, charged_cells_count: usize) { self.charged_cells_count = charged_cells_count; }
-    pub fn set_can_have_rocket(&mut self, can_have_rocket: bool) { self.can_have_rocket = can_have_rocket; }
     pub fn set_has_rocket(&mut self, rocket: bool) { self.has_rocket = rocket; }
     pub fn set_generate(&mut self, generate: HashSet<BasicResourceType>) { self.generate = generate; }
     pub fn set_combine(&mut self, combine: HashSet<ComplexResourceType>) { self.combine = combine; }
+}
+
+#[derive(Resource)]
+pub struct PlanetTerrainSpriteData {
+    pub terrain: PlanetTerrainSpriteInfo,
+}
+
+pub struct  PlanetTerrainSpriteInfo {
+    pub(crate) alive: Handle<Image>,
+    pub(crate) destroyed: Handle<Image>,
 }
 
 // Explorers
@@ -175,4 +180,33 @@ pub struct ExplorerSpriteData {
 pub struct ExplorerSpriteInfo {
     pub alive_sprite: Handle<Image>,
     pub dead_sprite: Handle<Image>,
+    pub alive_arrow_sprite: Handle<Image>,
+    pub dead_arrow_sprite: Handle<Image>,
 }
+
+#[derive(Resource)]
+pub struct RocketSpritesData {
+    pub rocket: RocketSpriteInfo,
+}
+
+pub struct RocketSpriteInfo {
+    pub empty_rocket_base: Handle<Image>,
+    pub full_built_rocket: Handle<Image>,
+    pub flying_rocket: Handle<Image>,
+}
+
+#[derive(Resource)]
+pub struct EnergyCellsSpritesData {
+    pub energy_cell: EnergyCellsSpriteInfo,
+}
+
+pub struct EnergyCellsSpriteInfo {
+    pub empty: Handle<Image>,
+    pub charged: Handle<Image>,
+}
+
+#[derive(Resource)]
+pub struct ButtonClickSound(pub Handle<AudioSource>);
+
+#[derive(Resource)]
+pub struct ExplosionSound(pub Handle<AudioSource>);

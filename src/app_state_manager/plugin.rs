@@ -6,6 +6,7 @@ use super::systems::*;
 
 pub struct AppStateManagerPlugin;
 
+/// This plugin handles the transitions between the different app states and the relative buttons events
 impl Plugin for AppStateManagerPlugin {
     fn build(&self, app: &mut App) {
         app

@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy::tasks::futures_lite::StreamExt;
 use crate::log::resources::*;
 
 /// This functions reads all the LogMessage events and adds them to the Log. This way, we only have 1 function responsible for adding messages to the log
@@ -14,6 +13,5 @@ pub(super) fn collect_log_events(
             level: event.level.clone(),
             message: event.message.as_str().into(), // String → Box<str>
         });
-        // println!("{}", event.message); // Debug
     }
 }

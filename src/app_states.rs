@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use common_game::utils::ID;
 
 #[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
 pub enum AppState {

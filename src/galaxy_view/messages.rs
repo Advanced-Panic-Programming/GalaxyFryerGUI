@@ -1,7 +1,7 @@
 use std::collections::HashSet;
-use bevy::prelude::{Message, Resource};
+use bevy::prelude::Message;
 use common_game::components::planet::DummyPlanetState;
-use common_game::components::resource::{BasicResourceType, ComplexResourceType, ResourceType};
+use common_game::components::resource::{BasicResourceType, ComplexResourceType};
 use common_game::utils::ID;
 use galaxy_fryer::explorer::bag::BagView;
 
@@ -14,14 +14,11 @@ pub struct ReceivedPlanetDestroyed {
 pub struct PlanetDestroyedCutscene {
     pub planet_id: ID,
 }
+
 #[derive(Message)]
-pub struct ReceivedAsteroidDestroyed{
-    pub planet_id: ID,
-}
+pub struct ReceivedAsteroidDestroyed;
 #[derive(Message)]
-pub struct AsteroidDestroyedCutscene{
-    pub planet_id: ID,
-}
+pub struct AsteroidDestroyedCutscene;
 #[derive(Message)]
 pub struct ReceivedPlanetState{
     pub planet_id: ID,

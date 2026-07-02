@@ -1,4 +1,3 @@
-use bevy::prelude::*;
 use bevy::color::Color;
 
 pub const KEYCAP_BACKGROUND_COLOR: Color = Color::srgba(0.0, 0.0, 0.0, 0.4); // transparent

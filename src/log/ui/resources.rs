@@ -3,7 +3,6 @@ use bevy::prelude::*;
 #[derive(Resource, Default)]
 pub struct DisplayedLogEntries {
     pub count: usize,
-    // pub last_rendered: usize,
 }
 
 #[derive(Resource)]

@@ -1,12 +1,10 @@
-use bevy::ecs::system::command::insert_resource;
 use bevy::prelude::*;
-use crate::app_state_manager::messages::SetupOrchestratorCompleted;
-use crate::app_states::AppState;
 use crate::app_states::AppState::*;
-use crate::setup_orchestrator::resources;
 use crate::setup_orchestrator::systems::*;
 use crate::setup_orchestrator::resources::*;
 
+/// This module is responsible for the initialization of the orchestrator and the communication channels. It runs after 'SetupSimulation' and before the actual simulation
+/// ensuring that the communication channels and the actual galaxy logic (handled in the orchestrator) is up and running for the GUI systems to interact with.
 pub struct SetupOrchestratorPlugin;
 
 impl Plugin for SetupOrchestratorPlugin {

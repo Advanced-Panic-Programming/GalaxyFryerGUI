@@ -135,10 +135,8 @@ pub fn update_log_ui(
     displayed.count = total_entries;
 
     // If autoscroll is active, we scroll the log and show the new messages
-    if auto_scroll.enabled {
-        if let Ok(mut scroll) = scroll_query.single_mut() {
-                scroll.y = displayed.count as f32 * (LOG_FONT_SIZE + LOG_ROW_GAP);
-        }
+    if auto_scroll.enabled && let Ok(mut scroll) = scroll_query.single_mut() {
+        scroll.y = displayed.count as f32 * (LOG_FONT_SIZE + LOG_ROW_GAP);
     }
 }
 
@@ -180,7 +178,7 @@ pub fn scroll_log_ui(
 
 pub fn cleanup_log_ui(
     mut commands: Commands,
-    query: Query<Entity, With<LogUI>>,
+    query: Query<Entity, (With<LogUI>, Without<ChildOf>)>,
     mut displayed: ResMut<DisplayedLogEntries>,
 ) {
     displayed.count = 0;

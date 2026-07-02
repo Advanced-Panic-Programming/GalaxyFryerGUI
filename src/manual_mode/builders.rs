@@ -34,6 +34,33 @@ pub(super) fn small_arrow_btn(
         });
 }
 
+pub(super) fn spinner_value_slot(
+    parent: &mut RelatedSpawnerCommands<ChildOf>,
+    font: Handle<Font>,
+    label: &str,
+    marker: impl Bundle,
+) {
+    parent
+        .spawn(Node {
+            width: Val::Px(SPINNER_VALUE_WIDTH),
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+            ..default()
+        })
+        .with_children(|b| {
+            b.spawn((
+                Text::new(label),
+                TextFont { font, font_size: FS_NM, ..default() },
+                TextColor(TEXT_VALUE),
+                TextLayout {
+                    linebreak: LineBreak::NoWrap,
+                    ..default()
+                },
+                marker,
+            ));
+        });
+}
+
 pub(super) fn action_btn(
     parent: &mut RelatedSpawnerCommands<ChildOf>,
     font: Handle<Font>,
@@ -62,6 +89,10 @@ pub(super) fn action_btn(
                 Text::new(label),
                 TextFont { font, font_size: FS_NM, ..default() },
                 TextColor(Color::WHITE),
+                TextLayout {
+                    linebreak: LineBreak::NoWrap,
+                    ..default()
+                }
             ));
         });
 }

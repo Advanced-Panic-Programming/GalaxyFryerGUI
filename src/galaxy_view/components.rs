@@ -2,6 +2,9 @@ use std::time::Duration;
 use bevy::prelude::*;
 
 #[derive(Component)]
+pub struct GalaxyMap;
+
+#[derive(Component)]
 pub struct SpawnedByGalaxyView;
 
 #[derive(Component)]
@@ -19,7 +22,6 @@ pub struct ExplorerArrow {
 pub struct AnimationConfig {
     pub(crate) first_sprite_index: usize,
     pub(crate) last_sprite_index: usize,
-    fps: u8,
     pub(crate) frame_timer: Timer,
 }
 
@@ -28,7 +30,6 @@ impl AnimationConfig {
         Self {
             first_sprite_index: first,
             last_sprite_index: last,
-            fps,
             frame_timer: Self::timer_from_fps(fps),
         }
     }

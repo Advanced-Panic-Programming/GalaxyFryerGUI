@@ -20,9 +20,6 @@ use crate::manual_mode::resources::Tab;
 pub struct ManualModePanelRoot;
 
 #[derive(Component)]
-pub struct TabBar;
-
-#[derive(Component)]
 pub struct TabButton {
     pub tab: Tab,
 }
@@ -31,9 +28,6 @@ pub struct TabButton {
 pub struct TabContent {
     pub tab: Tab,
 }
-
-#[derive(Component)]
-pub struct ContentArea;
 
 // ---------------------------------------------------------------
 //      Spinners Buttons

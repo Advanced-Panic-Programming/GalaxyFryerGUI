@@ -1,11 +1,11 @@
 use bevy::prelude::*;
-use crate::app_states::AppState;
 use crate::app_states::AppState::*;
 use crate::manual_mode::resources::*;
 use crate::manual_mode::systems::*;
 use crate::manual_mode::buttons_logic::*;
 use crate::manual_mode::gui_updates::*;
 
+/// This plugin handles the manual mode panel that allows to decide the destiny of the galaxy.
 pub struct ManualModePlugin;
 
 impl Plugin for ManualModePlugin {

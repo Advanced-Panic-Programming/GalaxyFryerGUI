@@ -3,6 +3,7 @@ use crate::app_states::AppState::{GalaxyView, PlanetView};
 use crate::legend::systems::*;
 use crate::setup_orchestrator::resources::CurrentOrchestratorMode;
 
+/// This plugin handles the commands legend in the top right corner. It's unrelated to other modules.
 pub struct LegendPlugin;
 
 impl Plugin for LegendPlugin {

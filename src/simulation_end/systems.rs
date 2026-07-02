@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use crate::galaxy_view::messages::ReceivedSimulationEnd;
 
 /// When the orchestrator sends the SimulationEnd message to the GUI, the app_state_manager system will
 /// generate the corresponding 'ReceivedSimulationEnd' event.

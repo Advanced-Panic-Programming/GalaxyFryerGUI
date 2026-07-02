@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 use crate::log::resources::LogMessage;
-use common_game::utils::ID;
 use galaxy_fryer::app::gui_protocol::OrchestratorToGUI::*;
-use crate::setup_orchestrator::resources::{FromOrchestrator, OrchestratorMode, ToOrchestrator};
+use crate::setup_orchestrator::resources::FromOrchestrator;
 use crate::galaxy_view::messages::*;
 
 /// This function manages the orchestrator messages and generates the corresponding events 
@@ -40,6 +39,12 @@ pub fn receive_from_orchestrator(
                 automatic_mode_writer.write(ReceivedAutomaticModeAck);
                 log.write(LogMessage::automatic_mode_ack());
             }
+            SendSunrayAck { p_id } => {
+                log.write(LogMessage::send_sunray_ack(p_id));
+            }
+            SendAsteroidAck { p_id } => {
+                log.write(LogMessage::send_asteroid_ack(p_id));
+            }
             SendPlanetState{p_id, planet_state} => {
                 planet_state_writer.write(ReceivedPlanetState{
                     planet_id: p_id,
@@ -56,9 +61,9 @@ pub fn receive_from_orchestrator(
             }
             SendAsteroidDestroyed{p_id} => {
                 // Generate in-game event
-                asteroid_destroyed_writer.write(ReceivedAsteroidDestroyed{planet_id: p_id});
+                asteroid_destroyed_writer.write(ReceivedAsteroidDestroyed);
                 // Activate cutscene
-                asteroid_destroyed_cutscene_writer.write(AsteroidDestroyedCutscene{planet_id: p_id});
+                asteroid_destroyed_cutscene_writer.write(AsteroidDestroyedCutscene);
                 // Log
                 log.write(LogMessage::asteroid_destroyed(p_id));
             }
@@ -90,8 +95,13 @@ pub fn receive_from_orchestrator(
             SendExplorerBag{explorer_id, bag} => {
                 explorer_bag_writer.write(ReceivedExplorerBag{ 
                     explorer_id,
-                    explorer_bag: bag,
+                    explorer_bag: bag.clone(),
                 });
+                // Prints in the log the explorer state (only explorer 2 has a state)
+                // The State is sent only the first time the explorer enters the state or when it changes state so that it doesn't print the same state multiple times
+                if let Some(state) = bag.get_state() {
+                    log.write(LogMessage::explorer_state(explorer_id, state));
+                }
             }
             SendKilledExplorer {explorer_id} => {
                 explorer_kill_writer.write(ReceivedKilledExplorer{explorer_id});

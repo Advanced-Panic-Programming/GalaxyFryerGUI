@@ -1,10 +1,11 @@
 use bevy::prelude::*;
-use bevy::window::{WindowMode, WindowResolution};
-use crate::app_states::AppState;
 use crate::app_states::AppState::*;
 use crate::setup_simulation::resources::*;
 use crate::setup_simulation::systems::*;
 
+/// This plugin initializes all the resources and loads all the assets needed during the simulation. It runs before every other systems 
+/// ensuring resources exist when needed
+/// Here are also handled the sfx systems that run independently of the current app state
 pub struct SetupSimulationPlugin;
 
 impl Plugin for SetupSimulationPlugin {
@@ -22,17 +23,30 @@ impl Plugin for SetupSimulationPlugin {
                     spawn_camera,
                     spawn_background,
                     init_galaxy_orbit,
+                    init_ui_scale,
                     init_planets_sprites_data_resource,
                     init_planets_data_resource,
                     init_selected_planet_resource,
+                    init_planet_terrain_sprites_resource,
                     init_explorer_sprites_resource,
-                )
+                    init_rocket_sprites_resource,
+                    init_energy_cell_sprites_resource,
+                    init_button_click_sound_resource,
+                    init_explosion_sound_resource,
+                    play_background_music,
+                ).chain()
             )
             // Update system: sends SetupSimulationCompleted Message -> AppStateManager will change app state
             // Bevy guarantees that "Update" systems will be executed only AFTER the "OnEnter" systems 
-            .add_systems(Update, finish_simulation_setup.run_if(in_state(SetupSimulation)))
             // ===== Update systems =====
-            .add_systems(Update, update_orbit_on_window_resized) // Runs even if the app is in a different state
+            .add_systems(Update, finish_simulation_setup.run_if(in_state(SetupSimulation)))
+            // This systems will run even after exiting SetupSimulation
+            .add_systems(Update, (
+                    update_ui_scale_on_resize,
+                    update_background_size_on_resize,
+                    play_sound_on_button_press,
+                )
+            )
         ;
     }
 }
