@@ -4,7 +4,8 @@ use crate::app_states::AppState::GalaxyView;
 use crate::galaxy_view;
 use crate::galaxy_view::messages::*;
 
-pub struct GalaxyViewPlugin;
+/// This plugin handles the 'GalaxyView' state and contains the systems that update the common resources: Planets, Explorers.
+pub struct GalaxyViewPlugin; 
 
 impl Plugin for GalaxyViewPlugin {
     fn build(&self, app: &mut App) {

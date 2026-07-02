@@ -3,6 +3,7 @@ use crate::pause_menu::systems::*;
 use bevy::prelude::*;
 use crate::setup_orchestrator::resources::ToOrchestrator;
 
+/// This plugin handles the pause menu.
 pub struct PauseMenuPlugin;
 
 impl Plugin for PauseMenuPlugin {

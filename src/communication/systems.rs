@@ -95,8 +95,13 @@ pub fn receive_from_orchestrator(
             SendExplorerBag{explorer_id, bag} => {
                 explorer_bag_writer.write(ReceivedExplorerBag{ 
                     explorer_id,
-                    explorer_bag: bag,
+                    explorer_bag: bag.clone(),
                 });
+                // Prints in the log the explorer state (only explorer 2 has a state)
+                // The State is sent only the first time the explorer enters the state or when it changes state so that it doesn't print the same state multiple times
+                if let Some(state) = bag.get_state() {
+                    log.write(LogMessage::explorer_state(explorer_id, state));
+                }
             }
             SendKilledExplorer {explorer_id} => {
                 explorer_kill_writer.write(ReceivedKilledExplorer{explorer_id});

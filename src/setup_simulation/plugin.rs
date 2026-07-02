@@ -3,6 +3,9 @@ use crate::app_states::AppState::*;
 use crate::setup_simulation::resources::*;
 use crate::setup_simulation::systems::*;
 
+/// This plugin initializes all the resources and loads all the assets needed during the simulation. It runs before every other systems 
+/// ensuring resources exist when needed
+/// Here are also handled the sfx systems that run independently of the current app state
 pub struct SetupSimulationPlugin;
 
 impl Plugin for SetupSimulationPlugin {

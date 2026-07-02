@@ -3,6 +3,8 @@ use crate::log::resources::*;
 use crate::log::systems::*;
 use crate::log::ui::plugin::LogUIPlugin;
 
+/// This plugin is responsible for showing the events in the log panel. Each system is responsible to generate its own events 'LogMessage'.
+/// This plugin then reads the events and shows them in the log.
 pub struct LogPlugin;
 
 impl Plugin for LogPlugin {

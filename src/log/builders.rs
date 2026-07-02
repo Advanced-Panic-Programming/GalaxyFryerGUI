@@ -32,6 +32,13 @@ impl LogMessage {
             message: format!("Explorer #{} | killed", explorer_id+1),
         }
     }
+    
+    pub fn explorer_state( explorer_id: ID, explorer_state: String) -> Self {
+        Self {
+            level: Basic,
+            message: format!("Explorer #{} is in state [{}]", explorer_id + 1, explorer_state),
+        }
+    }
 
     // Simulation
     pub fn automatic_mode_ack() -> Self {

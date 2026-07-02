@@ -20,6 +20,7 @@ fn digit_to_index(key: &KeyCode) -> Option<usize> {
     }
 }
 
+/// Handles keyboard buttons from 1 to 7 to switch to PlanetView
 pub fn app_states_affected_inputs(
     current_state: ResMut<State<AppState>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
@@ -42,6 +43,7 @@ pub fn app_states_affected_inputs(
     }
 }
 
+/// Handles inputs related to the 'pause_menu' module
 pub fn menu_updates_inputs(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     gui_to_orch: ResMut<ToOrchestrator>,
@@ -56,6 +58,7 @@ pub fn menu_updates_inputs(
     
 }
 
+/// Handles all the keyboard inputs in the legend apart from the 1-7 buttons
 pub fn game_related_inputs(
     current_state: ResMut<State<AppState>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,

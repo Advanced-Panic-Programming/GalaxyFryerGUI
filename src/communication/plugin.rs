@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::communication::systems::receive_from_orchestrator;
 use crate::setup_orchestrator::resources::FromOrchestrator;
 
-/// This plugin manages the messages received from the orchestrators and generates the corresponding Bevy events.
+/// This plugin manages the messages received from the orchestrators and generates the corresponding Bevy events for other systems to update avoiding racing conditions on messages.
 pub struct CommunicationPlugin;
 
 impl Plugin for CommunicationPlugin {

@@ -33,7 +33,7 @@ use crate::simulation_end::plugin::SimulationEndPlugin;
 fn main() {
 
     App::new()
-        // ===== Plugins ===== (MUST be before everything else)
+        // ===== Default Plugins ===== (MUST be before everything else)
         .add_plugins(DefaultPlugins
             .set(ImagePlugin::default_nearest())
             .set(WindowPlugin {
@@ -59,7 +59,7 @@ fn main() {
         .add_plugins(PlanetViewPlugin)
         .add_plugins(CutscenePlugin)
         .add_plugins(SimulationEndPlugin)
-        // States init
+        // AppStates init
         .init_state::<AppState>()
         // PostStartup -> Sets fullscreen after startup bc bevy is bugged
         .add_systems(PostStartup, set_fullscreen)

@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::app_states::AppState::PlanetView;
 use crate::planet_view::systems::*;
 
+/// This plugin handles the 'PlanetView' state
 pub struct PlanetViewPlugin;
 
 impl Plugin for PlanetViewPlugin {
