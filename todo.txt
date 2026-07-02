@@ -1,7 +1,0 @@
-!!! IMPORTANTE !!!
-I sistemi che utilizzano le risorse non inizializzate a valori di default DEVONO avere questo run_if:.run_if(resource_exists::<"nome_risorsa">)
-
-TODO:
-- e la riga del pianeta è più a sinistra del resto
-- Aggiungere log per azioni non possibili (move to planet fallita) e per start e stop explorer AI
-??? Aggiungi modulo aggiornamento dati: Ogni tot manda un messaggio all' orchestrator per aggiornare le risorse ???
