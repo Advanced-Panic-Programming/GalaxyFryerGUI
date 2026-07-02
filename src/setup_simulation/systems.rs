@@ -259,6 +259,16 @@ pub fn init_energy_cell_sprites_resource(
     })
 }
 
+pub fn play_background_music(
+    asset_server: Res<AssetServer>,
+    mut commands: Commands,
+) {
+    commands.spawn((
+        AudioPlayer::new(asset_server.load(SOUNDTRACK_PATH)),
+        PlaybackSettings::LOOP,
+    ));
+}
+
 // SetupSimulationEnd
 pub fn finish_simulation_setup(
     mut writer: MessageWriter<SetupSimulationCompleted>,

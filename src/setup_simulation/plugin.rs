@@ -28,6 +28,7 @@ impl Plugin for SetupSimulationPlugin {
                     init_explorer_sprites_resource,
                     init_rocket_sprites_resource,
                     init_energy_cell_sprites_resource,
+                    play_background_music,
                 ).chain()
             )
             // Update system: sends SetupSimulationCompleted Message -> AppStateManager will change app state
